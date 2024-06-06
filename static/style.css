@@ -1,0 +1,453 @@
+/* Googlefont Poppins CDN Link */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+.updateButton {
+    background-color: #4CAF50; /* Green background */
+    border: none;
+    color: white;
+    /* padding: 10px 20px; Add padding to make the button larger */
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer;
+    transition-duration: 0.4s; /* Smooth hover transition */
+    width: 150px; /* Adjust width as needed */
+}
+/* Hide refresh button by default */
+.updateButton {
+  display: none;
+}
+/* CSS for header section */
+.header {
+    color: white;
+    background: #0099ff; /* Blue background */
+    margin-bottom: 20px; /* Add margin between label-value-container elements */
+    display: flex; /* Use flexbox to arrange items horizontally */
+    align-items: center; /* Center items vertically */
+    //justify-content: space-between; /* Space items evenly */
+}
+/* Show refresh button when hovering over the hamburger menu icon */
+/* Hamburger icon */
+.sidebar-button {
+    position: relative; /* Ensure relative positioning for the container */
+}
+
+.sidebar-button i {
+  font-size: 30px; /* Larger font size for hamburger icon */
+  margin-top: 5px; /* Adjust vertical alignment as needed */
+}
+
+/* Menu items */
+.menu-items {
+  position: absolute;
+  top: calc(100% - 5px); /* Position slightly above the hamburger icon */
+  left: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  display: none; /* Hide menu items by default */
+  z-index: 1; /* Ensure menu items appear above other content */
+}
+
+.sidebar-button:hover .menu-items {
+  display: block; /* Show menu items when hovering over the hamburger menu icon */
+}
+/* Show menu items when either the sidebar button or menu items themselves are hovered over */
+.sidebar-button:hover .menu-items,
+.menu-items:hover {
+  display: block;
+}
+.menu-item {
+  display: block;
+  padding: 8px 20px; /* Adjust padding as needed */
+  color: #000; /* Adjust color as needed */
+  text-decoration: none; /* Remove underline */
+  font-size: 14px; /* Smaller font size for menu items */
+}
+
+.menu-item:hover {
+  background-color: #f0f0f0; /* Change background color on hover */
+}
+/* Close button */
+.close-button {
+  position: absolute;
+  top: 0px; /* Adjust top position as needed */
+  right: 0px; /* Adjust right position as needed */
+  padding: 2px;
+  cursor: pointer;
+  color: black; /* Set the color to black */
+}
+.label-value-container label {
+  margin-right: 10px;
+  background: #0099ff; /* Blue background */
+}
+
+.label-value-container span {
+  color: #000000;
+  background: #0099ff; /* Blue background */
+  font-weight: bold;
+}
+
+.label-value-container button.updateButton {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition-duration: 0.4s;
+  /* width: 100%; Make the button width 100% to fill the container */
+  /* padding: 10px; Add padding to the button */
+  /* margin-top: 5px; Add some top margin for separation */
+}
+
+.label-value-container button.updateButton:hover {
+  background-color: #45a049;
+}
+/* CSS for location info container */
+.location-info {
+    display: flex; /* Use flexbox to arrange items horizontally */
+    align-items: center; /* Center items vertically */
+}
+
+/* Label for time range */
+.location-info label {
+    margin-left: 10px; /* Add spacing between label and dropdown */
+}
+
+/* Dropdown button */
+.dropbtn {
+    background-color: #3498db;
+    color: white;
+    padding: 8px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    max-height: 40px;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    overflow-y: auto; /* Add scrollbar if content exceeds height */
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {
+    background-color: #2980b9;
+}
+
+.home-section{
+  position: relative;
+  background: #f5f5f5;
+  min-height: 100vh;
+  width: 100%;
+  left: 5px;
+  transition: all 0.5s ease;
+}
+.home-section nav{
+  display: flex;
+  justify-content: space-between;
+  height: 80px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  position: fixed;
+  width: 100%;
+  z-index: 100;
+  padding: 0 20px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  transition: all 0.5s ease;
+}
+.home-section .home-content{
+  position: relative;
+  padding-top: 10px;
+}
+.home-content .overview-boxes{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 0 20px;
+  margin-bottom: 26px;
+}
+/* four sensor boxes along the top */
+.overview-boxes .box{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% / 4 - 15px);
+  background: #fff;
+  padding: 15px 14px;
+  border-radius: 12px;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+/* Temperature/Humidity ... along the top */
+.overview-boxes .box-topic{
+  font-size: 20px;
+  font-weight: 500;
+}
+/* numbers and units ... along the top */
+.home-content .box .number{
+  display: inline-block;
+  font-size: 35px;
+  margin-top: -6px;
+  font-weight: 500;
+}
+.home-content .box .indicator{
+  display: flex;
+  align-items: center;
+}
+.home-content .box .indicator i{
+  height: 20px;
+  width: 20px;
+  background: #8FDACB;
+  line-height: 20px;
+  text-align: center;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 20px;
+  margin-right: 5px;
+}
+.box .indicator i.down{
+  background: #e87d88;
+}
+.home-content .box .indicator .text{
+  font-size: 12px;
+}
+.home-content .box .readings{
+  display: inline-block;
+  font-size: 32px;
+  height: 50px;
+  width: 50px;
+  line-height: 50px;
+  text-align: center;
+  color: #ff6666;
+  border-radius: 12px;
+  margin: -15px 0 0 6px;
+}
+.home-content .box .cart.two{
+   color: #2BD47D;
+   background: #C0F2D8;
+ }
+.home-content .box .cart.three{
+   color: #ffc233;
+   background: #ffe8b3;
+ }
+.home-content .box .cart.four{
+   color: #e05260;
+   background: #f7d4d7;
+ }
+.home-content .total-order{
+  font-size: 20px;
+  font-weight: 500;
+}
+.home-content .graph-box{
+  display: flex;
+  justify-content: space-between;
+}
+/* Main container with four graphs  */
+.home-content .graph-box .history-charts{
+  width: 100%;
+  background: #fff;
+  padding: 20px 30px;
+  margin: 0 20px;
+  border-radius: 12px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-flow: column wrap;
+}
+.home-content .graph-box .history-details{
+  display: flex;
+  justify-content: space-between; 
+}
+/* Default styles for history charts */
+.home-content .graph-box .history-details .history-col-item{
+  width: 100%;
+  display: flex;
+  /*flex-flow: column nowrap;*/
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap; /* Allow charts to wrap to the next line */
+}
+
+.graph-box .title{
+  font-size: 24px;
+  font-weight: 500;
+}
+/* Adjust individual history chart width for desktop */
+.home-content .graph-box .history-details .history-divs{
+  width: calc(50% - 20px); /* Adjust width for 2 charts in a row */
+  margin-right: 20px; /* Add space between charts */
+  margin-top: 20px;
+  border-radius: 12px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Right-hand container with four vertical gauges */
+.home-content .graph-box .gaugeCharts{
+  display: none;
+  width: 20%;
+  background: #fff;
+  padding: 0px 0px;
+  margin: 0 0px 0 0;
+  border-radius: 0px;
+}
+/* Reduce vertical spacing between gauge charts */
+.gauge-box {
+  margin-bottom: 0px; /* Adjust as needed */
+}
+
+.home-content .graph-box .gaugeCharts .gauge-list{
+  align-items: center;
+  flex-flow: column nowrap;
+}
+/* Adjustments for smaller screens */
+@media screen and (max-width: 768px) {
+  /* Your existing sidebar styles */
+/* New styles for top navigation and elements */
+  nav {
+    background: #0099ff; /* Blue background */
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+/* Adjust hamburger icon color */
+/* Show refresh button only in mobile view */
+@media screen and (max-width: 768px) {
+  .updateButton {
+    display: block; /* Show refresh button */
+  }  /* Show refresh button by default on mobile */
+  .updateButton {
+    display: block;
+  }
+  .dashboard {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .label-value-container {
+    background: #0099ff; /* Blue background */
+    flex-direction: column; /* Change direction to column for smaller screens */
+    align-items: center; /* Align fields to the center */
+    display: flex;
+  }
+  .label-value-container .dropdown {
+    margin-left: 20px; /* Add some space between latitude/longitude and dropdown */
+  }
+
+  .label-value-container label,
+  .label-value-container span,
+  .label-value-container button.updateButton {
+    width: 100%; /* Set width to 100% for full width on smaller screens */
+    margin: 5px 0; /* Add vertical margin between elements */
+  }
+
+  .button-container {
+    background: #0099ff; /* Blue background */
+    display: flex;
+    flex-direction: column; /* Change direction to column for smaller screens */
+    align-items: center; /* Align buttons to the center */
+  }
+
+  .button-container button.updateButton {
+    width: calc(100% - 20px); /* Subtract padding from the button width */
+  }
+
+  
+
+  /* Display overview boxes in a column */
+  .home-content .overview-boxes {
+    flex-direction: column;
+    align-items: center;
+    display: none;
+  }
+
+  /* Adjust individual box width */
+  .home-content .overview-boxes .box {
+    width: calc(100% * 4); /* Adjust width as needed */
+    margin-bottom: 20px; /* Add bottom margin between boxes */
+  }
+
+  /* Display gauge charts above history charts */
+  .home-content .graph-box .gaugeCharts {
+    width: 100%; /* Set width to 100% */
+    margin-top: 20px; /* Add top margin */
+    display: flex;
+    align-items: center;
+  }
+
+  .home-content .graph-box .gaugeCharts .gauge-list{
+    align-items: center;
+    flex-flow: column nowrap;
+  }
+  /* Adjust individual gauge chart width */
+  .home-content .graph-box .gaugeCharts .gauge-box {
+    width: 100%; /* Adjust width as needed */
+    margin-bottom: 20px; /* Add bottom margin between charts */
+  }
+  /* Hide history charts on mobile */
+  .home-content .graph-box .history-charts {
+    display: none;
+  }
+  /* Display history charts in a column */
+  .home-content .graph-box .history-charts .history-col-item {
+    flex-direction: column; /* Change to column layout */
+  }
+
+  /* Adjust individual history chart width for mobile */
+  .home-content .graph-box .history-charts .history-divs {
+  width: 100%; /* Set width to 100% for mobile devices */
+  margin-bottom: 20px; /* Add bottom margin between charts */
+  }
+  /* Make Plotly charts responsive */
+  .plotly-graph-div {
+    width: 100% !important; /* Override Plotly's fixed width */
+  }
+  /* Hide the .ddn box label in mobile mode */
+  label[for="time-range"] {
+    display: none;
+  }
+  /* Hide the .ddn box in mobile mode */
+  .dropdown {
+    display: none;
+  }
+}

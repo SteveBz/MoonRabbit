@@ -1,0 +1,39 @@
+{
+    "device_id": "UK00001",
+    "lat": "51",
+    "long": ".001",
+    "sensor_co2": "scd30",
+    "sensor_pressure": "bme280",
+    "last_calibration_date": 0,
+    "last_calibration_value": 0,
+    "time_intervals": {
+        "month": {
+            "co2": 0,
+            "temperature": 0,
+            "humidity": 0,
+            "pressure": 0,
+            "count": 0
+        },
+        "min": {
+            "co2": [],
+            "temperature": [],
+            "humidity": [],
+            "pressure": []
+        },
+        "hour": {
+            "co2": 0,
+            "temperature": 0,
+            "humidity": 0,
+            "pressure": 0,
+            "count": 0
+        },
+        "days": {
+            "co2": 400,
+            "temperature": 20,
+            "humidity": 40,
+            "pressure": 1000,
+            "count": 0
+        }
+    }
+}
+

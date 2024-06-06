@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>The Carbon Project - Moon Rabbit</title>
+    <link
+      href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="static/style.css" />
+    <script src="https://cdn.plot.ly/plotly-2.16.1.min.js"></script>
+  </head>
+  <body>
+    <header class="header">
+    <nav>
+      <div class="sidebar-button" onclick="toggleMenu()">
+        <i class="bx bx-menu"></i> <!-- Hamburger menu icon -->
+        <div class="menu-items">
+          <div class="close-button" onclick="toggleMenu()">X</div> <!-- Close button -->
+          <a href="#" class="menu-item" onclick="updateLat()">Update Latitude</a>
+          <a href="#" class="menu-item" onclick="updateLong()">Update Longitude</a>
+          <a href="#" class="menu-item" onclick="loadGlobalCO2()">Global CO2 Concentrations</a> <!-- New menu item -->
+          <a href="#" class="menu-item" onclick="handleRebootClick()">Reboot sensor</a> <!-- Reboot button -->
+        </div>
+      </div>
+    </nav>
+    <div class="label-value-container">
+        <div class="location-info">
+            <label>Latitude:</label>
+            <span id="latitude">0.0000</span>
+            <label>Longitude:</label>
+            <span id="longitude">0.0000</span>
+            <label for="time-range">Select Time Range:</label>
+            <div class="dropdown">
+                <button class="dropbtn">Choose</button>
+                <div class="dropdown-content">        
+                  <a href="#" data-value="pause">Pause</a>
+                  <a href="#" data-value="realtime">Realtime</a>
+                  <a href="#" data-value="1_hour">1 Hour</a>
+                  <a href="#" data-value="1_day">1 Day</a>
+                  <a href="#" data-value="1_week">1 Week</a>
+                  <a href="#" data-value="1_month">1 Month</a>
+                  <a href="#" data-value="1_year">1 Year</a>
+                  <a href="#" data-value="10_years">10 Years</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </header>
+    <section class="home-section">
+
+      <div class="home-content">
+        <div class="overview-boxes">
+          <div class="box">
+            <div class="right-side">
+              <div class="box-topic">Temperature</div>
+              <div class="number" id="temperature"></div>
+            </div>
+            <i class="bx bxs-thermometer readings"></i>
+          </div>
+          <div class="box">
+            <div class="right-side">
+              <div class="box-topic">Humidity</div>
+              <div class="number" id="humidity"></div>
+            </div>
+            <i class="bx bxs-droplet-half readings two"></i>
+          </div>
+          <div class="box">
+            <div class="right-side">
+              <div class="box-topic">Pressure</div>
+              <div class="number" id="pressure"></div>
+            </div>
+            <i class="bx bxs-tachometer readings three"></i>
+          </div>
+          <div class="box">
+            <div class="right-side">
+              <div class="box-topic">Carbon Dioxide</div>
+              <div class="number" id="co2"></div>
+            </div>
+            <i class="bx bxs-building readings four"></i>
+          </div>
+        </div>
+        <div class="graph-box">
+          <div class="history-charts">
+            <div class="title">History Charts</div>
+            <div class="history-details">
+              <div class="history-col-item">
+                <div id="co2-history" class="history-divs"></div>
+                <div id="temperature-history" class="history-divs"></div>
+                <div id="humidity-history" class="history-divs"></div>
+                <div id="pressure-history" class="history-divs"></div>
+              </div>
+            </div>
+          </div>
+          <div class="gaugeCharts">
+            <div class="gauge-list">
+              <div class="gauge-box"><div id="co2-gauge"></div></div>
+              <div class="gauge-box"><div id="temperature-gauge"></div></div>
+              <div class="gauge-box"><div id="humidity-gauge"></div></div>
+              <div class="gauge-box"><div id="pressure-gauge"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script src="static/main.js"></script>
+  </body>
+</html>
