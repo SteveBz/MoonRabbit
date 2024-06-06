@@ -9,6 +9,7 @@ A Raspberry Pi powered CO2 monitoring station using Python and Flask
 sudo apt-get update && sudo apt-get upgrade -y
 sudo apt-get install supervisor -y
 sudo cp *.conf /etc/supervisor/conf.d/
+sudo apt-get install sqlite3
 
 git clone https://github.com/SteveBz/MoonRabbit
 cd MoonRabbit/
