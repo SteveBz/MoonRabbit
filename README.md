@@ -5,6 +5,7 @@ A Raspberry Pi powered CO2 monitoring station using Python and Flask
 ## Write Up:  
 
 # MoonRabbit
+```
 sudo apt-get update && sudo apt-get upgrade -y
 sudo apt-get install supervisor -y
 sudo cp *.conf /etc/supervisor/conf.d/
@@ -22,6 +23,10 @@ pip3 install adafruit-blinka
 pip3 install adafruit-circuitpython-scd30
 pip3 install pandas
 pip3 install requests
+```
+
 sudo nano /etc/supervisor/supervisord.conf
+```
 [inet_http_server]
 port=*:9001
+```
