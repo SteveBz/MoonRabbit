@@ -10,6 +10,7 @@ sudo apt-get update && sudo apt-get upgrade -y
 sudo apt-get install supervisor -y
 sudo cp *.conf /etc/supervisor/conf.d/
 sudo apt-get install sqlite3
+sudo apt-get install sqlitebrowser
 
 git clone https://github.com/SteveBz/MoonRabbit
 cd MoonRabbit/
