@@ -8,6 +8,7 @@
     "last_calibration_value": 0,
     "time_intervals": {
         "month": {
+            "start": "2000-06-06T22:11:28.935968",
             "co2": 0,
             "temperature": 0,
             "humidity": 0,
@@ -15,12 +16,14 @@
             "count": 0
         },
         "min": {
+            "start": "2000-06-06T22:11:28.935968",
             "co2": [],
             "temperature": [],
             "humidity": [],
             "pressure": []
         },
         "hour": {
+            "start": "2000-06-06T22:11:28.935968",
             "co2": 0,
             "temperature": 0,
             "humidity": 0,
@@ -28,6 +31,7 @@
             "count": 0
         },
         "days": {
+            "start": "2000-06-06T22:11:28.935968",
             "co2": 400,
             "temperature": 20,
             "humidity": 40,
