@@ -30,7 +30,7 @@
             "pressure": 0,
             "count": 0
         },
-        "days": {
+        "day": {
             "start": "2000-06-06T22:11:28.935968",
             "co2": 400,
             "temperature": 20,
