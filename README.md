@@ -1,10 +1,13 @@
 # raspberry-pi-scd30-bme280-CO2-monitor-flask-python
 A Raspberry Pi powered CO2 monitoring station using Python and Flask  
 
+## MoonRabbit
 
-## Write Up:  
+# Set up WiFi or Network
 
-# MoonRabbit
+# Set up SSH
+
+# Via SSH
 
 sudo nano /etc/supervisor/supervisord.conf
 ```
