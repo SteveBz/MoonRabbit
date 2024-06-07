@@ -41,7 +41,7 @@ Swap size has changed
 
 ### Supervisord
 
-Supervisord allows remore control of the software on the Raspberry Pi Zero 2 W from a prowser on the same WiFi LAN.
+Supervisord allows remore control of the software on the Raspberry Pi Zero 2 W from a browser on the same WiFi LAN.
 
 Install Supervisord
 ```
