@@ -41,7 +41,7 @@ Swap size has changed
 
 ### Supervisord
 
-Supervisord allows remore control of the software on the Raspberry Pi 0 W from a prowser on the same WiFi LAN.
+Supervisord allows remore control of the software on the Raspberry Pi Zero 2 W from a prowser on the same WiFi LAN.
 
 Install Supervisord
 ```
@@ -60,6 +60,8 @@ port=*:9001
 ```
 
 ### Enable hardware interfaces in the Raspberry Pi configuration
+IIC or I2C (I-squared-C, or I-two-C), is the interface that links all the sensors to the Raspberry Pi Zero 2 W
+
 sudo nano /boot/firmware/config.txt
 
 ```
