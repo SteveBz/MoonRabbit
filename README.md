@@ -32,3 +32,13 @@ sudo nano /etc/supervisor/supervisord.conf
 [inet_http_server]
 port=*:9001
 ```
+sudo nano /boot/firmware/config.txt
+```
+# Uncomment some or all of these to enable the optional hardware interfaces
+dtparam=i2c_arm=on
+#dtparam=i2s=on
+dtparam=spi=on
+
+# Set I2C Clock Speed
+dtparam=i2c_arm_baudrate=10000
+```
