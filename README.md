@@ -1,14 +1,16 @@
 # raspberry-pi-scd30-bme280-CO2-monitor-flask-python
 A Raspberry Pi powered CO2 monitoring station using Python and Flask  
 
-# MoonRabbit
+# MoonRabbit setup
 
-## Set up WiFi or Network
+## Via a keyboard, mouse and screen through the rpi0 OTG port
 
-## Set up SSH
+### Set up WiFi or Network
+
+### Set up SSH
 
 ## Via SSH
-## Fix swap memory default
+### Fix swap memory default
 Run swapon command
 ```
 swapon
