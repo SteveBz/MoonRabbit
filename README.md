@@ -20,7 +20,6 @@ pip3 install flask
 pip3 install flask-cors
 pip3 install smbus2
 pip3 install RPi.bme280
-install wheel package??
 pip3 install adafruit-blinka
 pip3 install adafruit-circuitpython-scd30
 pip3 install pandas
