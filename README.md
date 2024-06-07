@@ -53,7 +53,7 @@ Add the following lines to enable the web interface
 port=*:9001
 ```
 
-## Enable hardware interfaces in the Raspberry Pi configuration
+### Enable hardware interfaces in the Raspberry Pi configuration
 sudo nano /boot/firmware/config.txt
 
 ```
@@ -67,7 +67,7 @@ dtparam=spi=on
 dtparam=i2c_arm_baudrate=10000
 ```
 
-## Install Software
+### Install Software
 ```
 # Clone the project repository
 git clone https://github.com/SteveBz/MoonRabbit
