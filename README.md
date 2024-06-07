@@ -39,6 +39,10 @@ swapon
 ```
 Swap size has changed
 
+### Supervisord
+
+Supervisord allows remore control of the software on the Raspberry Pi 0 W from a prowser on the same WiFi LAN.
+
 Install Supervisord
 ```
 # Install necessary packages
