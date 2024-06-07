@@ -15,10 +15,11 @@ swapon
 > NAME      TYPE  SIZE   USED PRIO
 > var/swap file 100M 100M   -2
 ```
-```
+
 Swap Memory is 100 MB
 ```
 sudo nano /etc/dphys-swapfile
+```
 Change to swap size to 1024 MB
 ```
 CONF_SWAPSIZE=1024
@@ -34,6 +35,7 @@ swapon
 > var/swap file 1024M 377.8M   -2
 ```
 Swap size has changed
+
 Install Supervisord
 ```
 # Install necessary packages
