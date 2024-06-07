@@ -73,7 +73,7 @@ dtparam=spi=on
 dtparam=i2c_arm_baudrate=10000
 ```
 
-### Install Software
+### Install Moon Rabbit Software
 ```
 # Clone the project repository
 git clone https://github.com/SteveBz/MoonRabbit
