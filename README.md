@@ -38,20 +38,15 @@ dtparam=i2c_arm_baudrate=10000
 sudo apt-get update && sudo apt-get upgrade -y
 # Install necessary packages
 sudo apt-get install -y supervisor sqlite3 sqlitebrowser
-
+# Clone the project repository
 git clone https://github.com/SteveBz/MoonRabbit
 cd MoonRabbit/
+# Set up Python virtual environment and activate it
 python3 -m venv venv
 . venv/bin/activate
-pip3 install flask
-pip3 install flask-cors
-pip3 install smbus2
-pip3 install RPi.bme280
-pip3 install adafruit-blinka
-pip3 install adafruit-circuitpython-scd30
-pip3 install pandas
-pip3 install requests
-
+# Install required Python packages within the virtual environment
+pip install flask flask-cors smbus2 RPi.bme280 adafruit-blinka adafruit-circuitpython-scd30 pandas requests
+# Copy Supervisor configuration files
 sudo cp *.conf /etc/supervisor/conf.d/
 ```
 
