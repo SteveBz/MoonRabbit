@@ -72,6 +72,7 @@ class SensorModule:
     def get_sensor_readings(self):
         #print ("get_sensor_readings")
         self.co2_val = self.read_co2()
+        # Allow for zero value temp or hum in BME280
         if self.humidity_val==0 and self.hum != 0:
             self.humidity_val=self.hum
         if self.temperature_val==0 and self.hum != 0:
