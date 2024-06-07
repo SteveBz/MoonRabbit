@@ -9,7 +9,10 @@ A Raspberry Pi powered CO2 monitoring station using Python and Flask
 
 # Via SSH
 
+# Edit Supervisor configuration to allow web interface
 sudo nano /etc/supervisor/supervisord.conf
+
+# Add the following lines to enable the web interface
 ```
 [inet_http_server]
 port=*:9001
