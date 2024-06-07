@@ -70,7 +70,7 @@ dtparam=i2c_arm_baudrate=10000
 # Update and upgrade the system packages
 sudo apt-get update && sudo apt-get upgrade -y
 # Install necessary packages
-sudo apt-get install -y supervisor sqlite3 sqlitebrowser
+sudo apt-get install -y sqlite3 sqlitebrowser
 # Clone the project repository
 git clone https://github.com/SteveBz/MoonRabbit
 cd MoonRabbit/
