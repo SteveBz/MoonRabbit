@@ -41,7 +41,7 @@ Install Supervisord
 sudo apt-get install -y supervisor 
 # Copy Supervisor configuration files
 sudo cp *.conf /etc/supervisor/conf.d/
-## Edit Supervisor configuration to allow web interface
+# Edit Supervisor configuration to allow web interface
 sudo nano /etc/supervisor/supervisord.conf
 ```
 
