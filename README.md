@@ -9,6 +9,7 @@ A Raspberry Pi powered CO2 monitoring station using Python and Flask
 
 ## Via SSH
 ## Fix swap memory default
+Run swapon command
 ```
 swapon
 > NAME      TYPE  SIZE   USED PRIO
