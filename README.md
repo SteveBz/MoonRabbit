@@ -38,11 +38,11 @@ Swap size has changed
 Install Supervisord
 ```
 # Install necessary packages
-sudo apt-get install -y supervisor 
-# Copy Supervisor configuration files
-sudo cp *.conf /etc/supervisor/conf.d/
-# Edit Supervisor configuration to allow web interface
-sudo nano /etc/supervisor/supervisord.conf
+sudo apt-get install -y supervisor
+# Update and upgrade the system packages
+sudo apt-get update && sudo apt-get upgrade -y
+# Install necessary packages
+sudo apt-get install -y sqlite3 sqlitebrowser
 ```
 
 Add the following lines to enable the web interface
@@ -67,19 +67,17 @@ dtparam=i2c_arm_baudrate=10000
 
 ## Install Software
 ```
-# Update and upgrade the system packages
-sudo apt-get update && sudo apt-get upgrade -y
-# Install necessary packages
-sudo apt-get install -y sqlite3 sqlitebrowser
 # Clone the project repository
 git clone https://github.com/SteveBz/MoonRabbit
 cd MoonRabbit/
 # Set up Python virtual environment and activate it
 python3 -m venv venv
 . venv/bin/activate
-# Install required Python packages within the virtual environment
-pip install flask flask-cors smbus2 RPi.bme280 adafruit-blinka adafruit-circuitpython-scd30 pandas requests
 # Copy Supervisor configuration files
 sudo cp *.conf /etc/supervisor/conf.d/
+# Edit Supervisor configuration to allow web interface
+sudo nano /etc/supervisor/supervisord.conf
+# Install required Python packages within the virtual environment
+pip install flask flask-cors smbus2 RPi.bme280 adafruit-blinka adafruit-circuitpython-scd30 pandas requests
 ```
 
