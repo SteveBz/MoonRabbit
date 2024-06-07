@@ -11,6 +11,8 @@ A Raspberry Pi powered CO2 monitoring station using Python and Flask
 
 ## Via SSH
 ### Fix swap memory default
+The initial default, virtual memory allocation is very small.  You need to expand it to allow many things, such as updating software.
+
 Run swapon command
 ```
 swapon
