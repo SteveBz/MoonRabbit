@@ -21,9 +21,9 @@ port=*:9001
 # Enable hardware interfaces in the Raspberry Pi configuration
 sudo nano /boot/firmware/config.txt
 
-Uncomment  or add these lines to enable the hardware interfaces
-
 ```
+# Uncomment  or add these lines to enable the hardware interfaces
+
 dtparam=i2c_arm=on
 #dtparam=i2s=on
 dtparam=spi=on
