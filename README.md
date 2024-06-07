@@ -1,15 +1,15 @@
 # raspberry-pi-scd30-bme280-CO2-monitor-flask-python
 A Raspberry Pi powered CO2 monitoring station using Python and Flask  
 
-## MoonRabbit
+# MoonRabbit
 
-# Set up WiFi or Network
+## Set up WiFi or Network
 
-# Set up SSH
+## Set up SSH
 
-# Via SSH
+## Via SSH
 
-# Edit Supervisor configuration to allow web interface
+## Edit Supervisor configuration to allow web interface
 sudo nano /etc/supervisor/supervisord.conf
 
 Add the following lines to enable the web interface
@@ -18,7 +18,7 @@ Add the following lines to enable the web interface
 port=*:9001
 ```
 
-# Enable hardware interfaces in the Raspberry Pi configuration
+## Enable hardware interfaces in the Raspberry Pi configuration
 sudo nano /boot/firmware/config.txt
 
 ```
@@ -32,7 +32,7 @@ dtparam=spi=on
 dtparam=i2c_arm_baudrate=10000
 ```
 
-# Install Software
+## Install Software
 ```
 # Update and upgrade the system packages
 sudo apt-get update && sudo apt-get upgrade -y
