@@ -32,7 +32,7 @@ dtparam=spi=on
 dtparam=i2c_arm_baudrate=10000
 ```
 
-
+# Install Software
 ```
 # Update and upgrade the system packages
 sudo apt-get update && sudo apt-get upgrade -y
