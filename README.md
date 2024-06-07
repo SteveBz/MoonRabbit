@@ -15,12 +15,11 @@ swapon
 > NAME      TYPE  SIZE   USED PRIO
 > var/swap file 100M 100M   -2
 ```
-
 Swap Memory is 100 MB
 ```
 sudo nano /etc/dphys-swapfile
 ```
-Change to swap size to 1024 MB
+Change swap size to 1024 MB
 ```
 CONF_SWAPSIZE=1024
 ```
@@ -28,7 +27,7 @@ Reboot
 ```
 sudo reboot
 ```
-Check swapsize
+Check swapsize again
 ```
 swapon
 > NAME      TYPE  SIZE   USED PRIO
