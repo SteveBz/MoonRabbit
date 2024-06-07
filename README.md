@@ -8,6 +8,31 @@ A Raspberry Pi powered CO2 monitoring station using Python and Flask
 ## Set up SSH
 
 ## Via SSH
+## Fix swap memory default
+```
+swapon
+> NAME      TYPE  SIZE   USED PRIO
+> var/swap file 100M 100M   -2
+```
+```
+Swap Memory is 100 MB
+```
+sudo nano /etc/dphys-swapfile
+Change to swap size to 1024 MB
+```
+CONF_SWAPSIZE=1024
+```
+Reboot
+```
+sudo reboot
+```
+Check swapsize
+```
+swapon
+> NAME      TYPE  SIZE   USED PRIO
+> var/swap file 1024M 377.8M   -2
+```
+Swap size has changed
 
 ## Edit Supervisor configuration to allow web interface
 sudo nano /etc/supervisor/supervisord.conf
