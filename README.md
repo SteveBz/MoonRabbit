@@ -33,9 +33,15 @@ swapon
 > var/swap file 1024M 377.8M   -2
 ```
 Swap size has changed
-
+Install Supervisord
+```
+# Install necessary packages
+sudo apt-get install -y supervisor 
+# Copy Supervisor configuration files
+sudo cp *.conf /etc/supervisor/conf.d/
 ## Edit Supervisor configuration to allow web interface
 sudo nano /etc/supervisor/supervisord.conf
+```
 
 Add the following lines to enable the web interface
 ```
