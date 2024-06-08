@@ -27,7 +27,8 @@ Change swap size to 1024 MB
 ```
 CONF_SWAPSIZE=1024
 ```
-Reboot
+Use Control-s to save the changes and control-x to exit nano.
+Then reboot Moon Rabbit, to apply the changes.
 ```
 sudo reboot
 ```
