@@ -118,3 +118,5 @@ Eg, like this, substituting your address for the example.
 192.168.1.61:5000
 192.168.1.61:9001
 ```
+raw.githubusercontent.com/SteveBz/MoonRabbit/blob/main/Screenshot%202024-06-08%20091042.png
+raw.githubusercontent.com/SteveBz/MoonRabbit/blob/main/Screenshot%202024-06-08%20091122.png
