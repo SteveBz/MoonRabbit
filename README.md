@@ -5,9 +5,17 @@ A Raspberry Pi powered CO2 monitoring station using Python and Flask
 
 ## Via a keyboard, mouse and screen through the rpi0 OTG port
 
+Connect your keyboard and mouse to the OTG port via a OTG (On-The-Go) USB hub with a micro USB plug. Connect the monitor to the mini-HDMI port and boot by plugging the power cable in.  
+
 ### Set up WiFi or Network
 
-### Set up SSH
+Connect to the WiFi using the icon at the top right of the screen.
+
+### Set up SSH & I2C
+
+Menu>Preferences>Praspberry Pi Configuration>Interface>SSH
+
+Menu>Preferences>Praspberry Pi Configuration>Interface>SSH
 
 ## Via SSH
 ### Fix swap memory default
