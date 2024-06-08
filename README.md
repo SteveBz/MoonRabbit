@@ -15,7 +15,7 @@ Connect to the WiFi using the icon at the top right of the screen.
 
 Menu>Preferences>Praspberry Pi Configuration>Interface>SSH
 
-Menu>Preferences>Praspberry Pi Configuration>Interface>SSH
+Menu>Preferences>Praspberry Pi Configuration>Interface>I2C
 
 ## Via SSH
 ### Fix swap memory default
