@@ -106,6 +106,8 @@ Then reboot Moon Rabbit.
 ```
 sudo reboot
 ```
+
+### Test Moon Rabbit in a browser
 Navigate to a browser, open two tabs and type in the following IP adresesses:
 ```
 <your ip address>:5000
