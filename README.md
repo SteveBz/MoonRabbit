@@ -111,6 +111,7 @@ Navigate to a browser, open two tabs and type in the following IP adresesses:
 <your ip address>:5000
 <your ip address>:9001
 ```
+Eg, like this, substituting your address for the example.
 ```
 192.168.1.61:5000
 192.168.1.61:9001
