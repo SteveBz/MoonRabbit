@@ -54,12 +54,14 @@ sudo apt-get update && sudo apt-get upgrade -y
 sudo apt-get install -y sqlite3 sqlitebrowser
 ```
 
+# Edit Supervisor configuration to allow web interface
+sudo nano /etc/supervisor/supervisord.conf
 Add the following lines to enable the web interface
 ```
 [inet_http_server]
 port=*:9001
 ```
-
+Use Control-s to save the changes and control-x to exit nano.
 ### Enable hardware interfaces in the Raspberry Pi configuration
 IIC or I2C (I-squared-C, or I-two-C), is the interface that links all the sensors to the Raspberry Pi Zero 2 W
 
@@ -90,8 +92,6 @@ python3 -m venv venv
 . venv/bin/activate
 # Copy Supervisor configuration files
 sudo cp *.conf /etc/supervisor/conf.d/
-# Edit Supervisor configuration to allow web interface
-sudo nano /etc/supervisor/supervisord.conf
 # Install required Python packages within the virtual environment
 pip install flask flask-cors smbus2 RPi.bme280 adafruit-blinka adafruit-circuitpython-scd30 pandas requests
 ```
