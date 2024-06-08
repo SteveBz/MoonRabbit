@@ -95,4 +95,23 @@ sudo cp *.conf /etc/supervisor/conf.d/
 # Install required Python packages within the virtual environment
 pip install flask flask-cors smbus2 RPi.bme280 adafruit-blinka adafruit-circuitpython-scd30 pandas requests
 ```
+Find out the IP address of your raspberry pi from
+```
+(venv) pi@raspberrypi:~ $ ifconfig | grep 192
+        inet 192.168.1.61  netmask 255.255.255.0  broadcast 192.168.1.255
+```
+And it's the address of the format 192.168, but not ending 255, so in this case its 192.168.1.61
 
+Then reboot Moon Rabbit.
+```
+sudo reboot
+```
+Navigate to a browser, open two tabs and type in the following IP adresesses:
+<your ip address>:5000
+
+<your ip address>:9001
+
+```
+192.168.1.61:5000
+192.168.1.61:9001
+```
