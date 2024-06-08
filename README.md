@@ -75,7 +75,11 @@ dtparam=spi=on
 # Set I2C Clock Speed
 dtparam=i2c_arm_baudrate=10000
 ```
-
+Use Control-s to save the changes and control-x to exit nano.
+Then reboot Moon Rabbit, to apply the changes.
+```
+sudo reboot
+```
 ### Install Moon Rabbit Software
 ```
 # Clone the project repository
