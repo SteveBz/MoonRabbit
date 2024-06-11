@@ -1,3 +1,0 @@
-__main__
-periodic_task
-while True 1
