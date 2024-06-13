@@ -49,7 +49,7 @@ class SensorModule:
         # Commit the changes and close the connection
         db_manager.conn.commit()
         db_manager.conn.close()
-        config_manager = ConfigManager()
+        config_manager = ConfigManager("config.json")
         self.lat=config_manager.get_lat()
         self.long=config_manager.get_long()
         self.device=config_manager.get_device_id()
@@ -70,7 +70,7 @@ class SensorModule:
             self.bus.close()
         
     def get_sensor_readings(self):
-        #print ("get_sensor_readings")
+        print ("get_sensor_readings")
         self.co2_val = self.read_co2()
         # Allow for zero value temp or hum in BME280
         if self.humidity_val==0 and self.hum != 0:
@@ -78,13 +78,14 @@ class SensorModule:
         if self.temperature_val==0 and self.hum != 0:
             self.temperature_val=self.temp
         #print(1)
-        config_manager = ConfigManager()
+        #config_manager = ConfigManager()
+        sensor_values = ConfigManager("sensor_values.json")
         db_manager = DatabaseManager('measurement.db')
         db_manager.insert_measurement(self.device, 'scd30', self.lat, self.long, 'co2', self.co2_val)
         db_manager.insert_measurement(self.device, 'bme280', self.lat, self.long, 'humidity', self.humidity_val)
         db_manager.insert_measurement(self.device, 'bme280', self.lat, self.long, 'pressure', self.pressure_val)
         db_manager.insert_measurement(self.device, 'bme280', self.lat, self.long, 'temperature', self.temperature_val)
-        config=config_manager.set_time_interval_values(datetime.now().isoformat(), 
+        config=sensor_values.set_time_interval_values(datetime.now().isoformat(), 
                                                               {'co2':self.co2_val,
                                                               'humidity':self.humidity_val,
                                                               'pressure': self.pressure_val,
@@ -96,7 +97,7 @@ class SensorModule:
         if datetime.now()> end_mins:
             interval="min"
             self.aggregate_interval("sensor_measurement_mins", interval, mean_time, config, db_manager)
-            config=config_manager.remove_interval(interval)
+            config=sensor_values.remove_interval(interval)
         
         start_time = datetime.fromisoformat(config["time_intervals"]["hour"]["start"])
         end_mins = (start_time + timedelta(hours=1)).replace(microsecond=0)      
@@ -104,7 +105,7 @@ class SensorModule:
         if datetime.now()> end_mins:
             interval="hour"
             self.aggregate_interval("sensor_measurement_hours", interval, mean_time, config, db_manager)
-            config=config_manager.remove_interval(interval)
+            config=sensor_values.remove_interval(interval)
             
         start_time = datetime.fromisoformat(config["time_intervals"]["day"]["start"])
         end_mins = (start_time + timedelta(days=1)).replace(microsecond=0)      
@@ -112,7 +113,7 @@ class SensorModule:
         if datetime.now()> end_mins:
             interval="day"
             self.aggregate_interval("sensor_measurement_days", interval, mean_time, config, db_manager)
-            config=config_manager.remove_interval(interval)
+            config=sensor_values.remove_interval(interval)
 
         # Commit the changes and close the connection
         db_manager.conn.commit()

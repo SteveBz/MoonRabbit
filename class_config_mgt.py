@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 import fcntl
 
 class ConfigManager:
-    def __init__(self):
-        self.config_file = 'config.json'
+    def __init__(self, file='config.json'):
+        self.config_file = file
         self.config = self.load_config()
 
     def load_config(self):
