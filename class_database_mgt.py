@@ -11,7 +11,7 @@ import json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-from class_sqlite_dagnostic import SQLiteDiagnostic
+from class_sqlite_diagnostic import SQLiteDiagnostic
 class DatabaseManager:
     def __init__(self, db_file):
         """
