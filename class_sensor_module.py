@@ -50,10 +50,10 @@ class SensorModule:
         self.co2 = None
         
         #print ("calling DatabaseManager")
-        db_manager = DatabaseManager('measurement.db')
+        #db_manager = DatabaseManager('measurement.db')
         # Commit the changes and close the connection
-        db_manager.conn.commit()
-        db_manager.conn.close()
+        #db_manager.conn.commit()
+        #db_manager.conn.close()
         config_manager = ConfigManager("config.json")
         self.lat=config_manager.get_lat()
         self.long=config_manager.get_long()
