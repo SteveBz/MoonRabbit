@@ -101,7 +101,7 @@ python3 -m venv venv
 # Copy Supervisor configuration files
 sudo cp *.conf /etc/supervisor/conf.d/
 # Install required Python packages within the virtual environment
-pip install flask flask-cors smbus2 RPi.bme280 adafruit-blinka adafruit-circuitpython-scd30 pandas requests
+pip3 install flask flask-cors smbus2 RPi.bme280 adafruit-blinka adafruit-circuitpython-scd30 pandas requests psutil
 ```
 Find out the IP address of your raspberry pi from
 ```
