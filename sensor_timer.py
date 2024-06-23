@@ -5,6 +5,12 @@ import signal
 import sys
 from class_sensor_module import SensorModule
 
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 def periodic_task():
     n=0
     # print ("periodic_task")
@@ -16,7 +22,7 @@ def periodic_task():
         sensor=SensorModule()
         temperature, pressure, humidity, co2, lattitude, longitude = sensor.get_sensor_readings()
         last = time.time()
-        print(f"This job started at {start_time} and runs every {round((last-start)/n, 1)} seconds. {n:,}th event")
+        logger.info(f"This job started at {start_time} and runs every {round((last-start)/n, 1)} seconds. {n:,}th event")
         time.sleep(10)
 
 if __name__ == '__main__':

@@ -4,6 +4,12 @@ from class_sensor_module import SensorModule
 from class_database_mgt import DatabaseManager
 from class_config_mgt import ConfigManager
 import subprocess
+import logging
+import json
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 #import sqlite3
 #from sqlite3 import Error
@@ -52,20 +58,23 @@ def get_sensor_data():
     sensor_types = ['temperature', 'pressure', 'humidity', 'co2']
     for sensor_type in sensor_types:
         
-        latest_entry = db_manager.select_measurements_by_type(sensor_type)
-        
+        [latest_entry] = db_manager.select_measurements_by_type(sensor_type)
+        #print (f"latest_entry ({type(latest_entry)}) {latest_entry}")
+        #print(latest_entry.keys())
+        # Check if the length of latest_entry is even
+
         conf = ConfigManager()
         latitude=conf.get_lat()
         longitude=conf.get_long()
         if latest_entry:
-            id, device, date, sensor, _, _, _, value, _ = latest_entry[0]
+            #id, device, date, sensor, _, _, _, value, _ = latest_entry[0]
             latest_entries[sensor_type.lower()] = {
-                "date": date,
-                "sensor": sensor,
-                "latitude": latitude,
-                "longitude": longitude,
-                "type": sensor_type,
-                "value": value,
+                "date": latest_entry["date"],
+                "sensor": latest_entry["sensor"],
+                "latitude": latest_entry["latitude"],
+                "longitude": latest_entry["longitude"],
+                "type": latest_entry["type"],
+                "value": latest_entry["value"]
             }
         #print (latest_entry[0])
     # Close the connection
@@ -74,6 +83,7 @@ def get_sensor_data():
     if not latest_entries:
         print(jsonify({"status": "Error", "message": "No sensor data found"}))
         return jsonify({"status": "Error", "message": "No sensor data found"})
+    #logger.info (latest_entries)
     retVal={
             "status": "OK",
             "temperature": latest_entries["temperature"]["value"],
@@ -84,7 +94,7 @@ def get_sensor_data():
             "longitude": latest_entries["temperature"]["longitude"]
             
         }
-    print(retVal)
+    logger.info(retVal)
     return jsonify(retVal)
         
     
@@ -98,6 +108,17 @@ def reboot():
     print(output)
     # Return message
     return 'Reboot action initiated'
+
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    # Perform any necessary actions to initiate a reboot
+    print("Shutdown sensor")
+    command = "/usr/bin/sudo /sbin/shutdown now"
+    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+    output = process.communicate()[0]
+    print(output)
+    # Return message
+    return 'Shutdown action initiated'
 
     
 @app.route('/updateLatitude', methods=['POST'])

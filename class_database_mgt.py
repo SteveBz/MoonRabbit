@@ -4,7 +4,14 @@ from datetime import datetime, timedelta
 import time, math
 import pandas as pd # pip3 install pandas
 import random
+import logging
+import json
 
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+from class_sqlite_dagnostic import SQLiteDiagnostic
 class DatabaseManager:
     def __init__(self, db_file):
         """
@@ -24,10 +31,12 @@ class DatabaseManager:
         try:
             conn = sqlite3.connect(db_file, isolation_level=None, detect_types=sqlite3.PARSE_DECLTYPES)
             conn.row_factory = sqlite3.Row  # Enable accessing rows by column name
-            print(sqlite3.version)
+            conn.execute("PRAGMA journal_mode=WAL")  # Set to WAL mode for better concurrency
+            conn.execute("PRAGMA busy_timeout = 10000")  # Increase busy timeout to 10 seconds
+            logger.info(f"SQLite version: {sqlite3.version}")
             return conn
         except Error as e:
-            print(e)
+            logger.error(e)
             return None
 
     def create_table(self):
@@ -134,9 +143,9 @@ class DatabaseManager:
                 for query in table_queries:
                     cursor.execute(query)
             except Error as e:
-                print(e)
+                logger.error(e)
 
-    def select_measurements_by_type(self, sensor_type):
+    def select_measurements_by_type(self, sensor_type: str) -> dict:
         """
         Query all rows in the sensor_measurement table with a specific type.
         
@@ -148,7 +157,6 @@ class DatabaseManager:
         '''
         rows = self.retry_operation(self._execute_select, select_query, (sensor_type,))
         return rows
-        #rows_list = [dict(row) for row in rows]  # Convert sqlite3.Row to list of dictionaries
         
     def get_latest_measurements_by_type_and_duration(self, sensor_type, duration, max_points):
         """
@@ -272,13 +280,16 @@ class DatabaseManager:
         :param params: The parameters for the SQL query.
         :return: List of lists containing the query results.
         """
-        with self.conn:
-            cursor = self.conn.cursor()
-            cursor.execute(query, params)
-            rows = cursor.fetchall()
-            # Convert sqlite3.Row to list
-            rows = [list(row) for row in rows]
-        return rows
+        try:
+            with self.conn:
+                cursor = self.conn.cursor()
+                cursor.execute(query, params)
+                rows = cursor.fetchall()
+                rows = [dict(row) for row in rows]  # Convert rows to dictionaries for easier access
+                return rows
+        except sqlite3.Error as e:
+            logger.error(f"Error executing select query: {e}")
+            raise
 
     def update_measurements_to_transferred(self, id):
         """
@@ -346,20 +357,24 @@ class DatabaseManager:
                 self.conn.commit()
                 return result  # Return the result for any select operations
             except sqlite3.OperationalError as e:
-                print("Error:", e)
+                logger.error("Error:", e)
                 if "database is locked" in str(e):
-                    print("Database is locked. Retrying...")
+                    logger.error("Database is locked. Retrying...")
                     retries -= 1
                     if retries > 0:
-                        print("Retrying...")
-                        sleep_interval = random.uniform(base_sleep_interval, max_sleep_interval)
+                        logger.error("Retrying...")
+                        #sleep_interval = random.uniform(base_sleep_interval, max_sleep_interval)
+                        sleep_interval = min(base_sleep_interval * (2 ** (5 - retries)), max_sleep_interval)
                         time.sleep(sleep_interval)
                     else:
-                        print("Maximum retries reached. Operation failed.")
+                        logger.error("Maximum retries reached. Operation failed.")
+                        diagnostic = SQLiteDiagnostic(self.db_file)
+                        diagnostic.run_diagnostics()
+                        
                 else:
                     raise
             except sqlite3.Error as e:
-                print("Error:", e)
+                logger.error("Error:", e)
                 raise
 
     def close_connection(self):
@@ -372,7 +387,9 @@ class DatabaseManager:
 
 if __name__ == "__main__":
     # Example usage of DatabaseManager
-    db_manager = DatabaseManager("measurement.db")
+    db_file = "measurement.db"
+    db_manager = DatabaseManager(db_file)
+    
     device_id="GB00001"
     date = datetime.now()
     sensor = "bme280"

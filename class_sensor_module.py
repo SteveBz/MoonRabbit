@@ -1,6 +1,5 @@
 import smbus2 # pip3 install smbus2
 import bme280 # pip3 install RPi.bme280
-import time 
 import math
 import busio # pip3 install adafruit-blinka
 import board # pip3 install adafruit-blinka RPI.GPIO
@@ -10,12 +9,18 @@ import adafruit_scd30 # pip3 install adafruit-circuitpython-scd30
 from urllib.request import urlopen
 from class_config_mgt import ConfigManager
 from datetime import datetime, timedelta
+import time 
 
 from class_geoip_location_provider import LocationProvider
-
 from class_database_mgt import DatabaseManager
 
+import logging
 import json
+from class_shipLog import logShipping
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 class SensorModule:
     PORT = 1
     ADDRESS = 0x76
@@ -98,6 +103,7 @@ class SensorModule:
             interval="min"
             self.aggregate_interval("sensor_measurement_mins", interval, mean_time, config, db_manager)
             config=sensor_values.remove_interval(interval)
+            logShipping.transfer_to_central_log(db_manager)
         
         start_time = datetime.fromisoformat(config["time_intervals"]["hour"]["start"])
         end_mins = (start_time + timedelta(hours=1)).replace(microsecond=0)      
@@ -121,12 +127,24 @@ class SensorModule:
         
         retval=(self.temperature_val, self.pressure_val, self.humidity_val, self.co2_val, self.lat, self.long)
             
-        print(datetime.now(), f"Latitude: {self.lat}, ", f"Longitude: {self.long}", f"Temperature: {self.temperature_val:.1f} *C, ", f"Humidity: {self.humidity_val:,.1f} %", f"CO2: {int(self.co2_val):,d} ppm", f"Pressure: {int(self.pressure_val):,d} mBars")
+        # Construct the message as a single formatted string
+        log_message = (
+            f"{datetime.now().isoformat()} - "
+            f"Latitude: {self.lat}, "
+            f"Longitude: {self.long}, "
+            f"Temperature: {self.temperature_val:.1f} *C, "
+            f"Humidity: {self.humidity_val:.1f} %, "
+            f"CO2: {int(self.co2_val):,d} ppm, "
+            f"Pressure: {int(self.pressure_val):,d} mBars"
+        )
+        
+        # Log the message
+        logger.info(log_message)
         
         return retval
 
     def aggregate_interval(self, table, interval, mean_time, config, db_manager):
-        print (f"{interval} aggregate")
+        logger.info (f"{interval} aggregate")
         def insert_record_from_array(self, table, sensor_type, reading_type, config):
             sensor_reading_array = config["time_intervals"][interval][reading_type]
             db_manager.insert_aggregate_data(table, mean_time, self.device, sensor_type, self.lat, self.long, reading_type, 
