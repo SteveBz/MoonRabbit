@@ -722,6 +722,31 @@ function updateSensorReadingsWithTimeRange(timeRange) {
 //}
 
 
+// Function to handle the "shutdown" click event
+function handleShutdownClick(event) {
+    // Prevent default link behavior (e.g., page navigation)
+    // event.preventDefault();
+    // Add your code to handle the "shutdown" action (e.g., initiate a shutdown request)
+    fetch('/shutdown', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}), // No data to send in the request body for a shutdown
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to initiate shutdown on the server');
+        }
+        console.log('shutdown initiated successfully on the server');
+    })
+    .catch(error => {
+        console.error('Error initiating shutdown on the server:', error);
+    });
+    // For demonstration purposes, you can log a message
+    console.log('Initiating shutdown...');
+}
+
 // Function to handle the "Reboot" click event
 function handleRebootClick(event) {
     // Prevent default link behavior (e.g., page navigation)
