@@ -21,7 +21,9 @@ Connect to the WiFi using the icon at the top right of the screen.
 ### Set up SSH & I2C
 
 Menu>Preferences>Praspberry Pi Configuration>Interface>SSH
+
 Menu>Preferences>Praspberry Pi Configuration>Interface>I2C
+
 Menu>Preferences>Praspberry Pi Configuration>Interface>VNC
 
 ## Via SSH
