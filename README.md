@@ -1,9 +1,14 @@
 # Moon Rabbit CO2 Sensor (Raspberry Pi, scd30, bme280, flask & python)
 A Raspberry Pi powered CO2 monitoring station using Python and Flask  
+If starting with blank micro SD card:
+## Flash th Micro SD card with the Rapberry Pi Imager 
+#Use settings: "Raspberry Pi Zero 2 W", "64 Bit2, 
+
 
 # MoonRabbit setup
 
 ## Via a keyboard, mouse and screen through the rpi0 OTG port
+On first start, setup the default user name "pi" and password "RaspberryPi"
 
 Connect your keyboard and mouse to the OTG port via a OTG (On-The-Go) USB hub with a micro USB plug. Connect the monitor to the mini-HDMI port and boot by plugging the power cable in.  
 
