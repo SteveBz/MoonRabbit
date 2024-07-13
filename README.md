@@ -107,9 +107,6 @@ cd MoonRabbit/
 # Set up Python virtual environment and activate it
 python3 -m venv venv
 . venv/bin/activate
-# Copy Supervisor configuration files
-sudo cp *.conf /etc/supervisor/conf.d/
-# Install required Python packages within the virtual environment
 sh install.sh
 ```
 Find out the IP address of your raspberry pi from
