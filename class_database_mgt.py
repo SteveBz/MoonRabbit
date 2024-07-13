@@ -31,7 +31,7 @@ class DatabaseManager:
         try:
             conn = sqlite3.connect(db_file, isolation_level=None, detect_types=sqlite3.PARSE_DECLTYPES)
             conn.row_factory = sqlite3.Row  # Enable accessing rows by column name
-            conn.execute("PRAGMA journal_mode=WAL")  # Set to WAL mode for better concurrency
+            conn.execute("PRAGMA journal_mode=DELETE")  # Set to WAL mode for better concurrency
             conn.execute("PRAGMA busy_timeout = 10000")  # Increase busy timeout to 10 seconds
             logger.info(f"SQLite version: {sqlite3.version}")
             return conn
@@ -155,7 +155,7 @@ class DatabaseManager:
         select_query = '''
             SELECT * FROM sensor_measurement WHERE type = ? ORDER BY date DESC LIMIT 1
         '''
-        rows = self.retry_operation(self._execute_select, select_query, (sensor_type,))
+        rows = self.retry_operation(self._execute_select, select_query, (sensor_type,), retries=5, base_sleep_interval=1, max_sleep_interval=1)
         return rows
         
     def get_latest_measurements_by_type_and_duration(self, sensor_type, duration, max_points):
@@ -215,7 +215,7 @@ class DatabaseManager:
             ORDER BY date DESC
         '''
         # Use retry_operation for executing the select query
-        rows = self.retry_operation(self._execute_select, select_query, (sensor_type, start_time))
+        rows = self.retry_operation(self._execute_select, select_query, (sensor_type, start_time), retries=5, base_sleep_interval=1, max_sleep_interval=1)
 
         if not rows:
             return []
@@ -267,10 +267,10 @@ class DatabaseManager:
         """
         select_query = '''
             SELECT device_id, id, date, sensor, latitude, longitude, type, value, transferred
-            FROM sensor_measurement WHERE transferred = ? ORDER BY date DESC
+            FROM sensor_measurement WHERE transferred = ? ORDER BY date DESC  LIMIT 50
         '''
         # Use retry_operation to handle potential locking issues
-        rows = self.retry_operation(self._execute_select, select_query, (transferred,))
+        rows = self.retry_operation(self._execute_select, select_query, (transferred,), retries=5, base_sleep_interval=1, max_sleep_interval=1)
         return rows
     def _execute_select(self, query, params):
         """
@@ -300,7 +300,7 @@ class DatabaseManager:
         update_query = '''
             UPDATE sensor_measurement SET transferred = 1 WHERE id = ?
         '''
-        self.retry_operation(self.conn.cursor().execute, update_query, (id,))
+        self.retry_operation(self.conn.cursor().execute, update_query, (id,), retries=2, base_sleep_interval=1, max_sleep_interval=1)
 
     def insert_measurement(self, device_id, sensor, latitude, longitude, sensor_type, value):
         """
@@ -318,7 +318,7 @@ class DatabaseManager:
             INSERT INTO sensor_measurement (date, device_id, sensor, latitude, longitude, type, value)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         '''
-        self.retry_operation(self.conn.cursor().execute, insert_query, [date_time, device_id, sensor, latitude, longitude, sensor_type, value])
+        self.retry_operation(self.conn.cursor().execute, insert_query, [date_time, device_id, sensor, latitude, longitude, sensor_type, value], retries=5, base_sleep_interval=2, max_sleep_interval=10)
         
     def insert_aggregate_data(self, table ,date_time, device_id, sensor, latitude, longitude, sensor_type, value, max_value, min_value):
         """
@@ -338,7 +338,7 @@ class DatabaseManager:
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         '''
 
-        self.retry_operation(self.conn.cursor().execute, insert_query, [date_time, device_id, sensor, latitude, longitude, sensor_type, value, max_value, min_value])
+        self.retry_operation(self.conn.cursor().execute, insert_query, [date_time, device_id, sensor, latitude, longitude, sensor_type, value, max_value, min_value], retries=5, base_sleep_interval=1, max_sleep_interval=10)
         
   
     def retry_operation(self, operation, *args, retries=5, base_sleep_interval=2, max_sleep_interval=10):
@@ -357,7 +357,7 @@ class DatabaseManager:
                 self.conn.commit()
                 return result  # Return the result for any select operations
             except sqlite3.OperationalError as e:
-                logger.error("Error:", e)
+                logger.error(f"Error:{e}")
                 if "database is locked" in str(e):
                     logger.error("Database is locked. Retrying...")
                     retries -= 1
@@ -374,7 +374,7 @@ class DatabaseManager:
                 else:
                     raise
             except sqlite3.Error as e:
-                logger.error("Error:", e)
+                logger.error(f"Error:{e}")
                 raise
 
     def close_connection(self):

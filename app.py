@@ -97,6 +97,34 @@ def get_sensor_data():
     logger.info(retVal)
     return jsonify(retVal)
         
+
+@app.route('/update_sw', methods=['POST'])
+def update_sw():
+    # Perform any necessary actions to update the device software
+    print("Updating Software")
+     # Git pull command
+    git_pull_cmd = "git pull origin master"
+     # Re-install s/w including any updates
+    install_cmd = "sh install.sh"
+    
+    # Reboot command (with sudo)
+    reboot_cmd = "/usr/bin/sudo /sbin/reboot"
+    
+    try:
+        # Execute git pull command
+        subprocess.run(git_pull_cmd, shell=True, check=True)
+        
+        # Execute install_cmd
+        subprocess.run(install_cmd, shell=True, check=True)
+        
+        # If git pull succeeds, execute reboot command
+        subprocess.run(reboot_cmd, shell=True, check=True)
+        
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Command '{e.cmd}' returned non-zero exit status {e.returncode}")
+
+    # Return message
+    return 'Software update action initiated'
     
 @app.route('/reboot', methods=['POST'])
 def reboot():

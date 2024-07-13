@@ -16,8 +16,8 @@ from class_database_mgt import DatabaseManager
 
 import logging
 import json
-from class_shipLog import logShipping
-
+#from class_shipLog import logShipping
+from class_file_lock import FileLock
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -85,6 +85,8 @@ class SensorModule:
         #print(1)
         #config_manager = ConfigManager()
         sensor_values = ConfigManager("sensor_values.json")
+        lock = FileLock("SensorModule", lock_dir='locks')  # Use a dedicated directory for lock files
+        lock.acquire_lock(wait=True)
         db_manager = DatabaseManager('measurement.db')
         db_manager.insert_measurement(self.device, 'scd30', self.lat, self.long, 'co2', self.co2_val)
         db_manager.insert_measurement(self.device, 'bme280', self.lat, self.long, 'humidity', self.humidity_val)
@@ -103,7 +105,7 @@ class SensorModule:
             interval="min"
             self.aggregate_interval("sensor_measurement_mins", interval, mean_time, config, db_manager)
             config=sensor_values.remove_interval(interval)
-            logShipping.transfer_to_central_log(db_manager)
+            #logShipping.transfer_to_central_log(db_manager)
         
         start_time = datetime.fromisoformat(config["time_intervals"]["hour"]["start"])
         end_mins = (start_time + timedelta(hours=1)).replace(microsecond=0)      
@@ -125,6 +127,7 @@ class SensorModule:
         db_manager.conn.commit()
         db_manager.conn.close()
         
+        lock.release_lock(force=True)
         retval=(self.temperature_val, self.pressure_val, self.humidity_val, self.co2_val, self.lat, self.long)
             
         # Construct the message as a single formatted string
