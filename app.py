@@ -103,7 +103,7 @@ def update_sw():
     # Perform any necessary actions to update the device software
     print("Updating Software")
      # Git pull command
-    git_pull_cmd = "git pull origin master"
+    git_pull_cmd = "git pull"
      # Re-install s/w including any updates
     install_cmd = "sh install.sh"
     
