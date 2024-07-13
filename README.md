@@ -68,8 +68,6 @@ Install Supervisord
 sudo apt-get install -y supervisor
 # Update and upgrade the system packages
 sudo apt-get update && sudo apt-get upgrade -y
-# Install necessary packages
-sudo apt-get install -y sqlite3 sqlitebrowser
 ```
 
 # Edit Supervisor configuration to allow web interface
