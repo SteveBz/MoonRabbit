@@ -174,8 +174,11 @@ var co2Trace = {
   mode: "lines+markers",
   type: "line",
 };
-var lineChartWidth = 900
-var lineChartHeight = 290
+
+var refwidth = document.documentElement.clientWidth;
+var refheight = document.documentElement.clientHeight;
+var lineChartWidth = 900*refwidth/1920
+var lineChartHeight = 290*refheight/1080
 var ticktype = "date"
 var bottom = 40
 var temperatureLayout = {
@@ -720,6 +723,34 @@ function updateSensorReadingsWithTimeRange(timeRange) {
 //            return 30000; // Default to 30 seconds for realtime
 //    }
 //}
+
+
+
+// Function to handle the "Update Software" click event
+function updateSW(event) {
+    // Prevent default link behavior (e.g., page navigation)
+    // event.preventDefault();
+    // Add your code to handle the "shutdown" action (e.g., initiate a shutdown request)
+    fetch('/update_sw', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}), // No data to send in the request body for a shutdown
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to initiate update_sw on the server');
+        }
+        console.log('update_sw performed successfully on the server');
+    })
+    .catch(error => {
+        console.error('Error initiating shutdown on the server:', error);
+    });
+    // For demonstration purposes, you can log a message
+    console.log('Initiating update_sw...');
+}
+
 
 
 // Function to handle the "shutdown" click event
