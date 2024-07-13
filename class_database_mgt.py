@@ -333,12 +333,14 @@ class DatabaseManager:
         :param value: The measured value.
         """
         date_time=datetime.now()
+        # Format date_time to ISO 8601 format
+        iso_date = date_time.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         insert_query = f'''
             INSERT INTO {table} (date, device_id, sensor, latitude, longitude, type, value, max_value, min_value)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         '''
 
-        self.retry_operation(self.conn.cursor().execute, insert_query, [date_time, device_id, sensor, latitude, longitude, sensor_type, value, max_value, min_value], retries=5, base_sleep_interval=1, max_sleep_interval=10)
+        self.retry_operation(self.conn.cursor().execute, insert_query, [iso_date, device_id, sensor, latitude, longitude, sensor_type, value, max_value, min_value], retries=5, base_sleep_interval=1, max_sleep_interval=10)
         
   
     def retry_operation(self, operation, *args, retries=5, base_sleep_interval=2, max_sleep_interval=10):
