@@ -20,10 +20,7 @@
     cursor: pointer;
     transition-duration: 0.4s; /* Smooth hover transition */
     width: 150px; /* Adjust width as needed */
-}
-/* Hide refresh button by default */
-.updateButton {
-  display: none;
+    display: none; /* Hide refresh button by default */
 }
 /* CSS for header section */
 .header {
@@ -55,6 +52,7 @@
   padding: 10px;
   display: none; /* Hide menu items by default */
   z-index: 1; /* Ensure menu items appear above other content */
+  width: 200px; /* Set a fixed width for the menu items container */
 }
 
 .sidebar-button:hover .menu-items {
@@ -71,6 +69,8 @@
   color: #000; /* Adjust color as needed */
   text-decoration: none; /* Remove underline */
   font-size: 14px; /* Smaller font size for menu items */
+  width: 100%; /* Ensure menu items take full width of the container */
+  box-sizing: border-box; /* Ensure padding is included in the width calculation */
 }
 
 .menu-item:hover {
