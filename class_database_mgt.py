@@ -202,7 +202,7 @@ class DatabaseManager:
             raise ValueError(f"Invalid duration (Duration = {duration}) specified. Use 'hour', 'day', 'month', or 'year'.")
 
         select_query = f'''
-            SELECT device_id, id, date, sensor, latitude, longitude, type, value, transferred, 
+            SELECT device_id, id, strftime('%Y-%m-%d %H:%M:%S', date) as date, sensor, latitude, longitude, type, value, transferred, 
             strftime('%Y-%m-%d %H:%M:%S', date) as sec, 
             strftime('%Y-%m-%d %H:%M:00', date) as min, 
             strftime('%Y-%m-%d %H:00:00', date) as hour, 
@@ -215,7 +215,9 @@ class DatabaseManager:
             ORDER BY date DESC
         '''
         # Use retry_operation for executing the select query
-        rows = self.retry_operation(self._execute_select, select_query, (sensor_type, start_time), retries=5, base_sleep_interval=1, max_sleep_interval=1)
+        # Convert start_time to standard string format
+        start_time_str = start_time.strftime('%Y-%m-%d %H:%M:%S')
+        rows = self.retry_operation(self._execute_select, select_query, (sensor_type, start_time_str), retries=5, base_sleep_interval=1, max_sleep_interval=1)
 
         if not rows:
             return []
@@ -280,6 +282,7 @@ class DatabaseManager:
         :param params: The parameters for the SQL query.
         :return: List of lists containing the query results.
         """
+        print(params)
         try:
             with self.conn:
                 cursor = self.conn.cursor()
