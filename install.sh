@@ -1,6 +1,5 @@
 # Install necessary packages
 sudo apt-get install -y sqlite3 sqlitebrowser
-sudo apt-get install  -y ntp
 
 # Clear supervisor configuration files
 sudo rm /etc/supervisor/conf.d/*.conf
