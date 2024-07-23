@@ -27,6 +27,11 @@ Menu>Preferences>Praspberry Pi Configuration>Interface>I2C
 
 Menu>Preferences>Praspberry Pi Configuration>Interface>VNC
 
+Menu>Preferences>Praspberry Pi Configuration>Localisation>Locale
+Menu>Preferences>Praspberry Pi Configuration>Localisation>Timezone
+Menu>Preferences>Praspberry Pi Configuration>Localisation>Keyboard if necessary
+Menu>Preferences>Praspberry Pi Configuration>Localisation>WiFi Country
+
 ## Via SSH
 ### Fix swap memory default
 The initial default, virtual memory allocation is very small.  You need to expand it to allow many things, such as updating software.
