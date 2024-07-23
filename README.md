@@ -69,10 +69,10 @@ Supervisord allows remore control of the software on the Raspberry Pi Zero 2 W f
 
 Install Supervisord
 ```
-# Install necessary packages
-sudo apt-get install -y supervisor
 # Update and upgrade the system packages
 sudo apt-get update && sudo apt-get upgrade -y
+# Install necessary packages
+sudo apt-get install -y supervisor
 ```
 
 # Edit Supervisor configuration to allow web interface
