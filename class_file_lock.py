@@ -48,7 +48,7 @@ class FileLock:
         locked_files = [f for f in os.listdir(self.lock_dir)]
         return any(f != os.path.basename(self.lock_file) for f in locked_files)
 
-    def get_lock_liles(self):
+    def get_lock_files(self):
         """
         Checks if the lock is held by any application other than the current one.
         :return: Files if any lock or wait file exists other than the current application's lock file, False otherwise.
@@ -110,6 +110,10 @@ class FileLock:
         Releases the lock held by the current application.
         :param force: If True, forces the release even if the lock file is not found.
         """
+        try:
+            os.remove(self.wait_file)
+        except FileNotFoundError:
+            pass
         try:
             os.remove(self.lock_file)
         except FileNotFoundError:

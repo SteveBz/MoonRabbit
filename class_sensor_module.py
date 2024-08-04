@@ -67,8 +67,9 @@ class SensorModule:
         self.pressure_val = sample_reading.pressure
         self.scd = adafruit_scd30.SCD30(i2c_bus=self.i2c, ambient_pressure = int(self.pressure_val))
         self.scd.self_calibration_enabled=False
-        #self.co2_val = self.read_co2()
-        #print ("exiting __init__")
+        
+        lock = FileLock("SensorModule", lock_dir='locks')  # Use a dedicated directory for lock files
+        lock.release_lock(force=True)
 
     def __del__(self):
         if self.bus is not None:

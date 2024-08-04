@@ -26,15 +26,16 @@ class logShipping:
         lock = FileLock("logShipping", lock_dir='locks')  # Use a dedicated directory for lock files
         locked_or_waiting=lock.get_lock_status()
         if locked_or_waiting:
-            print(f"locked files are {lock.get_lock_liles}")
+            print(f"locked files are {lock.get_lock_files}")
             return
-        lock.acquire_lock(wait=False)
+        if not lock.acquire_lock(wait=False):
+            return false
         for entry in new_entries:
             logger.info(entry)
             
             locked_or_waiting=lock.get_lock_status()
             if locked_or_waiting:
-                print(f"locked files are {lock.get_lock_liles}")
+                print(f"locked files are {lock.get_lock_files}")
                 lock.release_lock(force=True)
                 return
             data = {
@@ -81,6 +82,9 @@ class logShipping:
 # Call the function to start transferring entries to the central log
 if __name__ == "__main__":
     # Connect to the local SQLite database
+    
+    lock = FileLock("logShipping", lock_dir='locks')  # Use a dedicated directory for lock files
+    lock.release_lock(force=True)
     db_manager = DatabaseManager('measurement.db')
     try:
         while True:
