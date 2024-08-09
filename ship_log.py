@@ -47,7 +47,9 @@ class logShipping:
                 'type': entry['type'],
                 'value': entry['value']
             }
-            url = 'http://192.168.1.162:5000/sensor_data'
+            #url = 'http://192.168.1.162:8000/cgi-bin/sensor_data_logger.py'
+            #url = 'http://192.168.1.162:5000/sensor_data'
+            url = 'http://www.carbonactive.org/cgi-bin/sensor_data_logger.py'
             try:
                 response = requests.post(url, json=data)
                 logger.info(f"Response status code: {response.status_code}")
@@ -81,10 +83,11 @@ class logShipping:
 
 # Call the function to start transferring entries to the central log
 if __name__ == "__main__":
-    # Connect to the local SQLite database
     
+    # Make sure lock file is released before starting
     lock = FileLock("logShipping", lock_dir='locks')  # Use a dedicated directory for lock files
     lock.release_lock(force=True)
+    # Connect to the local SQLite database
     db_manager = DatabaseManager('measurement.db')
     try:
         while True:

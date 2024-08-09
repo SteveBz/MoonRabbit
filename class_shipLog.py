@@ -33,7 +33,7 @@ class logShipping:
                 'type': entry['type'],
                 'value': entry['value']
             }
-            url = 'http://192.168.1.162:5000/sensor_data'
+            url = 'http://www.carbonactive.org/cgi-bin/sensor_data_logger.py'
             try:
                 response = requests.post(url, json=data)
                 #logger.info(f"Response status code: {response.status_code}")

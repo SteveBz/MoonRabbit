@@ -35,9 +35,9 @@ class FileLock:
         Checks if waiting is held by the named application.
         :return: True if waiting file held by named application, False otherwise.
         """
-        print(f"waiting_file = {os.path.basename(waiting_file)}")
+        print(f"Check waiting file name = {os.path.basename(waiting_file)}")
         waiting_files = [f for f in os.listdir(self.lock_dir) if f.endswith('.waiting')]
-        print(waiting_files)
+        print("waiting files found = ", waiting_files)
         return any(f == os.path.basename(waiting_file) for f in waiting_files)
 
     def get_lock_status(self):
@@ -63,7 +63,7 @@ class FileLock:
         """
         is_waiting=self.is_waiting(self.wait_file)
         file_path = self.lock_file if status == 'locked' else os.path.join(self.lock_dir, f"{self.app_name}.waiting")
-        print (is_waiting)
+        print ("'is_waiting' = ", is_waiting)
         if is_waiting:
             try:
                 print ("Replace old wait file")
@@ -72,7 +72,7 @@ class FileLock:
                 pass
         with open(file_path, 'w') as f:
             f.write(datetime.now().isoformat())
-        print(datetime.now().isoformat(),":",file_path, "Locked")
+        print(datetime.now().isoformat(),":",file_path, "New lock applied")
 
     def acquire_lock(self, wait=False):
         """

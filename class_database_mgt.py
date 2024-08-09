@@ -31,12 +31,13 @@ class DatabaseManager:
         try:
             conn = sqlite3.connect(db_file, isolation_level=None, detect_types=sqlite3.PARSE_DECLTYPES)
             conn.row_factory = sqlite3.Row  # Enable accessing rows by column name
-            conn.execute("PRAGMA journal_mode=DELETE")  # Set to WAL mode for better concurrency
-            conn.execute("PRAGMA busy_timeout = 10000")  # Increase busy timeout to 10 seconds
-            logger.info(f"SQLite version: {sqlite3.version}")
+            conn.execute("PRAGMA journal_mode=WAL")  # Set to WAL mode for better concurrency
+            conn.execute("PRAGMA wal_autocheckpoint = 500")  # -- Set a custom threshold (e.g., 500 pages, the default is 1000)
+            # conn.execute("PRAGMA busy_timeout = 10000")  # Increase busy timeout to 10 seconds
+            logger.info(f"Connecting SQLite version: {sqlite3.version}")
             return conn
         except Error as e:
-            logger.error(e)
+            logger.error(f"Connection error = '{e}'")
             return None
 
     def create_table(self):
@@ -143,7 +144,7 @@ class DatabaseManager:
                 for query in table_queries:
                     cursor.execute(query)
             except Error as e:
-                logger.error(e)
+                logger.error(f"Cursor error = '{e}'")
 
     def select_measurements_by_type(self, sensor_type: str) -> dict:
         """
