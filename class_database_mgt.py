@@ -47,7 +47,7 @@ class DatabaseManager:
         table_queries = [
             '''
                 CREATE TABLE IF NOT EXISTS sensor_measurement (
-                    device_id TEXT,
+                    device_id int,
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     date DATETIME,
                     sensor TEXT,
