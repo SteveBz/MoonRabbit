@@ -214,8 +214,8 @@ class ConfigManager:
                     self.config["time_intervals"][interval]["humidity"].append(sensor_value_dict["humidity"])
                     self.config["time_intervals"][interval]["pressure"].append(sensor_value_dict["pressure"])
                 case _:
-                    print(f"'{interval}'")
-                    print(self.config["time_intervals"])
+                    print(f"Interval: {interval}")
+                    print(f"Current values: {self.config['time_intervals'][interval]}")
                     self.config["time_intervals"][interval]["co2"] += sensor_value_dict["co2"]
                     self.config["time_intervals"][interval]["temperature"] += sensor_value_dict["temperature"]
                     self.config["time_intervals"][interval]["humidity"] += sensor_value_dict["humidity"]
