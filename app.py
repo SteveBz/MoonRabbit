@@ -11,11 +11,10 @@ import json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-#import sqlite3
-#from sqlite3 import Error
-
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://192.168.1.131:5000"}})
+
+# Allow requests from localhost on any port
+CORS(app, resources={r"/*": {"origins": "http://localhost:5000"}})
 
 @app.route("/")
 def hello_world():
@@ -56,6 +55,14 @@ def get_sensor_data():
     # Fetch the latest entry for each sensor type from the database
     latest_entries = {}
     sensor_types = ['temperature', 'pressure', 'humidity', 'co2']
+    
+    print(sensor_types)
+    conf = ConfigManager("config.json")
+    print(conf)
+    latitude=conf.get_lat()
+    print(latitude)
+    longitude=conf.get_long()
+    print(longitude)
     for sensor_type in sensor_types:
         
         [latest_entry] = db_manager.select_measurements_by_type(sensor_type)
@@ -63,9 +70,6 @@ def get_sensor_data():
         #print(latest_entry.keys())
         # Check if the length of latest_entry is even
 
-        conf = ConfigManager()
-        latitude=conf.get_lat()
-        longitude=conf.get_long()
         if latest_entry:
             #id, device, date, sensor, _, _, _, value, _ = latest_entry[0]
             latest_entries[sensor_type.lower()] = {
