@@ -4,7 +4,7 @@ import fcntl
 class ConfigManager:
     DEFAULT_STATUS = "00 - Raw"         # Define a constant for the default status
     DEFAULT_REGISTERED = False          # Define a constant for the default registered status
-    DEFAULT_DEVICE = None               # Define a constant for the default device
+    DEFAULT_DEVICE = 0                   # Define a constant for the default device
     DEFAULT_LAT = 51.1                  # Define a constant for the default latitude
     DEFAULT_LONG = 0.1                  # Define a constant for the default longitude
 
@@ -53,8 +53,8 @@ class ConfigManager:
         # Retrieve the device_id from config
         device_id = self.config.get("device_id", None)
         
-        # If device_id is None, save the config and return None
-        if device_id is None:
+        # If device_id is 0, save the config and return 0
+        if device_id == 0:
             self.save_config(self.config)
         
         return device_id
