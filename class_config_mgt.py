@@ -36,11 +36,11 @@ class ConfigManager:
             
     def create_default_config(self):
         default_config = {
-            "device_id": None,
-            "registered": False,
-            "status": "00 - raw",
-            "lat": 51.1,
-            "long": 0.1,
+            "device_id": self.DEFAULT_DEVICE,
+            "registered": self.DEFAULT_REGISTERED,
+            "status": self.DEFAULT_STATUS,
+            "lat": self.DEFAULT_LAT,
+            "long": self.DEFAULT_LONG,
             "sensor_co2": "scd30",
             "sensor_pressure": "bme280",
             "last_calibration_date": 0,
