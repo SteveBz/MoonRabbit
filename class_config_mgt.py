@@ -2,6 +2,10 @@ import json
 from datetime import datetime, timedelta
 import fcntl
 class ConfigManager:
+    DEFAULT_STATUS = "00 - Raw"       # Define a constant for the default status (00 - Raw,not calibrated or verified).
+    DEFAULT_REGISTERED = False        # Define a constant for the default registered (False, not registered).
+    DEFAULT_DEVICE = None             # Define a constant for the default device (None).
+
     def __init__(self, file='config.json'):
         self.config_file = file
         self.config = self.load_config()
@@ -43,25 +47,43 @@ class ConfigManager:
         self.save_config(default_config)
         return default_config
 
-
     def get_device_id(self):
-        return self.config["device_id"]
-
+        # Retrieve the device_id from config
+        device_id = self.config.get("device_id", None)
+        
+        # If device_id is None, save the config and return None
+        if device_id is None:
+            self.save_config(self.config)
+        
+        return device_id
+        
     def set_device_id(self, device_id):
         self.config["device_id"] = device_id
         self.save_config(self.config)
         
     def get_status(self):
-        # Use the get method with a default value
-        return self.config.get("status", "00 - Raw")
+        # Retrieve the status from config with a default value
+        status = self.config.get("status", self.DEFAULT_STATUS)
+        
+        # If the status is the default value, save the config
+        if status == self.DEFAULT_STATUS:
+            self.save_config(self.config)
+        
+        return status
 
     def set_status(self, status):
         self.config["status"] = status
         self.save_config(self.config)
     
     def is_registered(self):
-        # Use the get method with a default value
-        return self.config.get("registered", False)
+        # Retrieve the registered status from config with a default value
+        registered = self.config.get("registered", self.DEFAULT_REGISTERED)
+        
+        # If registered is False, save the config
+        if not registered:
+            self.save_config(self.config)
+        
+        return registered
 
     def set_registered(self, registered):
         self.config["registered"] = registered
