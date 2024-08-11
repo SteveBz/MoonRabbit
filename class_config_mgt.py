@@ -2,9 +2,11 @@ import json
 from datetime import datetime, timedelta
 import fcntl
 class ConfigManager:
-    DEFAULT_STATUS = "00 - Raw"       # Define a constant for the default status (00 - Raw,not calibrated or verified).
-    DEFAULT_REGISTERED = False        # Define a constant for the default registered (False, not registered).
-    DEFAULT_DEVICE = None             # Define a constant for the default device (None).
+    DEFAULT_STATUS = "00 - Raw"         # Define a constant for the default status
+    DEFAULT_REGISTERED = False          # Define a constant for the default registered status
+    DEFAULT_DEVICE = None               # Define a constant for the default device
+    DEFAULT_LAT = 51.1                  # Define a constant for the default latitude
+    DEFAULT_LONG = 0.1                  # Define a constant for the default longitude
 
     def __init__(self, file='config.json'):
         self.config_file = file
@@ -89,18 +91,19 @@ class ConfigManager:
         self.config["registered"] = registered
         self.save_config(self.config)
     def get_lat(self):
-        return float(self.config["lat"])
+        return float(self.config.get("lat", self.DEFAULT_LAT))
 
     def set_lat(self, lat):
         self.config["lat"] = round(lat,4)
         self.save_config(self.config)
 
     def get_long(self):
-        return float(self.config["long"])
+        return float(self.config.get("long", self.DEFAULT_LONG))
 
     def set_long(self, long):
         self.config["long"] = round(long,4)
         self.save_config(self.config)
+        
     def get_time_interval_values(self, interval):
         if "time_intervals" not in self.config:
             self.config["time_intervals"] = {
