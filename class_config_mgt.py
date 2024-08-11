@@ -235,7 +235,8 @@ if __name__ == "__main__":
     
     print("\nTest 30 return Longitude:")
     print("Longitude:", config_manager.get_long())
-    
+
+    config_manager = ConfigManager("sensor_values.json")
     print("\nTest 40 return minute subtotals:")
     # Set and get sensor values for different time intervals
     config_manager.set_time_interval_values(datetime.now(), {"co2": 420} )
