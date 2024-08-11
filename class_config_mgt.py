@@ -241,7 +241,12 @@ if __name__ == "__main__":
     config_manager = ConfigManager("sensor_values.json")
     print("\nTest 40 return minute subtotals:")
     # Set and get sensor values for different time intervals
-    config_manager.set_time_interval_values(datetime.now(), {"co2": 420} )
+    config_manager.set_time_interval_values(datetime.now(), {
+        "co2": 420,
+        "temperature": 22.4,
+        "humidity": 47.1,
+        "pressure": 1024
+    } )
     print("Minutes:", config_manager.get_time_interval_values("min"))
 
     print("\nTest 50 return invalid time period - ERROR:")
