@@ -31,6 +31,7 @@ class ConfigManager:
     def create_default_config(self):
         default_config = {
             "device_id": 1,
+            "status": "00 - Raw",
             "lat": 51.1,
             "long": 0.1,
             "sensor_co2": "scd30",
