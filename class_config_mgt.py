@@ -236,12 +236,12 @@ if __name__ == "__main__":
     print("\nTest 30 return Longitude:")
     print("Longitude:", config_manager.get_long())
     
-    print("\nTest 30 return minute subtotals:")
+    print("\nTest 40 return minute subtotals:")
     # Set and get sensor values for different time intervals
     config_manager.set_time_interval_values(datetime.now(), {"co2": 420} )
     print("Minutes:", config_manager.get_time_interval_values("min"))
 
-    print("\nTest 40 return invalid time period - ERROR:")
+    print("\nTest 50 return invalid time period - ERROR:")
     # Try to get an invalid time interval value
     try:
         print("Invalid key:", config_manager.get_time_interval_values("weeks"))
