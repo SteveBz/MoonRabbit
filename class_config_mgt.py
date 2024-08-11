@@ -1,7 +1,6 @@
 import json
 from datetime import datetime, timedelta
 import fcntl
-
 class ConfigManager:
     def __init__(self, file='config.json'):
         self.config_file = file
@@ -13,10 +12,11 @@ class ConfigManager:
                 fcntl.flock(f, fcntl.LOCK_EX)  # Acquire an exclusive lock
                 try:
                     config = json.load(f)
+                    fcntl.flock(f, fcntl.LOCK_UN)  # Release the lock
                 except json.JSONDecodeError:
+                    fcntl.flock(f, fcntl.LOCK_UN)  # Release the lock
                     config = self.create_default_config()
                     self.save_config(config)
-                fcntl.flock(f, fcntl.LOCK_UN)  # Release the lock
                 return config
         except FileNotFoundError:
             return self.create_default_config()
@@ -30,46 +30,13 @@ class ConfigManager:
             
     def create_default_config(self):
         default_config = {
-            "device_id": "GB00001",
+            "device_id": 1,
             "lat": 51.1,
             "long": 0.1,
             "sensor_co2": "scd30",
             "sensor_pressure": "bme280",
             "last_calibration_date": 0,
-            "last_calibration_value": 0,
-            "time_intervals": {
-                "month": {
-                    "start":datetime.now().isoformat(),
-                    "co2": 0,
-                    "temperature": 0,
-                    "humidity": 0,
-                    "pressure": 0,
-                    "count": 0
-                },
-                "min": {
-                    "start":datetime.now().isoformat(),
-                    "co2": [],
-                    "temperature": [],
-                    "humidity": [],
-                    "pressure": [],
-                },
-                "hour": {
-                    "start":datetime.now().isoformat(),
-                    "co2": 0,
-                    "temperature": 0,
-                    "humidity": 0,
-                    "pressure": 0,
-                    "count": 0
-                },
-                "day": {
-                    "start":datetime.now().isoformat(),
-                    "co2": 400,
-                    "temperature": 20,
-                    "humidity": 40,
-                    "pressure": 1000,
-                    "count": 0
-                }
-            }
+            "last_calibration_value": 0
         }
         self.save_config(default_config)
         return default_config
@@ -86,14 +53,14 @@ class ConfigManager:
         return float(self.config["lat"])
 
     def set_lat(self, lat):
-        self.config["lat"] = lat
+        self.config["lat"] = round(lat,4)
         self.save_config(self.config)
 
     def get_long(self):
         return float(self.config["long"])
 
     def set_long(self, long):
-        self.config["long"] = long
+        self.config["long"] = round(long,4)
         self.save_config(self.config)
     def get_time_interval_values(self, interval):
         if "time_intervals" not in self.config:
