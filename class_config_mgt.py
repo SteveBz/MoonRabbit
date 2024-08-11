@@ -178,7 +178,7 @@ class ConfigManager:
                     "pressure": [],
                 }
         if "hour" not in self.config["time_intervals"]:
-            self.config["time_intervals"]["hour"]: {
+            self.config["time_intervals"]["hour"]= {
                 "start":date_time,
                 "co2": 0,
                 "temperature": 0,
@@ -187,7 +187,7 @@ class ConfigManager:
                 "count":0
             }
         if "day" not in self.config["time_intervals"]:
-            self.config["time_intervals"]["day"]: {
+            self.config["time_intervals"]["day"]= {
                 "start":date_time,
                 "co2": 0,
                 "temperature": 0,
@@ -196,7 +196,7 @@ class ConfigManager:
                 "count":0
             }
         if "month" not in self.config["time_intervals"]:
-            self.config["time_intervals"]["month"]: {
+            self.config["time_intervals"]["month"]= {
                 "start":date_time,
                 "co2": 0,
                 "temperature": 0,
