@@ -30,7 +30,7 @@ class ConfigManager:
             
     def create_default_config(self):
         default_config = {
-            "device_id": "GB00001",
+            "device_id": 1,
             "lat": 51.1,
             "long": 0.1,
             "sensor_co2": "scd30",
