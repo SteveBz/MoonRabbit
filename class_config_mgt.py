@@ -30,9 +30,9 @@ class ConfigManager:
             
     def create_default_config(self):
         default_config = {
-            "device_id": 1,
+            "device_id": None,
             "registered": False,
-            "status": "00 - Raw",
+            "status": "00 - raw",
             "lat": 51.1,
             "long": 0.1,
             "sensor_co2": "scd30",
@@ -50,7 +50,22 @@ class ConfigManager:
     def set_device_id(self, device_id):
         self.config["device_id"] = device_id
         self.save_config(self.config)
+        
+    def get_status(self):
+        # Use the get method with a default value
+        return self.config.get("status", "00 - Raw")
 
+    def set_status(self, status):
+        self.config["status"] = status
+        self.save_config(self.config)
+    
+    def is_registered(self):
+        # Use the get method with a default value
+        return self.config.get("registered", False)
+
+    def set_registered(self, registered):
+        self.config["registered"] = registered
+        self.save_config(self.config)
     def get_lat(self):
         return float(self.config["lat"])
 
