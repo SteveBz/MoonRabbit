@@ -13,13 +13,20 @@ import time
 
 from class_geoip_location_provider import LocationProvider
 from class_database_mgt import DatabaseManager
-
+# for logging
+import sys
+import time
 import logging
+
+# import the PyIndi module
+import PyIndi
+from class_pyindi_client import IndiClient
+
 import json
 #from class_shipLog import logShipping
 from class_file_lock import FileLock
 # Set up logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 class SensorModule:
     PORT = 1
@@ -77,7 +84,7 @@ class SensorModule:
         
     def get_sensor_readings(self):
         print ("get_sensor_readings")
-        self.co2_val = self.read_co2()
+        self.co2_val = self.read_values()
         # Allow for zero value temp or hum in BME280
         if self.humidity_val==0 and self.hum != 0:
             self.humidity_val=self.hum
@@ -93,6 +100,17 @@ class SensorModule:
         db_manager.insert_measurement(self.device, 'bme280', self.lat, self.long, 'humidity', self.humidity_val)
         db_manager.insert_measurement(self.device, 'bme280', self.lat, self.long, 'pressure', self.pressure_val)
         db_manager.insert_measurement(self.device, 'bme280', self.lat, self.long, 'temperature', self.temperature_val)
+        # Check if self has an attribute named 'wind_direction'
+        if hasattr(self, 'wind_direction'):
+            db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'wind_direction', self.wind_direction)
+        # Check if self has an attribute named 'wind_speed'
+        if hasattr(self, 'wind_speed'):
+            db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'wind_speed', self.wind_speed)
+        # Check if self has an attribute named 'rain_rate'
+        if hasattr(self, 'rain_rate'):
+            db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'rain_rate', self.rain_rate)
+            
+            
         config=sensor_values.set_time_interval_values(datetime.now().isoformat(), 
                                                               {'co2':self.co2_val,
                                                               'humidity':self.humidity_val,
@@ -187,7 +205,7 @@ class SensorModule:
             # Temperature
             insert_record_from_value(self, table, 'bme280', 'temperature', config)
         
-    def read_co2(self):
+    def read_values(self):
         co2_val=400
         while True:
           if self.scd.data_available:
@@ -199,6 +217,85 @@ class SensorModule:
             if self.co2 < 5000:
               break
           time.sleep(1)
+          
+        indiClient = IndiClient()
+        indiClient.setServer("localhost", 7624)
+        
+        # Connect to server
+        print("Connecting and waiting 1 sec")
+        if not indiClient.connectServer():
+            print(
+                f"No indiserver running on {indiClient.getHost()}:{indiClient.getPort()} - Try to run"
+            )
+            print("  indiserver indi_simulator_telescope indi_simulator_ccd")
+            sys.exit(1)
+        
+        # Waiting for discover devices
+        time.sleep(1)
+        
+        # Print list of devices. The list is obtained from the wrapper function getDevices as indiClient is an instance
+        # of PyIndi.BaseClient and the original C++ array is mapped to a Python List. Each device in this list is an
+        # instance of PyIndi.BaseDevice, so we use getDeviceName to print its actual name.
+        #print("List of devices")
+        deviceList = indiClient.getDevices()
+        #for device in deviceList:
+        #    print(f"   > {device.getDeviceName()}")
+        
+        # Print all properties and their associated values.
+        #print("List of Device Properties")
+        self.device_readings={}
+        for device in deviceList:
+            print(f"-- {device.getDeviceName()}")
+            self.device_readings["device_name"]=device.getDeviceName()
+            genericPropertyList = device.getProperties()
+        
+            for genericProperty in genericPropertyList:
+                #print(f"   > {genericProperty.getName()} {genericProperty.getTypeAsString()}")
+        
+                #if genericProperty.getType() == PyIndi.INDI_TEXT:
+                #    for widget in PyIndi.PropertyText(genericProperty):
+                #        print(
+                #            f"       {widget.getName()}({widget.getLabel()}) = {widget.getText()}"
+                #        )
+        
+                if genericProperty.getType() == PyIndi.INDI_NUMBER:
+                    for widget in PyIndi.PropertyNumber(genericProperty):
+                      #print(f"{widget.getName()}")
+                      if "weather" in widget.getName().lower():
+                          print(
+                              f"       {widget.getName()}({widget.getLabel()}) = {widget.getValue()}"
+                          )
+                          self.device_readings[widget.getName()]=widget.getValue()
+                          if "rain_rate" in widget.getName().lower():
+                              self.rain_rate = widget.getValue()
+                          if "wind_speed" in widget.getName().lower():
+                              self.wind_speed = widget.getValue()
+                          if "wind_direction" in widget.getName().lower():
+                              self.wind_direction = widget.getValue()
+        
+                #if genericProperty.getType() == PyIndi.INDI_SWITCH:
+                #    for widget in PyIndi.PropertySwitch(genericProperty):
+                #        print(
+                #            f"       {widget.getName()}({widget.getLabel()}) = {widget.getStateAsString()}"
+                #        )
+        
+                #if genericProperty.getType() == PyIndi.INDI_LIGHT:
+                #    for widget in PyIndi.PropertyLight(genericProperty):
+                #        print(
+                #            f"       {widget.getLabel()}({widget.getLabel()}) = {widget.getStateAsString()}"
+                #        )
+        
+                #if genericProperty.getType() == PyIndi.INDI_BLOB:
+                #    for widget in PyIndi.PropertyBlob(genericProperty):
+                #        print(
+                #            f"       {widget.getName()}({widget.getLabel()}) = <blob {widget.getSize()} bytes>"
+                #        )
+        
+        # Disconnect from the indiserver
+        print("Disconnecting")
+        indiClient.disconnectServer()
+        print(self.device_readings)
+          
         return co2_val
         
 if __name__ == "__main__":
