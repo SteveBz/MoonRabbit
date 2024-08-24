@@ -1041,7 +1041,7 @@ EOF
 
 #########################################################
 
-
+sudo apt-get install swig
 pip install pyindi-client
 
 # This will make the utility scripts in the folder executable in case the user wants to use them.
