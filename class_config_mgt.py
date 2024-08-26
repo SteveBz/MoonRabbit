@@ -87,7 +87,7 @@ class ConfigManager:
         
         return registered
 
-    def set_registered(self, registered):
+    def set_registered(self, registered=True):
         self.config["registered"] = registered
         self.save_config(self.config)
     def get_lat(self):

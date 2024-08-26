@@ -3,10 +3,12 @@ from datetime import datetime
 import time
 from class_database_mgt import DatabaseManager
 
+from class_config_mgt import ConfigManager
+
 import logging
 
 # Set up logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 from class_file_lock import FileLock
@@ -16,7 +18,33 @@ class logShipping:
     @staticmethod
     def transfer_to_central_log(db_manager):
         # Connect to the local SQLite database
-        #db_manager = DatabaseManager('measurement.db')
+        db_manager = DatabaseManager('measurement.db')
+        
+
+        config_manager = ConfigManager("config.json")
+        if not config_manager.is_registered():
+            logger.info(f"Not registered")
+            url = 'http://www.carbonactive.org/cgi-bin/register_device.py'
+            
+            try:
+                logger.info(f"Not registered")
+                response = requests.get(url)
+                response.raise_for_status()  # This will raise an HTTPError for bad responses (4xx or 5xx)
+                
+                # You can now process the response if needed
+                device_data = response.json()  # Or response.text if it's not JSON
+                
+                # Do something with device_data
+                logger.info(device_data)
+                config_manager.set_registered()
+                config_manager.set_device_id(device_data["device_id"])
+                db_manager.update_device_id(device_data["device_id"])
+
+                
+            except requests.exceptions.HTTPError as http_err:
+                logger.error(f"HTTP error occurred: {http_err}")
+            except Exception as err:
+                logger.error(f"An error occurred: {err}")
 
         # Query local database for new entries
         new_entries = db_manager.select_measurements_by_transferred(0)

@@ -305,6 +305,38 @@ class DatabaseManager:
             UPDATE sensor_measurement SET transferred = 1 WHERE id = ?
         '''
         self.retry_operation(self.conn.cursor().execute, update_query, (id,), retries=2, base_sleep_interval=1, max_sleep_interval=1)
+        
+    def update_device_id(self, device_id):
+        """
+        Update the device ID for the whole table.
+    
+        :param device_id: The registered device_id of the device.
+        """
+        # Define the tables to be updated
+        tables = [
+            'sensor_measurement',
+            'sensor_measurement_mins',
+            'sensor_measurement_hours',
+            'sensor_measurement_days',
+            'sensor_measurement_monthly'
+        ]
+    
+        # Update each table
+        update_query = 'UPDATE {table} SET device_id = ? WHERE device_id != ?'
+    
+        for table in tables:
+            logger.info(f"Trying {table}")
+            try:
+                cursor = self.conn.cursor()  # Create a cursor
+                query = update_query.format(table=table)
+                self.retry_operation(cursor.execute, query, (device_id, device_id), retries=2, base_sleep_interval=1, max_sleep_interval=1)
+                cursor.close()  # Close the cursor after use
+                logger.info(f"Completing {table}")
+            except Exception as e:
+                logger.error(f"Failed to update {table}: {e}")
+    
+        self.conn.commit()  # Ensure changes are committed
+
 
     def insert_measurement(self, device_id, sensor, latitude, longitude, sensor_type, value):
         """

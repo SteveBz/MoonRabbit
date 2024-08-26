@@ -3,6 +3,7 @@ from datetime import datetime
 import time
 from class_database_mgt import DatabaseManager
 
+from class_config_mgt import ConfigManager
 import logging
 
 # Set up logging
@@ -17,6 +18,29 @@ class logShipping:
         # Connect to the local SQLite database
         #db_manager = DatabaseManager('measurement.db')
 
+        config_manager = ConfigManager("config.json")
+        
+        if not config_manager.is_registered():
+            url = 'http://www.carbonactive.org/cgi-bin/device_register.py'
+            
+            try:
+                response = requests.get(url)
+                response.raise_for_status()  # This will raise an HTTPError for bad responses (4xx or 5xx)
+                
+                # You can now process the response if needed
+                device_id = response.json()  # Or response.text if it's not JSON
+                
+                # Do something with device_data
+                print(device_id)
+                config_manager.set_device_id(device_id)
+                config_manager.set_registered()
+                db_manager.update_device_id(device_id)
+                
+            except requests.exceptions.HTTPError as http_err:
+                print(f"HTTP error occurred: {http_err}")
+            except Exception as err:
+                print(f"An error occurred: {err}")
+          
         # Query local database for new entries
         new_entries = db_manager.select_measurements_by_transferred(0)
         logger.info(f"Number of new entries to transfer: {len(new_entries)}")

@@ -65,6 +65,7 @@ class SensorModule:
         self.lat=config_manager.get_lat()
         self.long=config_manager.get_long()
         self.device=config_manager.get_device_id()
+        self.is_registered=config_manager.is_registered()
         # SCD-30 has tempremental I2C with clock stretching, datasheet recommends
         # starting at 50KHz
         self.i2c = busio.I2C(board.SCL, board.SDA) # uses board.SCL and board.SDA
@@ -92,6 +93,13 @@ class SensorModule:
             self.temperature_val=self.temp
         #print(1)
         #config_manager = ConfigManager()
+        if not self.is_registered:
+            config_manager = ConfigManager("config.json")
+            self.lat=config_manager.get_lat()
+            self.long=config_manager.get_long()
+            self.device=config_manager.get_device_id()
+            self.is_registered=config_manager.is_registered()
+            
         sensor_values = ConfigManager("sensor_values.json")
         lock = FileLock("SensorModule", lock_dir='locks')  # Use a dedicated directory for lock files
         lock.acquire_lock(wait=True)
@@ -222,12 +230,12 @@ class SensorModule:
         indiClient.setServer("localhost", 7624)
         
         # Connect to server
-        print("Connecting and waiting 1 sec")
+        logger.info ("Connecting and waiting 1 sec")
         if not indiClient.connectServer():
-            print(
+            logger.error (
                 f"No indiserver running on {indiClient.getHost()}:{indiClient.getPort()} - Try to run"
             )
-            print("  indiserver indi_simulator_telescope indi_simulator_ccd")
+            logger.info ("  indiserver indi_simulator_telescope indi_simulator_ccd")
             sys.exit(1)
         
         # Waiting for discover devices
@@ -245,12 +253,12 @@ class SensorModule:
         #print("List of Device Properties")
         self.device_readings={}
         for device in deviceList:
-            print(f"-- {device.getDeviceName()}")
+            logger.info (f"-- {device.getDeviceName()}")
             self.device_readings["device_name"]=device.getDeviceName()
             genericPropertyList = device.getProperties()
         
             for genericProperty in genericPropertyList:
-                #print(f"   > {genericProperty.getName()} {genericProperty.getTypeAsString()}")
+                logger.info (f"   > {genericProperty.getName()} {genericProperty.getTypeAsString()}")
         
                 #if genericProperty.getType() == PyIndi.INDI_TEXT:
                 #    for widget in PyIndi.PropertyText(genericProperty):
@@ -260,24 +268,25 @@ class SensorModule:
         
                 if genericProperty.getType() == PyIndi.INDI_NUMBER:
                     for widget in PyIndi.PropertyNumber(genericProperty):
-                      #print(f"{widget.getName()}")
-                      if "weather" in widget.getName().lower():
-                          print(
-                              f"       {widget.getName()}({widget.getLabel()}) = {widget.getValue()}"
-                          )
-                          self.device_readings[widget.getName()]=widget.getValue()
-                          if "rain_rate" in widget.getName().lower():
-                              self.rain_rate = widget.getValue()
-                          if "wind_speed" in widget.getName().lower():
-                              self.wind_speed = widget.getValue()
-                          if "wind_direction" in widget.getName().lower():
-                              self.wind_direction = widget.getValue()
+                        #print(f"{widget.getName()}")
+                        if "weather" in widget.getName().lower():
+                            logger.info (
+                                f"       {widget.getName()}({widget.getLabel()}) = {widget.getValue()}"
+                            )
+                            self.device_readings[widget.getName()]=widget.getValue()
+                            if "rain_rate" in widget.getName().lower():
+                                self.rain_rate = widget.getValue()
+                            if "wind_speed" in widget.getName().lower():
+                                self.wind_speed = widget.getValue()
+                            if "wind_direction" in widget.getName().lower():
+                                self.wind_direction = widget.getValue()
         
-                #if genericProperty.getType() == PyIndi.INDI_SWITCH:
-                #    for widget in PyIndi.PropertySwitch(genericProperty):
-                #        print(
-                #            f"       {widget.getName()}({widget.getLabel()}) = {widget.getStateAsString()}"
-                #        )
+                if genericProperty.getType() == PyIndi.INDI_SWITCH:
+                    for widget in PyIndi.PropertySwitch(genericProperty):
+                        if "connect" in widget.getName().lower():
+                            logger.info (
+                                f"       {widget.getName()}({widget.getLabel()}) = {widget.getStateAsString()}"
+                            )
         
                 #if genericProperty.getType() == PyIndi.INDI_LIGHT:
                 #    for widget in PyIndi.PropertyLight(genericProperty):
