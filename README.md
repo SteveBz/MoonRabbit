@@ -10,9 +10,13 @@ If starting with blank micro SD card:
 Connect your keyboard and mouse to the OTG port via a OTG (On-The-Go) USB hub with a micro USB plug. Connect the monitor to the mini-HDMI port and boot by plugging the power cable in.  
 
 On first start, setup the default user name "pi" and password "RaspberryPi"
+
 Connect to WiFi
+
 Enable Raspberry Pi Connect if you like.
+
 "Skip" OS Update
+
 Restart
 
 ### Set up WiFi or Network
