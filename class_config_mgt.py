@@ -104,7 +104,7 @@ class ConfigManager:
         self.config["long"] = round(long,4)
         self.save_config(self.config)
         
-    def get_time_interval_values(self, interval):
+    def get_time_interval_values(self, interval="min"):
         if "time_intervals" not in self.config:
             self.config["time_intervals"] = {
                 "month": {

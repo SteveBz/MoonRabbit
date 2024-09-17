@@ -105,6 +105,7 @@ class SensorModule:
             self.is_registered=config_manager.is_registered()
             
         sensor_values = ConfigManager("sensor_values.json")
+        sensor_values.get_time_interval_values()
         lock = FileLock("SensorModule", lock_dir='locks')  # Use a dedicated directory for lock files
         lock.acquire_lock(wait=True)
         db_manager = DatabaseManager('measurement.db')
@@ -122,7 +123,7 @@ class SensorModule:
         if hasattr(self, 'rain_rate'):
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'rain_rate', self.rain_rate)
             
-            
+        
         config=sensor_values.set_time_interval_values(datetime.now().isoformat(), 
                                                               {'co2':self.co2_val,
                                                               'humidity':self.humidity_val,
