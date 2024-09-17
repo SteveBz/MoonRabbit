@@ -7,14 +7,15 @@ If starting with blank micro SD card:
 # MoonRabbit setup
 
 ## Via a keyboard, mouse and screen through the rpi0 OTG port
+Connect your keyboard and mouse to the OTG port via a OTG (On-The-Go) USB hub with a micro USB plug. Connect the monitor to the mini-HDMI port and boot by plugging the power cable in.  
+
 On first start, setup the default user name "pi" and password "RaspberryPi"
+Connect to WiFi
 "Skip" OS Update
 Restart
 
-Connect your keyboard and mouse to the OTG port via a OTG (On-The-Go) USB hub with a micro USB plug. Connect the monitor to the mini-HDMI port and boot by plugging the power cable in.  
-
 ### Set up WiFi or Network
-
+If WiFi not yet connected:
 Connect to the WiFi using the icon at the top right of the screen.
 
 ### Set up SSH & I2C
