@@ -11,6 +11,7 @@ Connect your keyboard and mouse to the OTG port via a OTG (On-The-Go) USB hub wi
 
 On first start, setup the default user name "pi" and password "RaspberryPi"
 Connect to WiFi
+Enable Raspberry Pi Connect if you like.
 "Skip" OS Update
 Restart
 
