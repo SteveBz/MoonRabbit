@@ -2,7 +2,7 @@
 A Raspberry Pi powered CO2 monitoring station using Python and Flask  
 If starting with blank micro SD card:
 ## Flash the Micro SD card with the Rapberry Pi Imager 
-#Use settings: "Raspberry Pi Zero 2 W", "64 Bit", 
+#Use settings: "Raspberry Pi Zero 2 W", "legacy 32 Bit", 
 
 Test
 
@@ -27,10 +27,10 @@ Menu>Preferences>Praspberry Pi Configuration>Interface>I2C
 
 Menu>Preferences>Praspberry Pi Configuration>Interface>VNC
 
-Menu>Preferences>Praspberry Pi Configuration>Localisation>Locale
-Menu>Preferences>Praspberry Pi Configuration>Localisation>Timezone
-Menu>Preferences>Praspberry Pi Configuration>Localisation>Keyboard if necessary
-Menu>Preferences>Praspberry Pi Configuration>Localisation>WiFi Country
+Menu>Preferences>Raspberry Pi Configuration>Localisation>Locale
+Menu>Preferences>Raspberry Pi Configuration>Localisation>Timezone
+Menu>Preferences>Raspberry Pi Configuration>Localisation>Keyboard if necessary
+Menu>Preferences>Raspberry Pi Configuration>Localisation>WiFi Country
 
 ## Via SSH
 ### Fix swap memory default

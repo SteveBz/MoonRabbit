@@ -243,7 +243,7 @@ class SensorModule:
                 f"No indiserver running on {indiClient.getHost()}:{indiClient.getPort()} - Try to run"
             )
             logger.info ("  indiserver indi_simulator_telescope indi_simulator_ccd")
-            sys.exit(1)
+            #sys.exit(1)
         
         # Waiting for discover devices
         time.sleep(1)
