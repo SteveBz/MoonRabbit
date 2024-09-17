@@ -18,16 +18,20 @@ import sys
 import time
 import logging
 
+# Set up logging
+logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
+logger = logging.getLogger(__name__)
 # import the PyIndi module
-import PyIndi
-from class_pyindi_client import IndiClient
+try:
+    import PyIndi
+    from class_pyindi_client import IndiClient
+except:
+    logger.info (f"Pyindi not installed")
+    
 
 import json
 #from class_shipLog import logShipping
 from class_file_lock import FileLock
-# Set up logging
-logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
-logger = logging.getLogger(__name__)
 class SensorModule:
     PORT = 1
     ADDRESS = 0x76
@@ -216,17 +220,20 @@ class SensorModule:
     def read_values(self):
         co2_val=400
         while True:
-          if self.scd.data_available:
-            self.temp=self.scd.temperature
-            self.hum=self.scd.relative_humidity
-            self.co2=self.scd.CO2
-
-            co2_val = self.co2
-            if self.co2 < 5000:
-              break
-          time.sleep(1)
-          
-        indiClient = IndiClient()
+            if self.scd.data_available:
+                self.temp=self.scd.temperature
+                self.hum=self.scd.relative_humidity
+                self.co2=self.scd.CO2
+    
+                co2_val = self.co2
+                if self.co2 < 5000:
+                    break
+            time.sleep(1)
+        try:
+            indiClient = IndiClient()
+        except:
+            return co2_val
+            
         indiClient.setServer("localhost", 7624)
         
         # Connect to server
