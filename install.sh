@@ -3,6 +3,8 @@ sudo apt update
 sudo apt-get install -y sqlite3 sqlitebrowser
 sudo apt install -y software-properties-common
 sudo apt-get install -y indi-bin indi-aagcloudwatcher-ng
+sudo apt install swig
+sudo apt install libindi-dev
 
 # Clear supervisor configuration files
 sudo rm /etc/supervisor/conf.d/*.conf
