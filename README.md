@@ -37,6 +37,16 @@ Menu>Preferences>Raspberry Pi Configuration>Localisation>Keyboard if necessary
 Menu>Preferences>Raspberry Pi Configuration>Localisation>WiFi Country
 
 ## Via SSH
+
+
+You'll need the IP address of your raspberry pi. Get it from
+```
+(venv) pi@raspberrypi:~ $ ifconfig | grep 192
+        inet 192.168.1.61  netmask 255.255.255.0  broadcast 192.168.1.255
+```
+And it's the address of the format 192.168, but not ending 255, so in this case its 192.168.1.61
+
+
 ### Fix swap memory default
 The initial default, virtual memory allocation is very small.  You need to expand it to allow many things, such as updating software.
 
@@ -103,10 +113,6 @@ dtparam=spi=on
 dtparam=i2c_arm_baudrate=10000
 ```
 Use Control-s to save the changes and control-x to exit nano.
-Then reboot Moon Rabbit, to apply the changes.
-```
-sudo reboot
-```
 ### Install Moon Rabbit Software
 ```
 # Clone the project repository
@@ -116,17 +122,6 @@ cd MoonRabbit/
 python3 -m venv venv
 . venv/bin/activate
 sh install.sh
-```
-Find out the IP address of your raspberry pi from
-```
-(venv) pi@raspberrypi:~ $ ifconfig | grep 192
-        inet 192.168.1.61  netmask 255.255.255.0  broadcast 192.168.1.255
-```
-And it's the address of the format 192.168, but not ending 255, so in this case its 192.168.1.61
-
-Then reboot Moon Rabbit.
-```
-sudo reboot
 ```
 
 ### Test Moon Rabbit in a browser
