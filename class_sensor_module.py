@@ -93,7 +93,7 @@ class SensorModule:
         # Allow for zero value temp or hum in BME280
         if self.humidity_val==0 and self.hum != 0:
             self.humidity_val=self.hum
-        if (self.temperature_val==0 and self.temp != 0) or (self.temperature_val>100 and self.temp < 100) :
+        if self.temperature_val==0 and self.temp != 0:
             self.temperature_val=self.temp
         #print(1)
         #config_manager = ConfigManager()
@@ -233,7 +233,7 @@ class SensorModule:
         try:
             indiClient = IndiClient()
         except:
-            return (self.co2, self.hum, self.temp)
+            return self.co2
             
         indiClient.setServer("localhost", 7624)
         
