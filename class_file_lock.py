@@ -221,13 +221,13 @@ if __name__ == "__main__":
     lock4 = FileLock("App4", lock_dir='locks')
     lock4.LOCK_TIMEOUT = timedelta(seconds=5)
     if lock4.acquire_lock():
-        print("App4 acquired lock.")
+        print("App4 acquired lock. SUCCESS!")
     else:
-        print("App4 failed to acquire lock.")
+        print("App4 failed to acquire lock. FAIL")
     print("Waiting for lock to timeout...")
     time.sleep(10)
     if lock4.acquire_lock():
-        print("App4 reacquired lock after timeout.")
+        print("App4 reacquired lock after timeout.  SUCCESS!")
     else:
-        print("App4 failed to reacquire lock after timeout.")
+        print("App4 failed to reacquire lock after timeout. FAIL")
     lock4.release_lock(force=True)  # Ensure cleanup after test
