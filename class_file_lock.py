@@ -214,7 +214,7 @@ if __name__ == "__main__":
         print("App3 failed to acquire lock. SUCCESS")
     lock2.release_lock()
     time.sleep(2)
-    if lock3.acquire_lock():
+    if lock3.acquire_lock(wait=True):
         print("App3 acquired lock after App2 released it. SUCCESS!")
     else:
         print("App3 failed to acquire lock after App2 released it. FAIL")
