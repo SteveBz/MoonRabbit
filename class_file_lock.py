@@ -101,8 +101,12 @@ class FileLock:
                             continue
                 if not wait:
                     return False
-                self.set_status('waiting')
-                time.sleep(1)
+
+                # Ensure other applications are not already in "waiting" state
+                waiting_files = [f for f in os.listdir(self.lock_dir) if f.endswith('.waiting')]
+                if f"{self.app_name}.waiting" not in waiting_files:
+                    self.set_status('waiting')
+                time.sleep(2)  # Increase delay slightly to prevent busy-looping
                 
 
     def release_lock(self, force=False):
