@@ -204,7 +204,7 @@ if __name__ == "__main__":
     print("\nTest 4: Simulate App3 waiting and then acquiring lock after App2 releases")
     print("Expected result: App3 fails to acquire the lock initially, but succeeds after App2 releases it.")
     lock3 = FileLock("App3", lock_dir='locks')
-    if lock3.acquire_lock():
+    if lock3.acquire_lock(wait=True):
         print("App3 acquired lock. FAIL")
     else:
         print("App3 failed to acquire lock. SUCCESS")
