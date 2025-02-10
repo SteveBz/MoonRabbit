@@ -223,16 +223,12 @@ if __name__ == "__main__":
     time.sleep(2)  # Print(Check waiting lock) - update test code.
     print("Waiting over, release lock. >>")
     lock2.release_lock()
-    #if lock3.acquire_lock(wait=True):
-    #    print("App3 acquired lock after App2 released it. SUCCESS!")
-    #else:
-    #    print("App3 failed to acquire lock after App2 released it. FAIL")
 
     # Test 5: Simulate lock timeout
     print("\nTest 5: Simulate lock timeout")
     print("Expected result: App4 acquires the lock initially, the lock times out, and App4 reacquires the lock after timeout.")
     lock4 = FileLock("App4", lock_dir='locks')
-    lock4.LOCK_TIMEOUT = timedelta(seconds=5)
+    print("lock4.LOCK_TIMEOUT = ", lock4.LOCK_TIMEOUT)
     if lock4.acquire_lock():
         print("App4 acquired lock. SUCCESS!")
     else:
