@@ -229,6 +229,7 @@ if __name__ == "__main__":
     print("Expected result: App4 acquires the lock initially, the lock times out, and App4 reacquires the lock after timeout.")
     lock4 = FileLock("App4", lock_dir='locks')
     print("lock4.LOCK_TIMEOUT = ", lock4.LOCK_TIMEOUT)
+    print ("Locked files =", self.is_locked())
     if lock4.acquire_lock():
         print("App4 acquired lock. SUCCESS!")
     else:
