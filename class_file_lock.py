@@ -175,7 +175,7 @@ if __name__ == "__main__":
     # Test Plan
 
     # Test 1: Create a lock for App1
-    print("Test 1: Create a lock for App1")
+    print("Test 1: Basic Lock Acquisition - create a lock for App1")
     print("Expected result: App1 acquires the lock.")
     lock1 = FileLock("App1", lock_dir='locks')
     if lock1.acquire_lock():
@@ -185,7 +185,7 @@ if __name__ == "__main__":
     time.sleep(2)
 
     # Test 2: Try to acquire lock for App2 while App1 holds it
-    print("\nTest 2: Try to acquire lock for App2 while App1 holds it (from Test 1")
+    print("\nTest 2: Lock Contention - try to acquire lock for App2 while App1 holds it (from Test 1)")
     print("Expected result: App2 fails to acquire the lock because App1 is holding it.")
     lock2 = FileLock("App2", lock_dir='locks')
     if lock2.acquire_lock():
@@ -194,7 +194,7 @@ if __name__ == "__main__":
         print("App2 failed to acquire lock SUCCESS!")
     time.sleep(2)
 
-    # Test 3: Release lock for App1 and acquire for App2
+    # Test 3: Releasing and Reacquiring - release lock for App1 and acquire for App2
     print("\nTest 3: Release lock for App1 and acquire for App2")
     print("Expected result: App2 acquires the lock after App1 releases it.")
     lock1.release_lock()
@@ -204,7 +204,7 @@ if __name__ == "__main__":
         print("App2 failed to acquire lock after App1 released it. FAIL")
     time.sleep(2)
 
-    # Test 4: Simulate App3 waiting and then acquiring lock after App2 releases
+    # Test 4: Waiting Mechanism - simulate App3 waiting and then acquiring lock after App2 releases
     print("\nTest 4: Simulate App3 waiting and then acquiring lock after App2 releases")
     print("Expected result: App3 fails to acquire the lock initially, but succeeds after App2 releases it.")
     lock3 = FileLock("App3", lock_dir='locks')
@@ -212,8 +212,8 @@ if __name__ == "__main__":
         print("App3 acquired lock. FAIL")
     else:
         print("App3 failed to acquire lock. SUCCESS")
+    time.sleep(20)
     lock2.release_lock()
-    time.sleep(2)
     if lock3.acquire_lock(wait=True):
         print("App3 acquired lock after App2 released it. SUCCESS!")
     else:
