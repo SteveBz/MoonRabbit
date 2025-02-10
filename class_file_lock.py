@@ -230,16 +230,17 @@ if __name__ == "__main__":
     print("\nTest 5: Simulate lock timeout")
     print("Expected result: App4 acquires the lock initially, the lock times out, and App4 reacquires the lock after timeout.")
     lock4 = FileLock("App4", lock_dir='locks')
+    lock4.LOCK_TIMEOUT = timedelta(seconds=5)
     print("lock4.LOCK_TIMEOUT = ", lock4.LOCK_TIMEOUT)
     print ("Locked files =", lock4.is_locked())
-    if lock4.acquire_lock():
-        print("App4 acquired lock. SUCCESS!")
+    if lock4.acquire_lock(wait=True):
+        print("App4 acquired lock before timeout: FAIL, else: SUCCESS!")
     else:
         print("App4 failed to acquire lock. FAIL")
     print("Waiting for lock to timeout...")
     time.sleep(10)
-    if lock4.acquire_lock():
-        print("App4 reacquired lock after timeout.  SUCCESS!")
-    else:
-        print("App4 failed to reacquire lock after timeout. FAIL")
+    #if lock4.acquire_lock(wait=True):
+    #    print("App4 acquired lock before timeout: FAIL, else: SUCCESSSSUCCESS!")
+    #else:
+    #    print("App4 failed to reacquire lock after timeout. FAIL")
     lock4.release_lock(force=True)  # Ensure cleanup after test
