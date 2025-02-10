@@ -195,7 +195,7 @@ if __name__ == "__main__":
     time.sleep(2)
 
     # Test 3: Releasing and Reacquiring - release lock for App1 and acquire for App2
-    print("\nTest 3: Release lock for App1 and acquire for App2")
+    print("\nTest 3: Releasing and Reacquiring - release lock for App1 and acquire for App2")
     print("Expected result: App2 acquires the lock after App1 releases it.")
     lock1.release_lock()
     if lock2.acquire_lock():
@@ -205,14 +205,14 @@ if __name__ == "__main__":
     time.sleep(2)
 
     # Test 4: Waiting Mechanism - simulate App3 waiting and then acquiring lock after App2 releases
-    print("\nTest 4: Simulate App3 waiting and then acquiring lock after App2 releases")
+    print("\nTest 4: Waiting Mechanism - simulate App3 waiting and then acquiring lock after App2 releases")
     print("Expected result: App3 fails to acquire the lock initially, but succeeds after App2 releases it.")
     lock3 = FileLock("App3", lock_dir='locks')
     if lock3.acquire_lock(wait=True):
         print("App3 acquired lock. FAIL")
     else:
         print("App3 failed to acquire lock. SUCCESS")
-    time.sleep(20)
+    time.sleep(2)  # Print(Check waiting lock) - update test code.
     lock2.release_lock()
     if lock3.acquire_lock(wait=True):
         print("App3 acquired lock after App2 released it. SUCCESS!")
