@@ -211,6 +211,7 @@ if __name__ == "__main__":
     # Define App3's attempt function inline
     def app3_attempt():
         lock3 = FileLock("App3", lock_dir='locks')
+        print(""Attempting lock3)
         if lock3.acquire_lock(wait=True):
             print("App3 acquired lock before wait over: FAIL, else: SUCCESSS")
         else:
