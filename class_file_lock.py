@@ -146,6 +146,7 @@ class FileLock:
         self.heartbeat_active.set()
         self.heartbeat_thread = threading.Thread(target=self._heartbeat)
         self.heartbeat_thread.start()
+        print("Heartbeat started")
 
     def _heartbeat(self):
         """
@@ -155,6 +156,7 @@ class FileLock:
             with open(self.lock_file, 'w') as f:
                 f.write(datetime.now().isoformat())
             time.sleep(self.HEARTBEAT_INTERVAL.total_seconds())
+            print("Heartbeat")
 
     def is_locked_by_self(self):
         """
