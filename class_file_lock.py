@@ -90,7 +90,7 @@ class FileLock:
                 locked_and_waiting_files = [f for f in os.listdir(self.lock_dir) if f.endswith('.locked') or f.endswith('.waiting')]
                 for file in locked_and_waiting_files:
                     file_path = os.path.join(self.lock_dir, file)
-                    if file_path != os.path.basename(self.file):
+                    if file_path != self.lock_file and file_path != self.wait_file:
                         try:
                             with open(file_path, 'r') as f:
                                 timestamp_str = f.read().strip()
