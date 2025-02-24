@@ -182,6 +182,7 @@ if __name__ == "__main__":
     lock1 = FileLock("App1", lock_dir='locks')
     if lock1.acquire_lock():
         print("Test 1: App1 acquired lock. SUCCESS!")
+        lock1.release_lock()
     else:
         print("Test 1: Basic Lock Acquisition - create a lock for App1")
         print("Expected result: App1 acquires the lock.")
@@ -189,19 +190,28 @@ if __name__ == "__main__":
     time.sleep(2)
 
     # Test 2: Try to acquire lock for App2 while App1 holds it
-    lock2 = FileLock("App2", lock_dir='locks')
+    lock1 = FileLock("Test2_App1", lock_dir='locks')
+    lock2 = FileLock("Test2_App2", lock_dir='locks')
+    lock1.acquire_lock()
     if lock2.acquire_lock():
         print("App2 acquired lock. FAIL")
-        print("\nTest 2: Lock Contention - try to acquire lock for App2 while App1 holds it (from Test 1)")
+        print("\nTest 2: Lock Contention - try to acquire lock for App2 while App1 holds it")
         print("Expected result: App2 fails to acquire the lock because App1 is holding it.")
+        lock2.release_lock()
     else:
         print("Test 2: App2 failed to acquire lock SUCCESS!")
+    lock1.release_lock()
     time.sleep(2)
 
     # Test 3: Releasing and Reacquiring - release lock for App1 and acquire for App2
+    
+    lock1 = FileLock("Test3_App1")
+    lock2 = FileLock("Test3_App2")
+    lock1.acquire_lock()
     lock1.release_lock()
     if lock2.acquire_lock():
         print("Test 3: App2 acquired lock after App1 released it. SUCCESS")
+        lock2.release_lock()
     else:
         print("\nTest 3: Releasing and Reacquiring - release lock for App1 and acquire for App2")
         print("Expected result: App2 acquires the lock after App1 releases it.")
@@ -214,13 +224,16 @@ if __name__ == "__main__":
 
     # Define App3's attempt function inline
     def app3_attempt():
-        lock3 = FileLock("App3", lock_dir='locks')
+        lock3 = FileLock("Test4_App3", lock_dir='locks')
         print("Attempting lock3")
         if lock3.acquire_lock(wait=True):
             print("App3 acquired lock before wait over: FAIL, else: SUCCESSS")
         else:
             print("App3 failed to acquire lock. FAILS")
     # Start App3 in a separate thread
+    
+    lock2 = FileLock("Test4_App2")
+    lock2.acquire_lock()
     app3_thread = threading.Thread(target=app3_attempt)
     app3_thread.start()
     
