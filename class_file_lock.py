@@ -87,17 +87,18 @@ class FileLock:
                 return True
             else:
                 # Check for lock timeout
-                locked_files = [f for f in os.listdir(self.lock_dir) if f.endswith('.locked')]
-                for locked_file in locked_files:
-                    if locked_file != os.path.basename(self.lock_file):
+                locked_and_waiting_files = [f for f in os.listdir(self.lock_dir) if f.endswith('.locked') or f.endswith('.waiting')]
+                for file in locked_and_waiting_files:
+                    file_path = os.path.join(self.lock_dir, file)
+                    if file_path != os.path.basename(self.file):
                         try:
-                            with open(os.path.join(self.lock_dir, locked_file), 'r') as f:
-                                lock_time_str = f.read().strip()
-                                if lock_time_str:
-                                    lock_time = datetime.fromisoformat(lock_time_str)
-                                    if datetime.now() - lock_time > self.LOCK_TIMEOUT:
-                                        os.remove(lock_time_str)  # Directly remove the expired lock file
-                                        print(f"Lock {lock_time_str} expired and was removed.")
+                            with open(file_path, 'r') as f:
+                                timestamp_str = f.read().strip()
+                                if timestamp_str:
+                                    timestamp = datetime.fromisoformat(timestamp_str)
+                                    if datetime.now() - timestamp > self.LOCK_TIMEOUT:
+                                        os.remove(file_path)  # Remove expired lock or waiting file
+                                        print(f"Expired file {file} removed.")
                         except (ValueError, FileNotFoundError):
                             continue
                 if not wait:
