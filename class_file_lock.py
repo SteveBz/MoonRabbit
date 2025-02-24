@@ -177,32 +177,32 @@ if __name__ == "__main__":
     # Test Plan
 
     # Test 1: Create a lock for App1
-    print("Test 1: Basic Lock Acquisition - create a lock for App1")
-    print("Expected result: App1 acquires the lock.")
     lock1 = FileLock("App1", lock_dir='locks')
     if lock1.acquire_lock():
-        print("App1 acquired lock. SUCCESS!")
+        print("Test 1: App1 acquired lock. SUCCESS!")
     else:
+        print("Test 1: Basic Lock Acquisition - create a lock for App1")
+        print("Expected result: App1 acquires the lock.")
         print("App1 failed to acquire lock. FAIL")
     time.sleep(2)
 
     # Test 2: Try to acquire lock for App2 while App1 holds it
-    print("\nTest 2: Lock Contention - try to acquire lock for App2 while App1 holds it (from Test 1)")
-    print("Expected result: App2 fails to acquire the lock because App1 is holding it.")
     lock2 = FileLock("App2", lock_dir='locks')
     if lock2.acquire_lock():
         print("App2 acquired lock. FAIL")
+        print("\nTest 2: Lock Contention - try to acquire lock for App2 while App1 holds it (from Test 1)")
+        print("Expected result: App2 fails to acquire the lock because App1 is holding it.")
     else:
-        print("App2 failed to acquire lock SUCCESS!")
+        print("Test 2: App2 failed to acquire lock SUCCESS!")
     time.sleep(2)
 
     # Test 3: Releasing and Reacquiring - release lock for App1 and acquire for App2
-    print("\nTest 3: Releasing and Reacquiring - release lock for App1 and acquire for App2")
-    print("Expected result: App2 acquires the lock after App1 releases it.")
     lock1.release_lock()
     if lock2.acquire_lock():
-        print("App2 acquired lock after App1 released it. SUCCESS")
+        print("Test 3: App2 acquired lock after App1 released it. SUCCESS")
     else:
+        print("\nTest 3: Releasing and Reacquiring - release lock for App1 and acquire for App2")
+        print("Expected result: App2 acquires the lock after App1 releases it.")
         print("App2 failed to acquire lock after App1 released it. FAIL")
     time.sleep(2)
 
