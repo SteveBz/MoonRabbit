@@ -210,8 +210,11 @@ if __name__ == "__main__":
     lock1 = FileLock("Test3_App1")
     lock2 = FileLock("Test3_App2")
     lock1.acquire_lock()
+    time.sleep(1)
     lock1.release_lock()
+    time.sleep(1)
     if lock2.acquire_lock():
+        time.sleep(1)
         lock2.release_lock()
         print("Test 3: App2 acquired lock after App1 released it. SUCCESS")
     else:
