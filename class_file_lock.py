@@ -96,7 +96,7 @@ class FileLock:
                                 if lock_time_str:
                                     lock_time = datetime.fromisoformat(lock_time_str)
                                     if datetime.now() - lock_time > self.LOCK_TIMEOUT:
-                                        os.remove(lock_file_path)  # Directly remove the expired lock file
+                                        os.remove(lock_time_str)  # Directly remove the expired lock file
                                         print(f"Lock {lock_time_str} expired and was removed.")
                         except (ValueError, FileNotFoundError):
                             continue
