@@ -188,19 +188,21 @@ if __name__ == "__main__":
         print("Expected result: App1 acquires the lock.")
         print("App1 failed to acquire lock. FAIL")
     time.sleep(2)
-
+    print("----------------------------------------------------")
+    
     # Test 2: Try to acquire lock for App2 while App1 holds it
     lock1 = FileLock("Test2_App1", lock_dir='locks')
     lock2 = FileLock("Test2_App2", lock_dir='locks')
     lock1.acquire_lock()
     if lock2.acquire_lock():
-        print("App2 acquired lock. FAIL")
         print("\nTest 2: Lock Contention - try to acquire lock for App2 while App1 holds it")
         print("Expected result: App2 fails to acquire the lock because App1 is holding it.")
         lock2.release_lock()
+        print("App2 acquired lock. FAIL")
     else:
         print("Test 2: App2 failed to acquire lock SUCCESS!")
     lock1.release_lock()
+    print("----------------------------------------------------")
     time.sleep(2)
 
     # Test 3: Releasing and Reacquiring - release lock for App1 and acquire for App2
@@ -210,17 +212,17 @@ if __name__ == "__main__":
     lock1.acquire_lock()
     lock1.release_lock()
     if lock2.acquire_lock():
-        print("Test 3: App2 acquired lock after App1 released it. SUCCESS")
         lock2.release_lock()
+        print("Test 3: App2 acquired lock after App1 released it. SUCCESS")
     else:
         print("\nTest 3: Releasing and Reacquiring - release lock for App1 and acquire for App2")
         print("Expected result: App2 acquires the lock after App1 releases it.")
         print("App2 failed to acquire lock after App1 released it. FAIL")
+        
+    print("----------------------------------------------------")
     time.sleep(2)
 
     # Test 4: Waiting Mechanism - simulate App3 waiting and then acquiring lock after App2 releases
-    print("\nTest 4: Waiting Mechanism with Threads - App3 should wait and acquire lock after App2 releases")
-    print("Expected result: App3 waits while App2 holds the lock, then acquires it after App2 releases.")
 
     # Define App3's attempt function inline
     def app3_attempt():
@@ -229,6 +231,8 @@ if __name__ == "__main__":
         if lock3.acquire_lock(wait=True):
             print("App3 acquired lock before wait over: FAIL, else: SUCCESSS")
         else:
+            print("\nTest 4: Waiting Mechanism with Threads - App3 should wait and acquire lock after App2 releases")
+            print("Expected result: App3 waits while App2 holds the lock, then acquires it after App2 releases.")
             print("App3 failed to acquire lock. FAILS")
     # Start App3 in a separate thread
     
@@ -240,7 +244,8 @@ if __name__ == "__main__":
     time.sleep(2)  # Print(Check waiting lock) - update test code.
     print("Waiting over, release lock. >>")
     lock2.release_lock()
-
+    print("----------------------------------------------------")
+    
     # Test 5: Simulate lock timeout
     print("\nTest 5: Simulate lock timeout")
     print("Expected result: App4 acquires the lock initially, the lock times out, and App4 reacquires the lock after timeout.")
@@ -259,3 +264,5 @@ if __name__ == "__main__":
     #else:
     #    print("App4 failed to reacquire lock after timeout. FAIL")
     lock4.release_lock(force=True)  # Ensure cleanup after test
+    
+    print("----------------------------------------------------")
