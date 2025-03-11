@@ -140,8 +140,8 @@ Eg, like this, substituting your address for the example.
 
 # MoonRabbit Calibration
 
-Some of the SCD30s come nicely calibrated, some are well out.  Of the two I just one was rught with about 6 ppm, and one was out by 150 ppm.
+Some of the SCD30s come nicely calibrated, some are well out.  Of the two I just one was correct to about 6 ppm, and one was out by 150 ppm.
 
-As we don't know which is which, we have to calibrate them all.  This is a major cost item.  A bottle of calibration gas and a valve just cost me £250 as of 2024.  For this you can calibrate about 4 Moon Rabbits.
+I'm working on calibration both by using a known concentration source and other means. 
 
-I bought a 2000 ppm cylinder of CO2 and air calibration gas.  
+Watch this space.
