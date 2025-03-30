@@ -36,7 +36,7 @@ class SensorModule:
     PORT = 1
     ADDRESS = 0x76
     ADDRESS2 = 0x77
-    self.I2C_status=True
+    I2C_status=True
        
     def __init__(self):
         #print ("__init__")
