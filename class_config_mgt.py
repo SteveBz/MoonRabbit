@@ -58,7 +58,7 @@ class ConfigManager:
         if bus_address == 0:
             self.save_config(self.config)
         
-        return device_id
+        return bus_address
         
     def set_bus_address(self, bus_address):
         self.config["bus_address"] = bus_address
