@@ -75,10 +75,11 @@ class SensorModule:
                 SensorModule.ADDRESS=SensorModule.ADDRESS2
                 config_manager.set_bus_address(bus_address)
         else:
-            try:
+            #try:
                 self.calibration_params = bme280.load_calibration_params(self.bus, bus_address)
-            except:
-                self.I2C_status=self.reset_i2c(SensorModule.PORT)
+            #except:
+            #    self.I2C_status=self.reset_i2c(SensorModule.PORT)
+            #    self.calibration_params = bme280.load_calibration_params(self.bus, bus_address)
         
         #print ("calling DatabaseManager")
         #db_manager = DatabaseManager('measurement.db')
