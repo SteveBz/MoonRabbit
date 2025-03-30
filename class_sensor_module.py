@@ -36,16 +36,34 @@ class SensorModule:
     PORT = 1
     ADDRESS = 0x76
     ADDRESS2 = 0x77
+    self.I2C_status=True
        
     def __init__(self):
         #print ("__init__")
+        config_manager = ConfigManager("config.json")
+        self.lat=config_manager.get_lat()
+        self.long=config_manager.get_long()
+        self.device=config_manager.get_device_id()
+        self.is_registered=config_manager.is_registered()
+        self.bus_address=config_manager.get_bus_address()
+        bus_address=self.bus_address
         self.bus = smbus2.SMBus(SensorModule.PORT)
-        try:
-          self.calibration_params = bme280.load_calibration_params(self.bus, SensorModule.ADDRESS)
-        except:
-          self.calibration_params = bme280.load_calibration_params(self.bus, SensorModule.ADDRESS2)
-          #print ("Using ADDRESS2")
-          SensorModule.ADDRESS=SensorModule.ADDRESS2
+        if bus_address == 0:
+            bus_address = SensorModule.ADDRESS
+            try:
+                self.calibration_params = bme280.load_calibration_params(self.bus, SensorModule.ADDRESS)
+                config_manager.set_bus_address(bus_address)
+            except:
+                self.calibration_params = bme280.load_calibration_params(self.bus, SensorModule.ADDRESS2)
+                bus_address = SensorModule.ADDRESS2
+                #print ("Using ADDRESS2")
+                SensorModule.ADDRESS=SensorModule.ADDRESS2
+                config_manager.set_bus_address(bus_address)
+        else:
+            try:
+                self.calibration_params = bme280.load_calibration_params(self.bus, bus_address)
+            except:
+                self.I2C_status=self.reset_i2c(SensorModule.PORT)
         self.timer = 0
         self.i2c = None
         self.scd = None
@@ -65,11 +83,6 @@ class SensorModule:
         # Commit the changes and close the connection
         #db_manager.conn.commit()
         #db_manager.conn.close()
-        config_manager = ConfigManager("config.json")
-        self.lat=config_manager.get_lat()
-        self.long=config_manager.get_long()
-        self.device=config_manager.get_device_id()
-        self.is_registered=config_manager.is_registered()
         # SCD-30 has tempremental I2C with clock stretching, datasheet recommends
         # starting at 50KHz
         self.i2c = busio.I2C(board.SCL, board.SDA) # uses board.SCL and board.SDA
@@ -86,7 +99,17 @@ class SensorModule:
     def __del__(self):
         if self.bus is not None:
             self.bus.close()
-        
+
+    def reset_i2c(self, port):
+        try:
+            bus = SMBus(port)
+            bus.close()
+            time.sleep(1)  # Allow time for devices to reset
+            bus.open(port)
+            return True
+        except Exception as e:
+            print(f"I2C Reset failed: {e}")
+            return False
     def get_sensor_readings(self):
         print ("get_sensor_readings")
         self.co2_val = self.read_values()
