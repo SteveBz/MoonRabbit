@@ -7,6 +7,7 @@ class ConfigManager:
     DEFAULT_DEVICE = 0                   # Define a constant for the default device
     DEFAULT_LAT = 51.1                  # Define a constant for the default latitude
     DEFAULT_LONG = 0.1                  # Define a constant for the default longitude
+    DEFAULT_BUS_ADDRESS = 0             # Define a constant for the default bus address for sensor
 
     def __init__(self, file='config.json'):
         self.config_file = file
@@ -49,6 +50,20 @@ class ConfigManager:
         self.save_config(default_config)
         return default_config
 
+    def get_bus_address(self):
+        # Retrieve the bus address from config
+        bus_address = self.config.get("bus_address", self.DEFAULT_BUS_ADDRESS)
+        
+        # If bus_address is 0, save the config and return 0
+        if bus_address == 0:
+            self.save_config(self.config)
+        
+        return device_id
+        
+    def set_bus_address(self, bus_address):
+        self.config["bus_address"] = bus_address
+        self.save_config(self.config)
+        
     def get_device_id(self):
         # Retrieve the device_id from config
         device_id = self.config.get("device_id", None)
