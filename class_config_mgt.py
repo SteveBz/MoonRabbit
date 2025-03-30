@@ -56,13 +56,14 @@ class ConfigManager:
         
         # If bus_address is 0, save the config and return 0
         if bus_address == 0:
-            self.save_config(hex(self.config))
+            print(self.config)
+            self.save_config(self.config)
         
         return bus_address
         
     def set_bus_address(self, bus_address):
-        self.config["bus_address"] = bus_address
-        self.save_config(hex(self.config))
+        self.config["bus_address"] = hex(bus_address)
+        self.save_config(self.config)
         
     def get_device_id(self):
         # Retrieve the device_id from config
