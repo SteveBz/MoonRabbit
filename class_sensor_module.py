@@ -38,6 +38,7 @@ class SensorModule:
     ADDRESS2 = 0x77
        
     def __init__(self):
+        self.bus = smbus2.SMBus(SensorModule.PORT)
         #print ("__init__")
         self.I2C_status=True
         config_manager = ConfigManager("config.json")
@@ -47,7 +48,6 @@ class SensorModule:
         self.is_registered=config_manager.is_registered()
         self.bus_address=config_manager.get_bus_address()
         bus_address=self.bus_address
-        self.bus = smbus2.SMBus(SensorModule.PORT)
         if bus_address == 0:
             bus_address = SensorModule.ADDRESS
             try:
