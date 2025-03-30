@@ -18,7 +18,7 @@ class logShipping:
     @staticmethod
     def transfer_to_central_log(db_manager):
         # Connect to the local SQLite database
-        db_manager = DatabaseManager('measurement.db')
+        #db_manager = DatabaseManager('measurement.db')
         
 
         config_manager = ConfigManager("config.json")
@@ -49,6 +49,9 @@ class logShipping:
         # Query local database for new entries
         new_entries = db_manager.select_measurements_by_transferred(0)
         logger.info(f"Number of new entries to transfer: {len(new_entries)}")
+        if not new_entries:  # Early exit if no work
+            logger.info("No new entries to transfer")
+            return True  # Not an error, just no work
         
         # Send new entries to central log
         lock = FileLock("logShipping", lock_dir='locks')  # Use a dedicated directory for lock files
@@ -56,8 +59,12 @@ class logShipping:
         if locked_or_waiting:
             print(f"locked files are {lock.get_lock_files}")
             return
+            
+        # New version (fixed):
         if not lock.acquire_lock(wait=False):
-            return false
+            logger.info("Skipping transfer - another process holds the lock")
+            return False  # <- Proper Python boolean
+            
         for entry in new_entries:
             logger.info(entry)
             
