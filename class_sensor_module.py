@@ -39,8 +39,22 @@ class SensorModule:
        
     def __init__(self):
         self.bus = smbus2.SMBus(SensorModule.PORT)
+        self.device = None
+        self.lat = None
+        self.long = None
         #print ("__init__")
         self.I2C_status=True
+        
+        self.timer = 0
+        self.i2c = None
+        self.scd = None
+        self.co2_val = None
+        self.temperature_val = None
+        self.humidity_val = None
+        self.pressure_val = None
+        self.temp = None
+        self.hum = None
+        self.co2 = None
         config_manager = ConfigManager("config.json")
         self.lat=config_manager.get_lat()
         self.long=config_manager.get_long()
@@ -48,6 +62,7 @@ class SensorModule:
         self.is_registered=config_manager.is_registered()
         self.bus_address=config_manager.get_bus_address()
         bus_address=self.bus_address
+        print(bus_address)
         if bus_address == 0:
             bus_address = SensorModule.ADDRESS
             try:
@@ -64,19 +79,6 @@ class SensorModule:
                 self.calibration_params = bme280.load_calibration_params(self.bus, bus_address)
             except:
                 self.I2C_status=self.reset_i2c(SensorModule.PORT)
-        self.timer = 0
-        self.i2c = None
-        self.scd = None
-        self.co2_val = None
-        self.lat = None
-        self.long = None
-        self.temperature_val = None
-        self.humidity_val = None
-        self.pressure_val = None
-        self.device = None
-        self.temp = None
-        self.hum = None
-        self.co2 = None
         
         #print ("calling DatabaseManager")
         #db_manager = DatabaseManager('measurement.db')
