@@ -68,7 +68,6 @@ class logShipping:
         # After acquiring the lock:
         try:
             for entry in new_entries:
-            for entry in new_entries:
                 logger.info(entry)
                 
                 locked_or_waiting=lock.get_lock_status()
