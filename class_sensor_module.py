@@ -36,10 +36,10 @@ class SensorModule:
     PORT = 1
     ADDRESS = 0x76
     ADDRESS2 = 0x77
-    I2C_status=True
        
     def __init__(self):
         #print ("__init__")
+        self.I2C_status=True
         config_manager = ConfigManager("config.json")
         self.lat=config_manager.get_lat()
         self.long=config_manager.get_long()
