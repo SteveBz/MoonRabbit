@@ -64,53 +64,57 @@ class logShipping:
         if not lock.acquire_lock(wait=False):
             logger.info("Skipping transfer - another process holds the lock")
             return False  # <- Proper Python boolean
-            
-        for entry in new_entries:
-            logger.info(entry)
-            
-            locked_or_waiting=lock.get_lock_status()
-            if locked_or_waiting:
-                print(f"locked files are {lock.get_lock_files}")
-                lock.release_lock(force=True)
-                return
-            data = {
-                'device_id': entry['device_id'],
-                'date': entry['date'],
-                'sensor': entry['sensor'],
-                'latitude': entry['latitude'],
-                'longitude': entry['longitude'],
-                'type': entry['type'],
-                'value': entry['value']
-            }
-            #url = 'http://192.168.1.162:8000/cgi-bin/sensor_data_logger.py'
-            #url = 'http://192.168.1.162:5000/sensor_data'
-            url = 'http://www.carbonactive.org/cgi-bin/sensor_data_logger.py'
-            try:
-                response = requests.post(url, json=data)
-                logger.info(f"Response status code: {response.status_code}")
-                if response.status_code == 200:
-                    logger.info(f"Entry ID {entry['id']} and value {entry['value']} transferred successfully")
-                    try:
-                        # Mark the transferred entries in the local database
-                        db_manager.update_measurements_to_transferred(entry['id'])
-                    except Exception as e:
-                        logger.error(f"Error updating transfer column {e}")
-                        logger.error(f"Transferring data: {data}")
-                    db_manager.conn.commit()
-                    logger.info("Data transferred successfully to central log")
-                else:
-                    logger.error(f"Failed to transfer data to central log: {response.text}, url = {url}")
-                    logger.error(f"Transferring data: {data}")
-                    lock.release_lock(force=True)
-                    break  # Exit loop on failure to transfer
-            except requests.exceptions.RequestException as e:
-                logger.error(f"Exception occurred during data transfer: {e}")
-                logger.error("Server might be down. Retrying later ...")
-                lock.release_lock(force=True)
-                break  # Exit loop on network issue
 
-            print("Next loop")
-        lock.release_lock(force=True)
+        # After acquiring the lock:
+        try:
+            for entry in new_entries:
+            for entry in new_entries:
+                logger.info(entry)
+                
+                locked_or_waiting=lock.get_lock_status()
+                if locked_or_waiting:
+                    print(f"locked files are {lock.get_lock_files}")
+                    lock.release_lock(force=True)
+                    return
+                data = {
+                    'device_id': entry['device_id'],
+                    'date': entry['date'],
+                    'sensor': entry['sensor'],
+                    'latitude': entry['latitude'],
+                    'longitude': entry['longitude'],
+                    'type': entry['type'],
+                    'value': entry['value']
+                }
+                #url = 'http://192.168.1.162:8000/cgi-bin/sensor_data_logger.py'
+                #url = 'http://192.168.1.162:5000/sensor_data'
+                url = 'http://www.carbonactive.org/cgi-bin/sensor_data_logger.py'
+                try:
+                    response = requests.post(url, json=data)
+                    logger.info(f"Response status code: {response.status_code}")
+                    if response.status_code == 200:
+                        logger.info(f"Entry ID {entry['id']} and value {entry['value']} transferred successfully")
+                        try:
+                            # Mark the transferred entries in the local database
+                            db_manager.update_measurements_to_transferred(entry['id'])
+                        except Exception as e:
+                            logger.error(f"Error updating transfer column {e}")
+                            logger.error(f"Transferring data: {data}")
+                        db_manager.conn.commit()
+                        logger.info("Data transferred successfully to central log")
+                    else:
+                        logger.error(f"Failed to transfer data to central log: {response.text}, url = {url}")
+                        logger.error(f"Transferring data: {data}")
+                        lock.release_lock(force=True)
+                        break  # Exit loop on failure to transfer
+                except requests.exceptions.RequestException as e:
+                    logger.error(f"Exception occurred during data transfer: {e}")
+                    logger.error("Server might be down. Retrying later ...")
+                    lock.release_lock(force=True)
+                    break  # Exit loop on network issue
+    
+                print("Next loop")
+        finally:
+            lock.release_lock(force=True)  # Single guaranteed release
         print("Exit loop")
         # Close connections
         #db_manager.conn.close()
