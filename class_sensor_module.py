@@ -61,7 +61,10 @@ class SensorModule:
         self.device=config_manager.get_device_id()
         self.is_registered=config_manager.is_registered()
         #self.bus_address=config_manager.get_bus_address()
-        self.bus_address = int(config_manager.get_bus_address(), 16)  # Convert hex string to int
+        try:
+            self.bus_address = int(config_manager.get_bus_address(), 16)  # Convert hex string to int
+        except:
+            self.bus_address
         bus_address=self.bus_address
         print(bus_address)
         if bus_address == 0:
