@@ -64,7 +64,7 @@ class SensorModule:
         try:
             self.bus_address = int(config_manager.get_bus_address(), 16)  # Convert hex string to int
         except:
-            self.bus_address
+            self.bus_address = 0
         bus_address=self.bus_address
         print(bus_address)
         if bus_address == 0:
