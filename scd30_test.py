@@ -60,6 +60,7 @@ while True:
     
     # Update ambient pressure *without* reinitializing the sensor
     scd.ambient_pressure = ambient_pressure_hpa
+    scd.temperature_offset = scd.temperature - temperature_val
     
     time.sleep(1)
     data = scd.data_available
