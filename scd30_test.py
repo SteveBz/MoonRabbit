@@ -43,7 +43,7 @@ print("Ambient Pressure:", scd.ambient_pressure)
 # scd.altitude = 100
 print("Altitude:", scd.altitude, "meters above sea level")
 
-scd.forced_recalibration_reference = 409
+#scd.forced_recalibration_reference = 409
 print("Forced recalibration reference:", scd.forced_recalibration_reference)
 print("")
 
