@@ -28,6 +28,9 @@ ambient_pressure_hpa = int(pressure_val)
 i2c = busio.I2C(board.SCL, board.SDA, frequency=50000)
 #scd = adafruit_scd30.SCD30(i2c, ambient_pressure = int(ambient_pressure_hpa))
 scd = adafruit_scd30.SCD30(i2c)
+print("Warming up the SCD30 sensor...")
+time.sleep(5)
+
 # scd.temperature_offset = 10
 print("Temperature offset:", scd.temperature_offset)
 
@@ -43,7 +46,7 @@ print("Ambient Pressure:", scd.ambient_pressure)
 # scd.altitude = 100
 print("Altitude:", scd.altitude, "meters above sea level")
 
-scd.forced_recalibration_reference = 409
+#scd.forced_recalibration_reference = 409
 print("Forced recalibration reference:", scd.forced_recalibration_reference)
 print("")
 
@@ -62,10 +65,11 @@ while True:
     data = scd.data_available
     if data:
         print("Data Available!")
-        print("CO2:", scd.CO2, "PPM")
-        print("Temperature:", scd.temperature, "degrees C")
-        print("Humidity::", scd.relative_humidity, "% RH")
-        print("Pressure::", scd.ambient_pressure, "hPa")
+        print(f"CO2: {scd.CO2:.1f} ppm")
+        print(f"Temperature: {scd.temperature:.1f} °C")
+        print(f"Humidity: {scd.relative_humidity:.1f} %RH")
+        print(f"Ambient Pressure (BME280): {ambient_pressure_hpa} hPa")
+        print("Temperature offset:", scd.temperature - temperature_val, "degrees C")
         print("")
         print("Waiting for new data...")
         print("")
