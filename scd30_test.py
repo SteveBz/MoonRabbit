@@ -17,7 +17,7 @@ bus = smbus2.SMBus(1)
 # Load calibration parameters
 calibration_params = bme280.load_calibration_params(bus, address)
 
-sample_reading = bme280.sample(bus, SensorModule.ADDRESS, self.calibration_params)
+sample_reading = bme280.sample(bus, address, calibration_params)
 temperature_val = sample_reading.temperature
 humidity_val = sample_reading.humidity
 pressure_val = sample_reading.pressure
