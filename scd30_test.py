@@ -48,7 +48,7 @@ print("")
 
 while True:
     
-    sample_reading = bme280.sample(self.bus, SensorModule.ADDRESS, self.calibration_params)
+    sample_reading = bme280.sample(bus, address, calibration_params)
     self.temperature_val = sample_reading.temperature
     self.humidity_val = sample_reading.humidity
     self.pressure_val = sample_reading.pressure
