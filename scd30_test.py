@@ -59,6 +59,7 @@ while True:
         print("CO2:", scd.CO2, "PPM")
         print("Temperature:", scd.temperature, "degrees C")
         print("Humidity::", scd.relative_humidity, "%%rH")
+        print("Pressure::", scd.ambient_pressure, "hPa")
         print("")
         print("Waiting for new data...")
         print("")
