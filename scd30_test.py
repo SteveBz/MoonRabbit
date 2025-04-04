@@ -26,8 +26,8 @@ ambient_pressure_hpa = int(pressure_val)
 # SCD-30 has tempremental I2C with clock stretching, datasheet recommends
 # starting at 50KHz
 i2c = busio.I2C(board.SCL, board.SDA, frequency=50000)
-scd = adafruit_scd30.SCD30(i2c, ambient_pressure = int(ambient_pressure_hpa))
-#scd = adafruit_scd30.SCD30(i2c)
+#scd = adafruit_scd30.SCD30(i2c, ambient_pressure = int(ambient_pressure_hpa))
+scd = adafruit_scd30.SCD30(i2c)
 # scd.temperature_offset = 10
 print("Temperature offset:", scd.temperature_offset)
 
@@ -37,7 +37,7 @@ print("Measurement interval:", scd.measurement_interval)
 # scd.self_calibration_enabled = True
 print("Self-calibration enabled:", scd.self_calibration_enabled)
 
-# scd.ambient_pressure = 1100
+scd.ambient_pressure = int(ambient_pressure_hpa)
 print("Ambient Pressure:", scd.ambient_pressure)
 
 # scd.altitude = 100
