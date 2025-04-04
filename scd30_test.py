@@ -6,6 +6,16 @@ import board
 import busio
 import adafruit_scd30
 import bme280 # pip3 install RPi.bme280
+import smbus2
+
+# BME280 sensor address (default address)
+address = 0x76
+
+# Initialize I2C bus
+bus = smbus2.SMBus(1)
+
+# Load calibration parameters
+calibration_params = bme280.load_calibration_params(bus, address)
 
 # SCD-30 has tempremental I2C with clock stretching, datasheet recommends
 # starting at 50KHz
