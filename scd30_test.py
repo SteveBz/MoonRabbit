@@ -43,7 +43,7 @@ print("Ambient Pressure:", scd.ambient_pressure)
 # scd.altitude = 100
 print("Altitude:", scd.altitude, "meters above sea level")
 
-#scd.forced_recalibration_reference = 409
+scd.forced_recalibration_reference = 409
 print("Forced recalibration reference:", scd.forced_recalibration_reference)
 print("")
 
@@ -53,8 +53,11 @@ while True:
     temperature_val = sample_reading.temperature
     humidity_val = sample_reading.humidity
     pressure_val = sample_reading.pressure
-    ambient_pressure_hpa = int(pressure_val)
-    data = adafruit_scd30.SCD30(i2c_bus=i2c, ambient_pressure = int(ambient_pressure_hpa))
+    ambient_pressure_hpa = int(sample_reading.pressure)
+    
+    # Update ambient pressure *without* reinitializing the sensor
+    scd.ambient_pressure = ambient_pressure_hpa
+    
     time.sleep(1)
     data = scd.data_available
     if data:
