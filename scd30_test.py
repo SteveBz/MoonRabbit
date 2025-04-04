@@ -17,9 +17,15 @@ bus = smbus2.SMBus(1)
 # Load calibration parameters
 calibration_params = bme280.load_calibration_params(bus, address)
 
+sample_reading = bme280.sample(self.bus, SensorModule.ADDRESS, self.calibration_params)
+self.temperature_val = sample_reading.temperature
+self.humidity_val = sample_reading.humidity
+self.pressure_val = sample_reading.pressure
+
 # SCD-30 has tempremental I2C with clock stretching, datasheet recommends
 # starting at 50KHz
 i2c = busio.I2C(board.SCL, board.SDA, frequency=50000)
+self.scd = adafruit_scd30.SCD30(i2c, ambient_pressure = int(self.pressure_val))
 scd = adafruit_scd30.SCD30(i2c)
 # scd.temperature_offset = 10
 print("Temperature offset:", scd.temperature_offset)
