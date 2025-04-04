@@ -49,10 +49,10 @@ print("")
 while True:
     
     sample_reading = bme280.sample(bus, address, calibration_params)
-    self.temperature_val = sample_reading.temperature
-    self.humidity_val = sample_reading.humidity
-    self.pressure_val = sample_reading.pressure
-    self.scd = adafruit_scd30.SCD30(i2c_bus=self.i2c, ambient_pressure = int(self.pressure_val))
+    temperature_val = sample_reading.temperature
+    humidity_val = sample_reading.humidity
+    pressure_val = sample_reading.pressure
+    scd = adafruit_scd30.SCD30(i2c_bus=self.i2c, ambient_pressure = int(self.pressure_val))
     data = scd.data_available
     if data:
         print("Data Available!")
