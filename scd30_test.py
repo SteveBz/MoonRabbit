@@ -47,6 +47,12 @@ print("Forced recalibration reference:", scd.forced_recalibration_reference)
 print("")
 
 while True:
+    
+    sample_reading = bme280.sample(self.bus, SensorModule.ADDRESS, self.calibration_params)
+    self.temperature_val = sample_reading.temperature
+    self.humidity_val = sample_reading.humidity
+    self.pressure_val = sample_reading.pressure
+    self.scd = adafruit_scd30.SCD30(i2c_bus=self.i2c, ambient_pressure = int(self.pressure_val))
     data = scd.data_available
     if data:
         print("Data Available!")
