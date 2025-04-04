@@ -34,7 +34,7 @@ time.sleep(5)
 # scd.temperature_offset = 10
 print("Temperature offset:", scd.temperature_offset)
 
-# scd.measurement_interval = 4
+scd.measurement_interval = 4
 print("Measurement interval:", scd.measurement_interval)
 
 # scd.self_calibration_enabled = True
@@ -62,7 +62,7 @@ while True:
     scd.ambient_pressure = ambient_pressure_hpa
     scd.temperature_offset = scd.temperature - temperature_val
     
-    time.sleep(1)
+    time.sleep(2)
     data = scd.data_available
     if data:
         print("Data Available!")
@@ -75,4 +75,4 @@ while True:
         print("Waiting for new data...")
         print("")
 
-    time.sleep(0.5)
+    time.sleep(2)
