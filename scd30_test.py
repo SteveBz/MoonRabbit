@@ -5,6 +5,7 @@ import time
 import board
 import busio
 import adafruit_scd30
+import bme280 # pip3 install RPi.bme280
 
 # SCD-30 has tempremental I2C with clock stretching, datasheet recommends
 # starting at 50KHz
