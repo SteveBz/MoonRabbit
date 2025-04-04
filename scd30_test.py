@@ -52,7 +52,7 @@ while True:
     temperature_val = sample_reading.temperature
     humidity_val = sample_reading.humidity
     pressure_val = sample_reading.pressure
-    scd = adafruit_scd30.SCD30(i2c_bus=self.i2c, ambient_pressure = int(self.pressure_val))
+    scd = adafruit_scd30.SCD30(i2c_bus=self.i2c, ambient_pressure = int(pressure_val))
     data = scd.data_available
     if data:
         print("Data Available!")
