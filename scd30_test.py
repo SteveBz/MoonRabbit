@@ -7,7 +7,7 @@ import busio
 import adafruit_scd30
 import bme280 # pip3 install RPi.bme280
 import smbus2
-
+    
 # BME280 sensor address (default address)
 address = 0x76
 
@@ -18,18 +18,15 @@ bus = smbus2.SMBus(1)
 calibration_params = bme280.load_calibration_params(bus, address)
 
 sample_reading = bme280.sample(bus, address, calibration_params)
-temperature_val = sample_reading.temperature
-humidity_val = sample_reading.humidity
-pressure_val = sample_reading.pressure
-ambient_pressure_hpa = int(pressure_val)
+ambient_pressure_hpa = int(sample_reading.pressure)
 
 # SCD-30 has tempremental I2C with clock stretching, datasheet recommends
 # starting at 50KHz
 i2c = busio.I2C(board.SCL, board.SDA, frequency=50000)
 #scd = adafruit_scd30.SCD30(i2c, ambient_pressure = int(ambient_pressure_hpa))
-scd = adafruit_scd30.SCD30(i2c)
-print("Warming up the SCD30 sensor...")
-time.sleep(5)
+
+scd = adafruit_scd30.SCD30(i2c)print("Warming up the SCD30 sensor (please wait 60 seconds)...")
+time.sleep(60)
 
 # scd.temperature_offset = 10
 print("Temperature offset:", scd.temperature_offset)
@@ -50,19 +47,15 @@ print("Altitude:", scd.altitude, "meters above sea level")
 print("Forced recalibration reference:", scd.forced_recalibration_reference)
 print("")
 
-while True:
-    
+def read_sensors():
     sample_reading = bme280.sample(bus, address, calibration_params)
     temperature_val = sample_reading.temperature
-    humidity_val = sample_reading.humidity
-    pressure_val = sample_reading.pressure
     ambient_pressure_hpa = int(sample_reading.pressure)
     
     # Update ambient pressure *without* reinitializing the sensor
     scd.ambient_pressure = ambient_pressure_hpa
     scd.temperature_offset = scd.temperature - temperature_val
     
-    time.sleep(2)
     data = scd.data_available
     if data:
         print("Data Available!")
@@ -73,6 +66,15 @@ while True:
         print(f"Ambient Pressure (BME280): {ambient_pressure_hpa} hPa")
         print("")
         print("Waiting for new data...")
-        print("")
 
-    time.sleep(2)
+        print("")
+    
+try:
+    while True:
+        read_sensors()
+        time.sleep(4)
+
+except KeyboardInterrupt:
+    print("\nExiting gracefully...")
+    bus.close()
+
