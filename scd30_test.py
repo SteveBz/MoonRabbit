@@ -34,7 +34,7 @@ print("Is data available after warm-up?", scd.data_available)
 # scd.temperature_offset = 10
 print("Temperature offset:", scd.temperature_offset)
 
-scd.measurement_interval = 4
+#scd.measurement_interval = 4
 print("Measurement interval:", scd.measurement_interval)
 
 # scd.self_calibration_enabled = True
@@ -51,31 +51,40 @@ print("Forced recalibration reference:", scd.forced_recalibration_reference)
 print("")
 
 def read_sensors():
-    sample_reading = bme280.sample(bus, address, calibration_params)
-    temperature_val = sample_reading.temperature
-    ambient_pressure_hpa = int(sample_reading.pressure)
+    try:
+        sample_reading = bme280.sample(bus, address, calibration_params)
+        temperature_val = sample_reading.temperature
+        ambient_pressure_hpa = int(sample_reading.pressure)
+        
+        # Update ambient pressure *without* reinitializing the sensor
+        scd.ambient_pressure = ambient_pressure_hpa
+        scd.temperature_offset = scd.temperature - temperature_val
+        
+        data = scd.data_available
+        if data:
+            print("Data Available!")
+            print(f"CO2: {scd.CO2:.1f} ppm")
+            print(f"Temperature: {scd.temperature:.1f} °C")
+            print(f"Temperature offset: {(scd.temperature - temperature_val):.1f} °C")
+            print(f"Humidity: {scd.relative_humidity:.1f} %RH")
+            print(f"Ambient Pressure (BME280): {ambient_pressure_hpa} hPa")
+            print("")
+            print("Waiting for new data...")
     
-    # Update ambient pressure *without* reinitializing the sensor
-    scd.ambient_pressure = ambient_pressure_hpa
-    scd.temperature_offset = scd.temperature - temperature_val
-    
-    data = scd.data_available
-    if data:
-        print("Data Available!")
-        print(f"CO2: {scd.CO2:.1f} ppm")
-        print(f"Temperature: {scd.temperature:.1f} °C")
-        print(f"Temperature offset: {(scd.temperature - temperature_val):.1f} °C")
-        print(f"Humidity: {scd.relative_humidity:.1f} %RH")
-        print(f"Ambient Pressure (BME280): {ambient_pressure_hpa} hPa")
-        print("")
-        print("Waiting for new data...")
-
-        print("")
-    
+            print("")
+    except Exception as e:
+        print(f"Sensor read error: {e}")
 try:
     while True:
-        read_sensors()
-        time.sleep(4)
+        print("Waiting for data...")
+        for _ in range(10):  # Wait up to 40 seconds for data
+            if scd.data_available:
+                read_sensors()
+                break
+            else:
+                time.sleep(4)
+        else:
+            print("No data after waiting. Check sensor or increase wait time.\n")
 
 except KeyboardInterrupt:
     print("\nExiting gracefully...")
