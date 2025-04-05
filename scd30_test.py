@@ -25,7 +25,8 @@ ambient_pressure_hpa = int(sample_reading.pressure)
 i2c = busio.I2C(board.SCL, board.SDA, frequency=50000)
 #scd = adafruit_scd30.SCD30(i2c, ambient_pressure = int(ambient_pressure_hpa))
 
-scd = adafruit_scd30.SCD30(i2c)print("Warming up the SCD30 sensor (please wait 60 seconds)...")
+scd = adafruit_scd30.SCD30(i2c)
+print("Warming up the SCD30 sensor (please wait 60 seconds)...")
 time.sleep(60)
 
 # scd.temperature_offset = 10
