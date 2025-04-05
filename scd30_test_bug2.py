@@ -77,4 +77,5 @@ while True:
             print("")
     
         time.sleep(2)
-    except:
+    except Exception as e:
+        print(f"Sensor read error: {e}")
