@@ -18,10 +18,10 @@ bus = smbus2.SMBus(1)
 calibration_params = bme280.load_calibration_params(bus, address)
 
 sample_reading = bme280.sample(bus, address, calibration_params)
-temperature_val = sample_reading.temperature
-humidity_val = sample_reading.humidity
-pressure_val = sample_reading.pressure
-ambient_pressure_hpa = int(pressure_val)
+#temperature_val = sample_reading.temperature
+#humidity_val = sample_reading.humidity
+#pressure_val = sample_reading.pressure
+ambient_pressure_hpa = int(sample_reading.pressure)
 
 # SCD-30 has tempremental I2C with clock stretching, datasheet recommends
 # starting at 50KHz
@@ -55,7 +55,7 @@ while True:
     sample_reading = bme280.sample(bus, address, calibration_params)
     temperature_val = sample_reading.temperature
     humidity_val = sample_reading.humidity
-    pressure_val = sample_reading.pressure
+    #pressure_val = sample_reading.pressure
     ambient_pressure_hpa = int(sample_reading.pressure)
     
     # Update ambient pressure *without* reinitializing the sensor
