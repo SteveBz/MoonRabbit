@@ -22,7 +22,6 @@ ambient_pressure_hpa = int(sample_reading.pressure)
 
 ## SCD-30 has tempremental I2C with clock stretching, datasheet recommends
 ## starting at 50KHz  ************* Set at 10k during boot.
-##i2c = busio.I2C(board.SCL, board.SDA, frequency=50000)
 i2c = busio.I2C(board.SCL, board.SDA)
 #scd = adafruit_scd30.SCD30(i2c, ambient_pressure = int(ambient_pressure_hpa))
 
@@ -62,14 +61,11 @@ def read_sensors(scd):
         scd.ambient_pressure = ambient_pressure_hpa
         scd.temperature_offset = scd.temperature - temperature_val
         
-        print("Data Available.")
         print(f"CO2: {scd.CO2:.1f} ppm")
         print(f"Temperature: {scd.temperature:.1f} °C")
         print(f"Temperature offset: {(scd.temperature - temperature_val):.1f} °C")
         print(f"Humidity: {scd.relative_humidity:.1f} %RH")
         print(f"Ambient Pressure (BME280): {ambient_pressure_hpa} hPa")
-        print("")
-
         print("")
     except Exception as e:
         print(f"Sensor read error: {e}")
