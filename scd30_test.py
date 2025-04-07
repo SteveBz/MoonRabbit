@@ -62,8 +62,6 @@ def read_sensors(scd):
         scd.ambient_pressure = ambient_pressure_hpa
         scd.temperature_offset = scd.temperature - temperature_val
         
-        #data = scd.data_available
-        #if data:
         print("Data Available.")
         print(f"CO2: {scd.CO2:.1f} ppm")
         print(f"Temperature: {scd.temperature:.1f} °C")
@@ -71,7 +69,6 @@ def read_sensors(scd):
         print(f"Humidity: {scd.relative_humidity:.1f} %RH")
         print(f"Ambient Pressure (BME280): {ambient_pressure_hpa} hPa")
         print("")
-        print("Waiting for new data...")
 
         print("")
     except Exception as e:
