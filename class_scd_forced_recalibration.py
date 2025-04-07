@@ -22,6 +22,8 @@ def main():
     
     if args.forced_recal is not None:
         scd30.set_forced_recalibration_reference(args.forced_recal)
+    else:
+        print(f"Current forced recalibration reference: {scd30.scd30.forced_recalibration_reference} ppm")
 
 if __name__ == '__main__':
     main()
