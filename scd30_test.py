@@ -20,15 +20,17 @@ calibration_params = bme280.load_calibration_params(bus, address)
 sample_reading = bme280.sample(bus, address, calibration_params)
 ambient_pressure_hpa = int(sample_reading.pressure)
 
-# SCD-30 has tempremental I2C with clock stretching, datasheet recommends
-# starting at 50KHz
-i2c = busio.I2C(board.SCL, board.SDA, frequency=50000)
+## SCD-30 has tempremental I2C with clock stretching, datasheet recommends
+## starting at 50KHz  ************* Set at 10k during boot.
+##i2c = busio.I2C(board.SCL, board.SDA, frequency=50000)
+i2c = busio.I2C(board.SCL, board.SDA)
 #scd = adafruit_scd30.SCD30(i2c, ambient_pressure = int(ambient_pressure_hpa))
 
 scd = adafruit_scd30.SCD30(i2c)
 print("Is data available after initialisation?", scd.data_available)
-print("Warming up the SCD30 sensor (please wait 60 seconds)...")
-time.sleep(40)
+t=5
+print(f"Warming up the SCD30 sensor (please wait {t} seconds)...")
+time.sleep(t)
 print("Is data available after warm-up?", scd.data_available)
 
 # scd.temperature_offset = 10
