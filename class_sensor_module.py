@@ -119,6 +119,7 @@ class SensorModule:
             return False
     def get_sensor_readings(self):
         print ("get_sensor_readings")
+        
         self.co2_val = self.read_values()
         # Allow for zero value temp or hum in BME280
         if self.humidity_val==0 and self.hum != 0:
@@ -249,15 +250,28 @@ class SensorModule:
             insert_record_from_value(self, table, 'bme280', 'temperature', config)
         
     def read_values(self):
-        co2_val=400
+        """
+        Reads CO2, temperature, and humidity from the SCD30 sensor.
+        Applies temperature offset if external reference available.
+        Returns True on success, False on failure or timeout.
+        """    
+        attempts = 0
+        MAX_VALID_CO2 = 5000
+        co2_val = 400  # fallback/default
         while True:
             if self.scd.data_available:
                 self.temp=self.scd.temperature
                 self.hum=self.scd.relative_humidity
                 self.co2=self.scd.CO2
-    
+
+
+                # check if external reference temperature is available
+                if hasattr(self, "temperature_val") and self.temperature_val != 0 and self.temp != 0:
+                    self.temperature_offset = self.temp - self.temperature_val
+                    self.scd.temperature_offset = self.temperature_offset
+                    
                 co2_val = self.co2
-                if self.co2 < 5000:
+            if self.co2 < MAX_VALID_CO2:
                     break
             time.sleep(1)
         try:
