@@ -18,12 +18,15 @@ def main():
     parser.add_argument('-f', '--forced-recal', type=int, help='The forced recalibration reference value in ppm')
     args = parser.parse_args()
 
-    scd30 = SCD30()
-    
-    if args.forced_recal is not None:
-        scd30.set_forced_recalibration_reference(args.forced_recal)
-    else:
-        print(f"Current forced recalibration reference: {scd30.scd30.forced_recalibration_reference} ppm")
+    try:
+        scd30 = SCD30()
+        if args.forced_recal is not None:
+            print(f"Ambient pressure is: {scd30.scd30.ambient_pressure} ppm")
+            scd30.set_forced_recalibration_reference(args.forced_recal)
+        else:
+            print(f"Current forced recalibration reference: {scd30.scd30.forced_recalibration_reference} ppm")
+    except Exception as e:
+        print(f"Error: {e}")
 
 if __name__ == '__main__':
     main()
