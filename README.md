@@ -1,5 +1,9 @@
 # Moon Rabbit CO2 Sensor (Raspberry Pi, scd30, bme280, flask & python)
 A Raspberry Pi powered CO2 monitoring station using Python and Flask  
+
+![Alt text](Screenshot%202024-06-08%20091042.png)
+![Alt text](Screenshot%202024-06-08%20091122.png)
+
 If starting with blank micro SD card:
 ## Flash the Micro SD card with the Rapberry Pi Imager 
 #Use settings: "Raspberry Pi Zero 2 W", "64 Bit", <inserted drive>
@@ -135,8 +139,6 @@ Eg, like this, substituting your address for the example.
 192.168.1.61:5000
 192.168.1.61:9001
 ```
-![Alt text](Screenshot%202024-06-08%20091042.png)
-![Alt text](Screenshot%202024-06-08%20091122.png)
 
 # MoonRabbit Calibration
 
