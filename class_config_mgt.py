@@ -5,7 +5,7 @@ class ConfigManager:
     def __init__(self, file='config.json'):
         self.config_file = file
         self.config = self.load_config()
-        print (self.config)
+        #print (self.config)
 
         # Set runtime defaults from config
         if 'status' in self.config:
