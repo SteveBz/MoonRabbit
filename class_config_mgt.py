@@ -8,19 +8,29 @@ class ConfigManager:
         print (self.config)
 
         # Set runtime defaults from config
-        self.DEFAULT_STATUS = self.config['status']                      # Define a constant for the default status
-        self.DEFAULT_REGISTERED = self.config['registered']              # Define a constant for the default registered status
-        self.DEFAULT_DEVICE = self.config['device_id']                   # Define a constant for the default device
-        self.DEFAULT_LAT = float(self.config['lat'])                     # Define a constant for the default latitude
-        self.DEFAULT_LONG = float(self.config['long'])                   # Define a constant for the default longitude
-        self.DEFAULT_BUS_ADDRESS = self.config['bus_address']            # Define a constant for the default bus address for sensor
-
-        print(self.DEFAULT_STATUS)
-        print(self.DEFAULT_REGISTERED)
-        print(self.DEFAULT_DEVICE)
-        print(self.DEFAULT_LAT)
-        print(self.DEFAULT_LONG)
-        print(self.DEFAULT_BUS_ADDRESS)
+        if 'status' in self.config:
+            # Define a constant for the default status
+            self.DEFAULT_STATUS = self.config['status']
+        
+        if 'registered' in self.config:
+            # Define a constant for the default registered
+            self.DEFAULT_REGISTERED = self.config['registered']
+        
+        if 'device_id' in self.config:
+            # Define a constant for the default device
+            self.DEFAULT_DEVICE = self.config['device_id']
+        
+        if 'lat' in self.config:
+            # Define a constant for the default latitude
+            self.DEFAULT_LAT = float(self.config['lat'])
+        
+        if 'long' in self.config:
+            # Define a constant for the default longitude
+            self.DEFAULT_LONG = float(self.config['long'])
+        
+        if 'bus_address' in self.config:
+            # Define a constant for the default bus address for sensor
+            self.DEFAULT_BUS_ADDRESS = self.config['bus_address']
 
     def load_config(self):
         try:
