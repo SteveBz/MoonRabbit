@@ -15,6 +15,13 @@ class ConfigManager:
         self.DEFAULT_LONG = float(self.config['long'])                   # Define a constant for the default longitude
         self.DEFAULT_BUS_ADDRESS = self.config['bus_address']            # Define a constant for the default bus address for sensor
 
+        print(self.DEFAULT_STATUS)
+        print(self.DEFAULT_REGISTERED)
+        print(self.DEFAULT_DEVICE)
+        print(self.DEFAULT_LAT)
+        print(self.DEFAULT_LONG)
+        print(self.DEFAULT_BUS_ADDRESS)
+
     def load_config(self):
         try:
             with open(self.config_file, 'r+') as f:
