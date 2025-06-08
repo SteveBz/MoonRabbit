@@ -2,16 +2,17 @@ import json
 from datetime import datetime, timedelta
 import fcntl
 class ConfigManager:
-    DEFAULT_STATUS = "00 - Raw"         # Define a constant for the default status
-    DEFAULT_REGISTERED = False          # Define a constant for the default registered status
-    DEFAULT_DEVICE = 0                   # Define a constant for the default device
-    DEFAULT_LAT = 51.1                  # Define a constant for the default latitude
-    DEFAULT_LONG = 0.1                  # Define a constant for the default longitude
-    DEFAULT_BUS_ADDRESS = 0             # Define a constant for the default bus address for sensor
-
     def __init__(self, file='config.json'):
         self.config_file = file
         self.config = self.load_config()
+
+        # Set runtime defaults from config
+        self.DEFAULT_STATUS = self.config['status']                      # Define a constant for the default status
+        self.DEFAULT_REGISTERED = self.config['registered']              # Define a constant for the default registered status
+        self.DEFAULT_DEVICE = self.config['device_id']                   # Define a constant for the default device
+        self.DEFAULT_LAT = float(self.config['lat'])                     # Define a constant for the default latitude
+        self.DEFAULT_LONG = float(self.config['long'])                   # Define a constant for the default longitude
+        self.DEFAULT_BUS_ADDRESS = self.config['bus_address']            # Define a constant for the default bus address for sensor
 
     def load_config(self):
         try:
