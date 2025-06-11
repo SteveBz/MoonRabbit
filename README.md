@@ -130,7 +130,7 @@ sh install.sh
 
 ### If you want a hotspot do the following (optional)
 
-Optionally set up an Access Point called "MoonRabbit" with password "raspberry"
+Optionally set up an Access Point called "MoonRabbit" with password "raspberry".  It's good practice to name them uniquely if you are collaborating with others. 
 
 ```
 nmcli connection add type wifi ifname wlan0 con-name MoonRabbit autoconnect no ssid MoonRabbit
