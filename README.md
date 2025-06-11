@@ -128,6 +128,17 @@ python3 -m venv venv
 sh install.sh
 ```
 
+### If you want a hotspot do the following (optional)
+
+Optionally set up an Access Point called "MoonRabbit" with password "raspberry"
+
+```
+nmcli connection add type wifi ifname wlan0 con-name MoonRabbit autoconnect no ssid MoonRabbit
+nmcli connection modify MoonRabbit 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.method shared
+nmcli connection modify MoonRabbit wifi-sec.key-mgmt wpa-psk
+nmcli connection modify MoonRabbit wifi-sec.psk "raspberry"
+```
+
 ### Test Moon Rabbit in a browser
 Navigate to a browser, open two tabs and type in the following IP adresesses:
 ```
