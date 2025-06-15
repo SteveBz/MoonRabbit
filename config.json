@@ -1,0 +1,12 @@
+{
+    "device_id": 0,
+    "registered": false,
+    "status": "00 - Raw",
+    "lat": 51.1,
+    "long": 0.0,
+    "sensor_co2": "scd30",
+    "sensor_pressure": "bme280",
+    "last_calibration_date": 0,
+    "last_calibration_value": 0,
+    "bus_address": "0x76"
+}
