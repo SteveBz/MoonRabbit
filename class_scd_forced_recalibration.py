@@ -48,6 +48,7 @@ def main():
             print(".", end="", flush=True)
             time.sleep(0.5)
         print(" done.")
+        scd30.scd30.ambient_pressure=int(bme280_data.pressure)
         print(args.test)
         if args.forced_recal is not None:
             print(f"Ambient pressure is: {scd30.scd30.ambient_pressure} millibar")
