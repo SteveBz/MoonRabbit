@@ -37,7 +37,7 @@ def main():
         bus = smbus2.SMBus(port)
         bme280_calibration = bme280.load_calibration_params(bus, address)
         bme280_data = bme280.sample(bus, address, bme280_calibration)
-        print("Pressure = ", int(bme280_data.presure))
+        print("Pressure = ", int(bme280_data.pressure))
 
         # Pass BME280 pressure data to SCD30
         scd30 = SCD30() #ambient_pressure=int(bme280_data.pressure)
