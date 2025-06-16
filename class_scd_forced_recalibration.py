@@ -28,7 +28,17 @@ def main():
     args = parser.parse_args()
 
     try:
-        scd30 = SCD30()
+#        scd30 = SCD30()
+        # Set up BME280 using smbus2
+        port = 1
+        address = 0x76  # Adjust if your BME280 is at 0x77
+        bus = smbus2.SMBus(port)
+        bme280_calibration = bme280.load_calibration_params(bus, address)
+        bme280_data = bme280.sample(bus, address, bme280_calibration)
+
+        # Pass BME280 pressure data to SCD30
+        scd30 = SCD30(pressure_source=bme280_data)
+        
         # Wait for sensor data to be available
         print("Waiting for sensor to provide data...", end="", flush=True)
         while not scd30.scd30.data_available:
