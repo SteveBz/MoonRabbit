@@ -11,6 +11,13 @@ class SCD30:
         self.i2c = busio.I2C(board.SCL, board.SDA)
         self.scd30 = adafruit_scd30.SCD30(self.i2c)
 
+    def set_ambient_pressure_from_bme280(self):
+        if not self.pressure_source:
+            raise RuntimeError("BME280 pressure source not initialized")
+        pressure_hpa = self.pressure_source['pressure']
+        self.scd30.ambient_pressure = int(pressure_hpa)
+        print(f"Ambient pressure set to {int(pressure_hpa)} mbar from BME280")
+    
     def set_forced_recalibration_reference(self, value):
         self.scd30.forced_recalibration_reference = value
         print(f"Forced recalibration reference set to {value} ppm")
