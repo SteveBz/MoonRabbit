@@ -2,6 +2,7 @@ import argparse
 import board
 import busio
 import adafruit_scd30
+import bme280 # pip3 install RPi.bme280
 import time
 
 class SCD30:
