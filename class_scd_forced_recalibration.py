@@ -4,6 +4,7 @@ import busio
 import adafruit_scd30
 import bme280 # pip3 install RPi.bme280
 import time
+import smbus2
 
 class SCD30:
     def __init__(self):
