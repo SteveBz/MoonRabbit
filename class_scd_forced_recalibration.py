@@ -25,6 +25,7 @@ class SCD30:
 def main():
     parser = argparse.ArgumentParser(description='SCD30 sensor test.')
     parser.add_argument('-f', '--forced-recal', type=int, help='The forced recalibration reference value in ppm')
+    parser.add_argument('-t', '--test', type=int, help='Run in test mode')
     args = parser.parse_args()
 
     try:
@@ -45,6 +46,7 @@ def main():
             print(".", end="", flush=True)
             time.sleep(0.5)
         print(" done.")
+        print(args.test)
         if args.forced_recal is not None:
             print(f"Ambient pressure is: {scd30.scd30.ambient_pressure} millibar")
             scd30.set_forced_recalibration_reference(args.forced_recal)
