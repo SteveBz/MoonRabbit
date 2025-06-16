@@ -2,6 +2,7 @@ import argparse
 import board
 import busio
 import adafruit_scd30
+import time
 
 class SCD30:
     def __init__(self):
@@ -20,6 +21,12 @@ def main():
 
     try:
         scd30 = SCD30()
+        # Wait for sensor data to be available
+        print("Waiting for sensor to provide data...", end="", flush=True)
+        while not scd30.scd30.data_available:
+            print(".", end="", flush=True)
+            time.sleep(0.5)
+        print(" done.")
         if args.forced_recal is not None:
             print(f"Ambient pressure is: {scd30.scd30.ambient_pressure} millibar")
             scd30.set_forced_recalibration_reference(args.forced_recal)
