@@ -39,7 +39,7 @@ def main():
         bme280_data = bme280.sample(bus, address, bme280_calibration)
 
         # Pass BME280 pressure data to SCD30
-        scd30 = SCD30(ambient_pressure=int(bme280_data.pressure))
+        scd30 = SCD30() #ambient_pressure=int(bme280_data.pressure)
         
         # Wait for sensor data to be available
         print("Waiting for sensor to provide data...", end="", flush=True)
