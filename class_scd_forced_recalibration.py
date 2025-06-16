@@ -21,7 +21,7 @@ def main():
     try:
         scd30 = SCD30()
         if args.forced_recal is not None:
-            print(f"Ambient pressure is: {scd30.scd30.ambient_pressure} ppm")
+            print(f"Ambient pressure is: {scd30.scd30.ambient_pressure} millibar")
             scd30.set_forced_recalibration_reference(args.forced_recal)
         else:
             print(f"Current forced recalibration reference: {scd30.scd30.forced_recalibration_reference} ppm")
