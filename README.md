@@ -125,6 +125,7 @@ cd MoonRabbit/
 # Set up Python virtual environment and activate it
 python3 -m venv venv
 . venv/bin/activate
+sh install3.sh
 sh install.sh
 ```
 
