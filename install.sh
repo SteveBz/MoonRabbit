@@ -14,8 +14,8 @@ sudo cp *.conf /etc/supervisor/conf.d/
 pip3 install flask flask-cors smbus2 RPi.bme280 adafruit-blinka==8.40.0 adafruit-circuitpython-scd30 pandas requests psutil
 
 sudo apt-get update
-sudo apt-get install libdbus-1-dev pkg-config cmake
-sudo apt-get install libglib2.0-dev
+sudo apt-get install -y libdbus-1-dev pkg-config cmake
+sudo apt-get install  -y libglib2.0-dev
 pip install pyindi-client --no-cache-dir
 
 sudo apt-get -y autoremove
