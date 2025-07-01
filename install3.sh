@@ -28,7 +28,7 @@ setup_config() {
 
 # Process config files
 setup_config "default_config.json" "config.json"
-setup_config "default_sensor_value.json" "sensor_value.json" "Edit this file with your sensor values"
+setup_config "default_sensor_value.json" "sensor_values.json" "Edit this file with your sensor values"
 
 # Final status report
 if [ $? -ne 2 ]; then  # Only show if at least one file was created
