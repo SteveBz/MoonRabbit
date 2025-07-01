@@ -87,6 +87,8 @@ Supervisord allows remore control of the software on the Raspberry Pi Zero 2 W f
 
 Install Supervisord
 ```
+# Temporary apt bug workaround
+sudo apt install vlc-bin=1:3.0.21-0+rpt4+deb12u1 vlc-plugin-skins2=1:3.0.21-0+rpt4+deb12u1 vlc-plugin-qt=1:3.0.21-0+rpt4+deb12u1
 # Update and upgrade the system packages
 sudo apt-get update && sudo apt-get upgrade -y
 # Install necessary packages
