@@ -159,6 +159,18 @@ class DatabaseManager:
         rows = self.retry_operation(self._execute_select, select_query, (sensor_type,), retries=5, base_sleep_interval=1, max_sleep_interval=1)
         return rows
         
+    def select_measurements_all(self) -> dict:
+        """
+        Query all rows in the sensor_measurement table.
+        
+        :return: List of rows matching the query.
+        """
+        select_query = '''
+            SELECT * FROM sensor_measurement ORDER BY date DESC
+        '''
+        rows = self.retry_operation(self._execute_select, select_query, (), retries=5, base_sleep_interval=1, max_sleep_interval=1)
+        return rows
+        
     def get_latest_measurements_by_type_and_duration(self, sensor_type, duration, max_points):
         """
         Get the latest measurements by type and duration.
