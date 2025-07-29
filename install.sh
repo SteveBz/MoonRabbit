@@ -1,3 +1,7 @@
+# Sync datetime
+
+sudo timedatectl set-ntp true
+
 # Install necessary packages
 sudo apt update
 sudo apt-get install -y sqlite3 sqlitebrowser
