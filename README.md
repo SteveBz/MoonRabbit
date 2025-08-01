@@ -140,6 +140,7 @@ nmcli connection add type wifi ifname wlan0 con-name MoonRabbit autoconnect no s
 nmcli connection modify MoonRabbit 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.method shared
 nmcli connection modify MoonRabbit wifi-sec.key-mgmt wpa-psk
 nmcli connection modify MoonRabbit wifi-sec.psk "raspberry"
+nmcli connection modify MoonRabbit connection.autoconnect yes
 ```
 
 ### Test Moon Rabbit in a browser
