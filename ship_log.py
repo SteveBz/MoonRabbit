@@ -24,7 +24,7 @@ class logShipping:
         config_manager = ConfigManager("config.json")
         if not config_manager.is_registered():
             logger.info(f"Not registered")
-            url = 'http://www.carbonactive.org/cgi-bin/register_device.py'
+            url = 'http://www.co2matters.org/cgi-bin/register_device.py'
             
             try:
                 logger.info(f"Not registered")
@@ -86,7 +86,7 @@ class logShipping:
                 }
                 #url = 'http://192.168.1.162:8000/cgi-bin/sensor_data_logger.py'
                 #url = 'http://192.168.1.162:5000/sensor_data'
-                url = 'http://www.carbonactive.org/cgi-bin/sensor_data_logger.py'
+                url = 'http://www.co2matters.org/cgi-bin/sensor_data_logger.py'
                 try:
                     response = requests.post(url, json=data)
                     logger.info(f"Response status code: {response.status_code}")
