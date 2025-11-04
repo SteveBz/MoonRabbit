@@ -242,7 +242,7 @@ var pressureLayout = {
       //dtick: 15 * 60 * 1000 // milliseconds
   },
   yaxis: {
-    range: [850, 1100]
+    range: [950, 1050]
   },
   font: {
     size: 14,
