@@ -62,11 +62,11 @@ swapon
 ```
 Swap Memory is 100 MB
 ```
-sudo nano /etc/dphys-swapfile
+sudo nano /etc/rpi/swap.conf
 ```
-Change swap size to 1024 MB
+Add swap size, 1024 MB
 ```
-CONF_SWAPSIZE=1024
+zram-size = 1024
 ```
 Use Control-s to save the changes and control-x to exit nano.
 Then reboot Moon Rabbit, to apply the changes.
