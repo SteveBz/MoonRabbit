@@ -66,7 +66,7 @@ sudo nano /etc/rpi/swap.conf
 ```
 Add swap size, 1024 MB
 ```
-zram-size = 1024
+zram-size = 1024M
 ```
 Use Control-s to save the changes and control-x to exit nano.
 Then reboot Moon Rabbit, to apply the changes.
@@ -75,7 +75,7 @@ sudo reboot
 ```
 Check swapsize again
 ```
-swapon
+swapon --show
 > NAME      TYPE  SIZE   USED PRIO
 > var/swap file 1024M 377.8M   -2
 ```
