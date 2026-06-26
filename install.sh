@@ -5,7 +5,7 @@ sudo timedatectl set-ntp true
 # Install necessary packages
 sudo apt update
 sudo apt-get install -y sqlite3 sqlitebrowser
-sudo apt install -y software-properties-common
+#sudo apt install -y software-properties-common
 sudo apt-get install -y indi-bin indi-aagcloudwatcher-ng
 sudo apt install  -y swig
 sudo apt install  -y libindi-dev
