@@ -155,6 +155,7 @@ class SensorModule:
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'rain_rate', self.rain_rate)
 
         # Now insert all weather keys (skip 'device_name')
+        weather_data = self.device_readings.copy()  # includes 'device_name' and all weather keys
         for key, value in weather_data.items():
             if key != 'device_name':   # ignore the device name placeholder
                 # Use a fixed sensor type, e.g., 'vantage', or get it from the dict
