@@ -146,24 +146,21 @@ class SensorModule:
         db_manager.insert_measurement(self.device, 'bme280', self.lat, self.long, 'temperature', self.temperature_val)
         # Check if self has an attribute named 'wind_direction'
         if hasattr(self, 'wind_direction'):
-            print('wind_direction')
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'wind_direction', self.wind_direction)
-        else:
-            print('no wind_direction')
         # Check if self has an attribute named 'wind_speed'
         if hasattr(self, 'wind_speed'):
-            print('wind_speed')
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'wind_speed', self.wind_speed)
-        else:
-            print('no wind_speed')
         # Check if self has an attribute named 'rain_rate'
         if hasattr(self, 'rain_rate'):
-            print('rain_rate')
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'rain_rate', self.rain_rate)
-        else:
-            print('no rain_rate')
-            
-        
+
+        # Now insert all weather keys (skip 'device_name')
+        for key, value in weather_data.items():
+            if key != 'device_name':   # ignore the device name placeholder
+                # Use a fixed sensor type, e.g., 'vantage', or get it from the dict
+                sensor_type = weather_data.get('device_name', 'vantage')
+                db_manager.insert_measurement(self.device, sensor_type, self.lat, self.long, key, value)
+                
         config=sensor_values.set_time_interval_values(datetime.now().isoformat(), 
                                                               {'co2':self.co2_val,
                                                               'humidity':self.humidity_val,
