@@ -146,13 +146,22 @@ class SensorModule:
         db_manager.insert_measurement(self.device, 'bme280', self.lat, self.long, 'temperature', self.temperature_val)
         # Check if self has an attribute named 'wind_direction'
         if hasattr(self, 'wind_direction'):
+            print('wind_direction')
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'wind_direction', self.wind_direction)
+        else:
+            print('no wind_direction')
         # Check if self has an attribute named 'wind_speed'
         if hasattr(self, 'wind_speed'):
+            print('wind_speed')
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'wind_speed', self.wind_speed)
+        else:
+            print('no wind_speed')
         # Check if self has an attribute named 'rain_rate'
         if hasattr(self, 'rain_rate'):
+            print('rain_rate')
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'rain_rate', self.rain_rate)
+        else:
+            print('no rain_rate')
             
         
         config=sensor_values.set_time_interval_values(datetime.now().isoformat(), 
