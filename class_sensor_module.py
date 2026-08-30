@@ -305,58 +305,48 @@ class SensorModule:
         #print("List of Device Properties")
         self.device_readings={}
         for device in deviceList:
-            logger.info (f"-- {device.getDeviceName()}")
-            self.device_readings["device_name"]=device.getDeviceName()
-            genericPropertyList = device.getProperties()
+            logger.info(f"-- {device.getDeviceName()}")
+            self.device_readings["device_name"] = device.getDeviceName()
         
-            for genericProperty in genericPropertyList:
-                logger.info (f"   > {genericProperty.getName()} {genericProperty.getTypeAsString()}")
-        
-                #if genericProperty.getType() == PyIndi.INDI_TEXT:
-                #    for widget in PyIndi.PropertyText(genericProperty):
-                #        print(
-                #            f"       {widget.getName()}({widget.getLabel()}) = {widget.getText()}"
-                #        )
-        
-                if genericProperty.getType() == PyIndi.INDI_NUMBER:
-                    for widget in PyIndi.PropertyNumber(genericProperty):
-                        #print(f"{widget.getName()}")
-                        if "weather" in widget.getName().lower():
-                            logger.info (
-                                f"       {widget.getName()}({widget.getLabel()}) = {widget.getValue()}"
-                            )
-                            self.device_readings[widget.getName()]=widget.getValue()
-                            if "rain_rate" in widget.getName().lower():
-                                self.rain_rate = widget.getValue()
-                            if "wind_speed" in widget.getName().lower():
-                                self.wind_speed = widget.getValue()
-                            if "wind_direction" in widget.getName().lower():
-                                self.wind_direction = widget.getValue()
-        
-                if genericProperty.getType() == PyIndi.INDI_SWITCH:
-                    for widget in PyIndi.PropertySwitch(genericProperty):
-                        if "connect" in widget.getName().lower():
-                            logger.info (
-                                f"       {widget.getName()}({widget.getLabel()}) = {widget.getStateAsString()}"
-                            )
-        
-                #if genericProperty.getType() == PyIndi.INDI_LIGHT:
-                #    for widget in PyIndi.PropertyLight(genericProperty):
-                #        print(
-                #            f"       {widget.getLabel()}({widget.getLabel()}) = {widget.getStateAsString()}"
-                #        )
-        
-                #if genericProperty.getType() == PyIndi.INDI_BLOB:
-                #    for widget in PyIndi.PropertyBlob(genericProperty):
-                #        print(
-                #            f"       {widget.getName()}({widget.getLabel()}) = <blob {widget.getSize()} bytes>"
-                #        )
-        
-        # Disconnect from the indiserver
-        print("Disconnecting")
-        indiClient.disconnectServer()
-        print(self.device_readings)
-          
+            if device.getDeviceName() == "Vantage":
+                # ---- 1. Connect the device ----
+                connect_switch = device.getSwitch("CONNECTION")
+                if connect_switch:
+                    connect_switch[0].setState(PyIndi.ISS_ON)   # CONNECT
+                    connect_switch[1].setState(PyIndi.ISS_OFF)  # DISCONNECT
+                    indiClient.sendNewSwitch(connect_switch)
+                    logger.info("Sent CONNECT command to Vantage")
+                            
+                    timeout = time.time() + 10   # wait up to 10 seconds
+                    while time.time() < timeout:
+                        
+                        # Let the client receive messages from the server
+                        indiClient.processEvents()   # <-- add this line
+                        
+                        genericPropertyList = device.getProperties()
+                        # scan for weather properties
+                        #found = False
+                        for prop in genericPropertyList:
+                            
+                            logger.info (f"   > {prop.getName()} {prop.getTypeAsString()}")
+                            if prop.getType() == PyIndi.INDI_NUMBER:
+                                for widget in PyIndi.PropertyNumber(prop):
+                                    if "weather" in widget.getName().lower():
+                                        self.device_readings[widget.getName().lower()]=widget.getValue()
+                                    if "rain_rate" in widget.getName().lower():
+                                        self.rain_rate = widget.getValue()
+                                    if "wind_speed" in widget.getName().lower():
+                                        self.wind_speed = widget.getValue()
+                                    if "wind_direction" in widget.getName().lower():
+                                        self.wind_direction = widget.getValue()
+                        time.sleep(0.5)
+                                                    
+                # Disconnect from the indiserver
+                print("Disconnecting")
+                indiClient.disconnectServer()
+                print(self.device_readings)
+                break
+                  
         return co2_val
         
 if __name__ == "__main__":
