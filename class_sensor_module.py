@@ -320,9 +320,6 @@ class SensorModule:
                     timeout = time.time() + 10   # wait up to 10 seconds
                     while time.time() < timeout:
                         
-                        # Let the client receive messages from the server
-                        indiClient.processEvents()   # <-- add this line
-                        
                         genericPropertyList = device.getProperties()
                         # scan for weather properties
                         #found = False
