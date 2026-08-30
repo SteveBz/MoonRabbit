@@ -330,6 +330,7 @@ class SensorModule:
                                 for widget in PyIndi.PropertyNumber(prop):
                                     if "weather" in widget.getName().lower():
                                         self.device_readings[widget.getName().lower()]=widget.getValue()
+                                        self.device_readings["device_name"]="vantage_pro"
                                     if "rain_rate" in widget.getName().lower():
                                         self.rain_rate = widget.getValue()
                                     if "wind_speed" in widget.getName().lower():
