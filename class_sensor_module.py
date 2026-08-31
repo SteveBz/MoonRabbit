@@ -155,12 +155,20 @@ class SensorModule:
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'rain_rate', self.rain_rate)
 
         # Now insert all weather keys (skip 'device_name')
+        ignore_keys = {'weather_forecast', 'weather_solar_radiation'}
+        duplicate_weather_keys = {'weather_wind_direction', 'weather_rain_rate', 'weather_wind_speed'}
         weather_data = self.device_readings.copy()  # includes 'device_name' and all weather keys
+        sensor_type = weather_data.get('device_name', 'vantage')  # fetch once
         for key, value in weather_data.items():
-            if key != 'device_name':   # ignore the device name placeholder
-                # Use a fixed sensor type, e.g., 'vantage', or get it from the dict
-                sensor_type = weather_data.get('device_name', 'vantage')
-                db_manager.insert_measurement(self.device, sensor_type, self.lat, self.long, key, value)
+            if key == 'device_name':
+                continue                   # skip device name
+            if key in ignore_keys:
+                continue                  # not of interest
+            if key in duplicate_weather_keys:
+                continue                   # skip duplicates; plain versions will be inserted
+            
+            # Use a fixed sensor type, e.g., 'vantage', or get it from the dict
+            db_manager.insert_measurement(self.device, sensor_type, self.lat, self.long, key, value)
                 
         config=sensor_values.set_time_interval_values(datetime.now().isoformat(), 
                                                               {'co2':self.co2_val,
