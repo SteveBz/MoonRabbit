@@ -35,7 +35,7 @@ def refresh_history():
     db_manager = DatabaseManager('measurement.db')
     
     # Fetch the latest historical data for each sensor type from the database
-    sensor_types = ['temperature', 'pressure', 'humidity', 'co2']
+    sensor_types = ['temperature', 'pressure', 'humidity', 'co2', 'sky_temperature', 'rain_rate', 'wind_speed', 'wind_direction', 'rain']
     historical_data = {}
     for sensor_type in sensor_types:
         historical_data[sensor_type] = db_manager.get_latest_measurements_by_type_and_duration(sensor_type, duration, max_points)
