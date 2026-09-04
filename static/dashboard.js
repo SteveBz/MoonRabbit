@@ -68,11 +68,24 @@ function loadGlobalCO2() {
     'use strict';
 
     const MAX_POINTS = 360;
-    let currentDuration = 'realtime'; // will be set from dropdown
+    let currentDuration = 'realtime';
     let pollingPaused = false;
     let pollInterval = null;
-
     const sensors = {};
+
+    // ---- Helper: clean sensor name for display ----
+    function getDisplayName(raw) {
+        let name = raw;
+        // Remove 'weather_' prefix
+        if (name.startsWith('weather_')) {
+            name = name.substring(8);
+        }
+        // Replace underscores with spaces
+        name = name.replace(/_/g, ' ');
+        // Capitalise first letter of each word
+        name = name.replace(/\b\w/g, c => c.toUpperCase());
+        return name;
+    }
 
     // ---- Helper: get sizes ----
     function getSizes() {
@@ -88,14 +101,16 @@ function loadGlobalCO2() {
 
     // ---- Build UI for a single sensor ----
     function createSensorElements(name, meta) {
-        // Value box (reuse .box)
+        const displayName = getDisplayName(name);
+
+        // Value box
         const boxContainer = document.getElementById('sensor-boxes');
         const box = document.createElement('div');
         box.className = 'box';
         box.id = 'sensor-' + name;
         box.innerHTML = `
             <div class="right-side">
-                <div class="box-topic">${name}</div>
+                <div class="box-topic">${displayName}</div>
                 <div class="number" id="val-${name}">--</div>
                 <div style="font-size:14px;color:#888;">${meta.unit || ''}</div>
             </div>
@@ -122,6 +137,7 @@ function loadGlobalCO2() {
     function createChartsForSensor(name) {
         const sensor = sensors[name];
         const meta = sensor.meta;
+        const displayName = getDisplayName(name);
         const sizes = getSizes();
 
         // Gauge
@@ -133,7 +149,7 @@ function loadGlobalCO2() {
         const gaugeData = [{
             domain: { x: [0, 1], y: [0, 1] },
             value: 0,
-            title: { text: name, font: { size: 12 } },
+            title: { text: displayName, font: { size: 12 } },
             type: 'indicator',
             mode: 'gauge+number',
             gauge: {
@@ -154,7 +170,7 @@ function loadGlobalCO2() {
         // History chart
         const lineLayout = {
             autosize: true,
-            title: { text: `${name} (${meta.unit || ''})` },
+            title: { text: `${displayName} (${meta.unit || ''})` },
             xaxis: { type: 'date' },
             yaxis: { range: [meta.min || 0, meta.max || 100] },
             font: { size: 14, color: '#7f7f7f' },
@@ -166,7 +182,7 @@ function loadGlobalCO2() {
         const trace = {
             x: [],
             y: [],
-            name: name,
+            name: displayName,
             mode: 'lines+markers',
             type: 'scatter'
         };
