@@ -218,45 +218,59 @@ function loadGlobalCO2() {
                 }
                 refreshHistory();
                 startPolling();
+                // Fetch initial readings to set latitude/longitude immediately
+                setTimeout(updateSensorReadings, 200);
             })
             .catch(err => console.error('Init error:', err));
     }
 
     // ---- Polling ----
     function updateSensorReadings() {
-        fetch('/v2/sensorReadings')
-            .then(res => res.json())
-            .then(dataArray => {
-                dataArray.forEach(item => {
-                    const name = item.name;
-                    const sensor = sensors[name];
-                    if (!sensor) return;
-                    const value = parseFloat(item.value);
+    fetch('/v2/sensorReadings')
+        .then(res => res.json())
+        .then(data => {
+            // Update latitude/longitude
+            if (data.latitude !== undefined) {
+                const latSpan = document.getElementById('latitude');
+                if (latSpan) latSpan.textContent = data.latitude.toFixed(4);
+            }
+            if (data.longitude !== undefined) {
+                const longSpan = document.getElementById('longitude');
+                if (longSpan) longSpan.textContent = data.longitude.toFixed(4);
+            }
 
-                    // Update value box
-                    const valSpan = document.getElementById('val-' + name);
-                    if (valSpan) valSpan.textContent = value.toFixed(2);
+            // Process readings
+            const readings = data.readings || [];
+            readings.forEach(item => {
+                const name = item.name;
+                const sensor = sensors[name];
+                if (!sensor) return;
+                const value = parseFloat(item.value);
 
-                    // Update gauge
-                    Plotly.update('gauge-' + name, { value: value });
+                // Update value box
+                const valSpan = document.getElementById('val-' + name);
+                if (valSpan) valSpan.textContent = value.toFixed(2);
 
-                    // Append to history (if not paused)
-                    if (!pollingPaused) {
-                        sensor.xArray.push(new Date());
-                        sensor.yArray.push(value);
-                        if (sensor.xArray.length > MAX_POINTS) {
-                            sensor.xArray.shift();
-                            sensor.yArray.shift();
-                        }
-                        Plotly.update('history-' + name, {
-                            x: [sensor.xArray.slice()],
-                            y: [sensor.yArray.slice()]
-                        });
+                // Update gauge
+                Plotly.update('gauge-' + name, { value: value });
+
+                // Append to history (if not paused)
+                if (!pollingPaused) {
+                    sensor.xArray.push(new Date());
+                    sensor.yArray.push(value);
+                    if (sensor.xArray.length > MAX_POINTS) {
+                        sensor.xArray.shift();
+                        sensor.yArray.shift();
                     }
-                });
-            })
-            .catch(err => console.error('Polling error:', err));
-    }
+                    Plotly.update('history-' + name, {
+                        x: [sensor.xArray.slice()],
+                        y: [sensor.yArray.slice()]
+                    });
+                }
+            });
+        })
+        .catch(err => console.error('Polling error:', err));
+}
 
     function refreshHistory() {
         const url = `/v2/refreshHistory?maxPoints=${MAX_POINTS}&duration=${currentDuration}`;
