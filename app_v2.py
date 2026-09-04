@@ -34,7 +34,7 @@ def get_active_sensor_types():
     db = DatabaseManager('measurement.db')
     try:
         cursor = db.conn.cursor()
-        cursor.execute("SELECT DISTINCT type FROM measurements")
+        cursor.execute("SELECT DISTINCT type FROM sensor_measurement")
         rows = cursor.fetchall()
         types = [row[0] for row in rows]
         logger.info(f"Active sensor types found: {types}")
