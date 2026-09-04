@@ -54,6 +54,9 @@ def get_sensor_metadata_for_type(sensor_type):
 # ==============================================================
 # NEW: V2 API ENDPOINTS
 # ==============================================================
+@app.route('/new')
+def new_dashboard():
+    return render_template('index_generic.html')
 @app.route('/v2/sensorMetadata', methods=['GET'])
 def v2_sensor_metadata():
     logger.info("v2_sensorMetadata called")
