@@ -67,11 +67,8 @@ def v2_sensor_metadata():
 
 @app.route('/v2/sensorReadings', methods=['GET'])
 def v2_sensor_readings():
-    db = DatabaseManager(DB_PATH)
-    conf = ConfigManager("config.json")
-    latitude = conf.get_lat()
-    longitude = conf.get_long()
-    
+    logger.info("v2_sensorReadings called")
+    db = DatabaseManager('measurement.db')
     types = get_active_sensor_types()
     readings = []
     for sensor_type in types:
@@ -91,11 +88,8 @@ def v2_sensor_readings():
         except Exception as e:
             logger.error(f"Error reading {sensor_type}: {e}")
     db.conn.close()
-    return jsonify({
-        "latitude": latitude,
-        "longitude": longitude,
-        "readings": readings
-    })
+    logger.info(f"v2_sensorReadings returning {len(readings)} readings")
+    return jsonify(readings)
 
 @app.route('/v2/refreshHistory', methods=['GET'])
 def v2_refresh_history():
