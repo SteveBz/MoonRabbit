@@ -277,7 +277,6 @@ class SensorModule:
         start_time = time.time()
         timeout = 30  # seconds
         
-        attempts = 0
         while True:
             # Check for timeout
             if time.time() - start_time > timeout:
@@ -340,26 +339,57 @@ class SensorModule:
                     indiClient.sendNewSwitch(connect_switch)
                     logger.info("Sent CONNECT command to Vantage")
                             
+                    # ---- Initialise Vantage attributes ----
+                    self.vantage_temperature = None
+                    self.vantage_humidity = None
+                    self.vantage_pressure = None
+                    self.rain_rate = None
+                    self.wind_speed = None
+                    self.wind_direction = None
+
                     timeout = time.time() + 10   # wait up to 10 seconds
+
+                    required = {'rain_rate', 'wind_speed', 'wind_direction', 
+                    'weather_temperature', 'weather_humidity', 'weather_barometer'}
+                    collected = set()
                     while time.time() < timeout:
                         
                         genericPropertyList = device.getProperties()
                         # scan for weather properties
-                        #found = False
                         for prop in genericPropertyList:
                             
                             logger.info (f"   > {prop.getName()} {prop.getTypeAsString()}")
                             if prop.getType() == PyIndi.INDI_NUMBER:
                                 for widget in PyIndi.PropertyNumber(prop):
-                                    if "weather" in widget.getName().lower():
-                                        self.device_readings[widget.getName().lower()]=widget.getValue()
-                                        self.device_readings["device_name"]="vantage_pro"
-                                    if "rain_rate" in widget.getName().lower():
-                                        self.rain_rate = widget.getValue()
-                                    if "wind_speed" in widget.getName().lower():
-                                        self.wind_speed = widget.getValue()
-                                    if "wind_direction" in widget.getName().lower():
-                                        self.wind_direction = widget.getValue()
+                                    
+                                    name = widget.getName().lower()
+                                    value = widget.getValue()
+                                    # ---- Store weather readings and overwrite BME values ----
+                                    if "weather" in name:
+                                        self.device_readings[name] = value
+                                        self.device_readings["device_name"] = "vantage_pro"
+                                        collected.add(name)
+    
+                                        if "temperature" in name:
+                                            self.temperature_val = value   # overwrite BME
+                                        elif "humidity" in name:
+                                            self.humidity_val = value      # overwrite BME
+                                        elif "barometer" in name or "pressure" in name:
+                                            self.pressure_val = value      # overwrite BME
+                                    # ---- Wind/rain readings ----
+                                    if "rain_rate" in name:
+                                        self.rain_rate = value
+                                        collected.add('rain_rate')
+                                    if "wind_speed" in name:
+                                        self.wind_speed = value
+                                        collected.add('wind_speed')
+                                    if "wind_direction" in name:
+                                        self.wind_direction = value
+                                        collected.add('wind_direction')
+                        # ---- Break early if all required readings are collected ----
+                        if collected >= required:
+                            logger.info(f"All Vantage readings collected: {collected}")
+                            break
                         time.sleep(0.5)
                                                     
                 # Disconnect from the indiserver
