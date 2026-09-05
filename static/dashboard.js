@@ -114,7 +114,7 @@ function loadGlobalCO2() {
     // ---- Build UI for a single sensor ----
     function createSensorElements(name, meta) {
         const displayName = getDisplayName(name);
-
+        const iconClass = getIconForSensor(name);
         // Value box
         const boxContainer = document.getElementById('sensor-boxes');
         const box = document.createElement('div');
