@@ -75,6 +75,8 @@ function loadGlobalCO2() {
 
     // ---- Helper: clean sensor name for display ----
     function getDisplayName(raw) {
+        // Special cases
+        if (raw === 'co2') return 'CO\u2082';
         let name = raw;
         // Remove 'weather_' prefix
         if (name.startsWith('weather_')) {
