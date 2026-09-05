@@ -270,15 +270,23 @@ class SensorModule:
         Applies temperature offset if external reference available.
         Returns True on success, False on failure or timeout.
         """    
-        attempts = 0
+
+         # ---- CO2 reading with timeout ----
         MAX_VALID_CO2 = 5000
         co2_val = 400  # fallback/default
+        start_time = time.time()
+        timeout = 30  # seconds
+        
+        attempts = 0
         while True:
+            # Check for timeout
+            if time.time() - start_time > timeout:
+                logger.warning("CO2 sensor timeout - using fallback value 400 ppm")
+                break
             if self.scd.data_available:
                 self.temp=self.scd.temperature
                 self.hum=self.scd.relative_humidity
                 self.co2=self.scd.CO2
-
 
                 # check if external reference temperature is available
                 if hasattr(self, "temperature_val") and self.temperature_val != 0 and self.temp != 0:
@@ -286,8 +294,8 @@ class SensorModule:
                     self.scd.temperature_offset = self.temperature_offset
                     
                 co2_val = self.co2
-            if self.co2 < MAX_VALID_CO2:
-                    break
+                if self.co2 < MAX_VALID_CO2:
+                        break
             time.sleep(1)
         try:
             indiClient = IndiClient()
