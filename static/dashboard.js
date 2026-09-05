@@ -92,8 +92,8 @@ function loadGlobalCO2() {
         if (name.includes('humidity')) return 'bxs-droplet-half';
         if (name.includes('pressure') || name.includes('barometer')) return 'bxs-tachometer';
         if (name.includes('co2') || name.includes('carbon')) return 'bxs-building';
-        if (name.includes('wind_speed')) return 'bxs-wind';
-        if (name.includes('wind_direction')) return 'bxs-compass';
+        if (name.includes('speed')) return 'bxs-wind';
+        if (name.includes('direction')) return 'bxs-compass';
         if (name.includes('rain')) return 'bxs-cloud-rain';
         if (name.includes('solar')) return 'bxs-sun';
         // default
