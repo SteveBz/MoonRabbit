@@ -86,7 +86,19 @@ function loadGlobalCO2() {
         name = name.replace(/\b\w/g, c => c.toUpperCase());
         return name;
     }
-
+    function getIconForSensor(rawName) {
+        const name = rawName.toLowerCase();
+        if (name.includes('temperature') || name === 'temp') return 'bxs-thermometer';
+        if (name.includes('humidity')) return 'bxs-droplet-half';
+        if (name.includes('pressure') || name.includes('barometer')) return 'bxs-tachometer';
+        if (name.includes('co2') || name.includes('carbon')) return 'bxs-building';
+        if (name.includes('wind_speed')) return 'bxs-wind';
+        if (name.includes('wind_direction')) return 'bxs-compass';
+        if (name.includes('rain')) return 'bxs-cloud-rain';
+        if (name.includes('solar')) return 'bxs-sun';
+        // default
+        return 'bxs-dashboard';
+    }
     // ---- Helper: get sizes ----
     function getSizes() {
         const w = document.documentElement.clientWidth;
@@ -114,7 +126,7 @@ function loadGlobalCO2() {
                 <div class="number" id="val-${name}">--</div>
                 <div style="font-size:14px;color:#888;">${meta.unit || ''}</div>
             </div>
-            <i class="bx bxs-thermometer readings" style="color:${meta.color || '#666'}"></i>
+            <i class="bx ${iconClass} readings" style="color:${meta.color || '#666'}"></i>
         `;
         boxContainer.appendChild(box);
 
