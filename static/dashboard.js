@@ -90,12 +90,13 @@ function loadGlobalCO2() {
     }
     function getIconForSensor(rawName) {
         const name = rawName.toLowerCase();
+        console.log('getIconForSensor:', rawName);   // ADD THIS
         if (name.includes('temperature') || name === 'temp') return 'bxs-thermometer';
         if (name.includes('humidity')) return 'bxs-droplet-half';
         if (name.includes('pressure') || name.includes('barometer')) return 'bxs-tachometer';
         if (name.includes('co2') || name.includes('carbon')) return 'bxs-flask';
-    if (name.includes('wind_speed') || name.includes('speed')) return 'bxs-wind';
-    if (name.includes('wind_direction') || name.includes('direction')) return 'bxs-compass';
+        if (name.includes('wind_speed') || name.includes('speed')) return 'bxs-wind';
+        if (name.includes('wind_direction') || name.includes('direction')) return 'bxs-compass';
         if (name.includes('rain')) return 'bxs-cloud-rain';
         if (name.includes('solar')) return 'bxs-sun';
         // default
