@@ -163,17 +163,17 @@ class SensorModule:
         db_manager = DatabaseManager('measurement.db')
         db_manager.insert_measurement(self.device, 'scd30', self.lat, self.long, 'co2', self.co2_val)
         if "humidity" in self.device_readings:
-            source_sensor = self.device_name   # will be 'vantage_pro' (or whatever you set)
+            source_sensor = self.device_readings["device_name"]   # will be 'vantage_pro' (or whatever you set)
         else:
             source_sensor = 'bme280'
         db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'humidity', self.humidity_val)
         if "pressure" in self.device_readings:
-            source_sensor = self.device_name   # will be 'vantage_pro' (or whatever you set)
+            source_sensor = self.device_readings["device_name"]   # will be 'vantage_pro' (or whatever you set)
         else:
             source_sensor = 'bme280'
         db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'pressure', self.pressure_val)
         if "temperature" in self.device_readings:
-            source_sensor = self.device_name   # will be 'vantage_pro' (or whatever you set)
+            source_sensor = self.device_readings["device_name"]   # will be 'vantage_pro' (or whatever you set)
         else:
             source_sensor = 'bme280'
         db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'temperature', self.temperature_val)
@@ -332,7 +332,7 @@ class SensorModule:
         start_time = time.time()
         timeout = 30  # seconds
         self.device_readings={}
-        self.device_name = 'bme280'   # default fallback
+        #self.device_name = 'bme280'   # default fallback
         
         while True:
             # Check for timeout
