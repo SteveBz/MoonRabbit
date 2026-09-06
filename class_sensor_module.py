@@ -188,7 +188,7 @@ class SensorModule:
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'rain_rate', self.rain_rate)
 
         # Now insert all weather keys (skip 'device_name')
-        ignore_keys = {'weather_forecast', 'weather_solar_radiation'}
+        ignore_keys = {'weather_forecast', 'forecast', 'weather_solar_radiation', 'solar_radiation'}
         duplicate_weather_keys = {
             'weather_wind_direction', 'weather_rain_rate', 'weather_wind_speed',
             'pressure', 'temperature', 'barometer', 'humidity',
