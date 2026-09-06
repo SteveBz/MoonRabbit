@@ -330,6 +330,7 @@ class SensorModule:
         start_time = time.time()
         timeout = 30  # seconds
         self.device_readings={}
+        self.device_name = 'bme280'   # default fallback
         
         while True:
             # Check for timeout
