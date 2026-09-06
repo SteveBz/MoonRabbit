@@ -36,7 +36,26 @@ class SensorModule:
     PORT = 1
     ADDRESS = 0x76
     ADDRESS2 = 0x77
-       
+    # Map reading type to the sensor that produces it
+    SENSOR_MAP = {
+        'co2': 'scd30',
+        'humidity': 'bme280',
+        'pressure': 'bme280',
+        'temperature': 'bme280',
+        'wind_speed': 'vantage_pro',
+        'wind_direction': 'vantage_pro',
+        'rain_rate': 'vantage_pro',
+    }
+    # Map attribute name to reading type (for building values dict)
+    ATTR_TO_READING = {
+        'co2_val': 'co2',
+        'humidity_val': 'humidity',
+        'pressure_val': 'pressure',
+        'temperature_val': 'temperature',
+        'wind_speed': 'wind_speed',
+        'wind_direction': 'wind_direction',
+        'rain_rate': 'rain_rate',
+    }
     def __init__(self):
         self.bus = smbus2.SMBus(SensorModule.PORT)
         self.device = None
@@ -141,9 +160,21 @@ class SensorModule:
         lock.acquire_lock(wait=True)
         db_manager = DatabaseManager('measurement.db')
         db_manager.insert_measurement(self.device, 'scd30', self.lat, self.long, 'co2', self.co2_val)
-        db_manager.insert_measurement(self.device, 'bme280', self.lat, self.long, 'humidity', self.humidity_val)
-        db_manager.insert_measurement(self.device, 'bme280', self.lat, self.long, 'pressure', self.pressure_val)
-        db_manager.insert_measurement(self.device, 'bme280', self.lat, self.long, 'temperature', self.temperature_val)
+        if "humidity" in self.device_readings:
+            source_sensor = self.device_name   # will be 'vantage_pro' (or whatever you set)
+        else:
+            source_sensor = 'bme280'
+        db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'humidity', self.humidity_val)
+        if "pressure" in self.device_readings:
+            source_sensor = self.device_name   # will be 'vantage_pro' (or whatever you set)
+        else:
+            source_sensor = 'bme280'
+        db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'pressure', self.pressure_val)
+        if "temperature" in self.device_readings:
+            source_sensor = self.device_name   # will be 'vantage_pro' (or whatever you set)
+        else:
+            source_sensor = 'bme280'
+        db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'temperature', self.temperature_val)
         # Check if self has an attribute named 'wind_direction'
         if hasattr(self, 'wind_direction'):
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'wind_direction', self.wind_direction)
@@ -156,7 +187,11 @@ class SensorModule:
 
         # Now insert all weather keys (skip 'device_name')
         ignore_keys = {'weather_forecast', 'weather_solar_radiation'}
-        duplicate_weather_keys = {'weather_wind_direction', 'weather_rain_rate', 'weather_wind_speed'}
+        duplicate_weather_keys = {
+            'weather_wind_direction', 'weather_rain_rate', 'weather_wind_speed',
+            'pressure', 'temperature', 'barometer', 'humidity',
+            'wind_speed', 'wind_direction', 'rain_rate'   # <-- add these
+        }
         weather_data = self.device_readings.copy()  # includes 'device_name' and all weather keys
         sensor_type = weather_data.get('device_name', 'vantage')  # fetch once
         for key, value in weather_data.items():
@@ -168,13 +203,19 @@ class SensorModule:
                 continue                   # skip duplicates; plain versions will be inserted
             
             # Use a fixed sensor type, e.g., 'vantage', or get it from the dict
-            db_manager.insert_measurement(self.device, sensor_type, self.lat, self.long, key, value)
-                
-        config=sensor_values.set_time_interval_values(datetime.now().isoformat(), 
-                                                              {'co2':self.co2_val,
-                                                              'humidity':self.humidity_val,
-                                                              'pressure': self.pressure_val,
-                                                              'temperature': self.temperature_val})
+        db_manager.insert_measurement(self.device, sensor_type, self.lat, self.long, key, value)
+        values = {}
+        for attr, key in self.ATTR_TO_READING.items():
+            val = getattr(self, attr, None)
+            if val is not None:
+                values[key] = val
+        
+        config = sensor_values.set_time_interval_values(datetime.now().isoformat(), values)
+        #config=sensor_values.set_time_interval_values(datetime.now().isoformat(), 
+        #                                                      {'co2':self.co2_val,
+        #                                                      'humidity':self.humidity_val,
+        #                                                      'pressure': self.pressure_val,
+        #                                                      'temperature': self.temperature_val})
         
         start_time = datetime.fromisoformat(config["time_intervals"]["min"]["start"])
         end_mins = (start_time + timedelta(minutes=1)).replace(microsecond=0)      
@@ -240,29 +281,41 @@ class SensorModule:
                 sensor_readings[reading_type]/sensor_readings["count"], 
                 0, # max - sort out later 
                 0) # min - sort out later
+
+        # NEW dynamic loop
+        interval_data = config["time_intervals"][interval]
+        
         if interval == "min":
-            # CO2
-            insert_record_from_array(self, table, 'scd30', 'co2', config)
-    
-            # Pressure
-            insert_record_from_array(self, table, 'bme280', 'pressure', config)
-            
-            # Humidity
-            insert_record_from_array(self, table, 'bme280', 'humidity', config)
-            
-            # Temperature
-            insert_record_from_array(self, table, 'bme280', 'temperature', config)
-        else:            # CO2
-            insert_record_from_value(self, table, 'scd30', 'co2', config)
-    
-            # Pressure
-            insert_record_from_value(self, table, 'bme280', 'pressure', config)
-            
-            # Humidity
-            insert_record_from_value(self, table, 'bme280', 'humidity', config)
-            
-            # Temperature
-            insert_record_from_value(self, table, 'bme280', 'temperature', config)
+            for reading_type, sensor_type in self.SENSOR_SOURCE_MAP.items():
+                if reading_type in interval_data:
+                    insert_record_from_array(self, table, sensor_type, reading_type, config)
+        else:  # hour or day
+            for reading_type, sensor_type in self.SENSOR_SOURCE_MAP.items():
+                if reading_type in interval_data:
+                    insert_record_from_value(self, table, sensor_type, reading_type, config)
+        #if interval == "min":
+        #    # CO2
+        #    insert_record_from_array(self, table, 'scd30', 'co2', config)
+   # 
+   #         # Pressure
+   #         insert_record_from_array(self, table, 'bme280', 'pressure', config)
+   #         
+   #         # Humidity
+   #         insert_record_from_array(self, table, 'bme280', 'humidity', config)
+   #         
+   #         # Temperature
+   #         insert_record_from_array(self, table, 'bme280', 'temperature', config)
+   #     else:            # CO2
+   #         insert_record_from_value(self, table, 'scd30', 'co2', config)
+   # 
+   #         # Pressure
+   #         insert_record_from_value(self, table, 'bme280', 'pressure', config)
+   #         
+   #         # Humidity
+   #         insert_record_from_value(self, table, 'bme280', 'humidity', config)
+   #         
+   #         # Temperature
+   #         insert_record_from_value(self, table, 'bme280', 'temperature', config)
         
     def read_values(self):
         """
@@ -276,6 +329,7 @@ class SensorModule:
         co2_val = 400  # fallback/default
         start_time = time.time()
         timeout = 30  # seconds
+        self.device_readings={}
         
         while True:
             # Check for timeout
@@ -325,7 +379,6 @@ class SensorModule:
         
         # Print all properties and their associated values.
         #print("List of Device Properties")
-        self.device_readings={}
         for device in deviceList:
             logger.info(f"-- {device.getDeviceName()}")
             self.device_readings["device_name"] = device.getDeviceName()
@@ -366,7 +419,12 @@ class SensorModule:
                                     value = widget.getValue()
                                     # ---- Store weather readings and overwrite BME values ----
                                     if "weather" in name:
-                                        self.device_readings[name] = value
+                                        clean_name = name.replace("weather_", "")   # remove prefix
+                                        # Normalise barometer to pressure
+                                        if "barometer" in clean_name or "pressure" in clean_name:
+                                            clean_name = "pressure"
+                                        self.device_readings[clean_name] = value
+                                        #self.device_readings[name] = value
                                         self.device_readings["device_name"] = "vantage_pro"
                                         collected.add(name)
     
