@@ -37,7 +37,7 @@ class SensorModule:
     ADDRESS = 0x76
     ADDRESS2 = 0x77
     # Map reading type to the sensor that produces it
-    SENSOR_MAP = {
+    SENSOR_SOURCE_MAP = {
         'co2': 'scd30',
         'humidity': 'bme280',
         'pressure': 'bme280',
@@ -203,7 +203,7 @@ class SensorModule:
                 continue                   # skip duplicates; plain versions will be inserted
             
             # Use a fixed sensor type, e.g., 'vantage', or get it from the dict
-        db_manager.insert_measurement(self.device, sensor_type, self.lat, self.long, key, value)
+            db_manager.insert_measurement(self.device, sensor_type, self.lat, self.long, key, value)
         values = {}
         for attr, key in self.ATTR_TO_READING.items():
             val = getattr(self, attr, None)
@@ -403,8 +403,7 @@ class SensorModule:
 
                     timeout = time.time() + 10   # wait up to 10 seconds
 
-                    required = {'rain_rate', 'wind_speed', 'wind_direction', 
-                    'weather_temperature', 'weather_humidity', 'weather_barometer'}
+                    required = {'rain_rate', 'wind_speed', 'wind_direction', 'weather_temperature', 'weather_humidity', 'weather_barometer'}
                     collected = set()
                     while time.time() < timeout:
                         
