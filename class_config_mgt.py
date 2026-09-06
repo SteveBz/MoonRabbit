@@ -182,24 +182,22 @@ class ConfigManager:
             raise KeyError(f"Invalid interval '{interval}' for time intervals")
 
     def remove_interval(self, interval):
+        old_data = self.config["time_intervals"][interval]
+        # Collect all keys except 'start' and 'count'
+        sensor_keys = [k for k in old_data.keys() if k not in ("start", "count")]
+
         del self.config["time_intervals"][interval]
+
+        new_data = {"start": datetime.now().isoformat()}
         if interval == "min":
-            self.config["time_intervals"]["min"] = {
-                    "start":datetime.now().isoformat(),
-                    "co2": [],
-                    "temperature": [],
-                    "humidity": [],
-                    "pressure": [],
-                }
+            for key in sensor_keys:
+                new_data[key] = []
         else:
-            self.config["time_intervals"][interval]= {
-                "start":datetime.now().isoformat(),
-                "co2": 0,
-                "temperature": 0,
-                "humidity": 0,
-                "pressure": 0,
-                "count":0
-            }
+            for key in sensor_keys:
+                new_data[key] = 0
+            new_data["count"] = 0
+
+        self.config["time_intervals"][interval] = new_data
         self.save_config(self.config)
         return self.config
             
@@ -239,21 +237,25 @@ class ConfigManager:
                 "pressure": 0,
                 "count":0
             }
+            
+        for interval, interval_data in self.config["time_intervals"].items():
+            # 1. Update each sensor key (add if missing)
+            for sensor_key, value in sensor_value_dict.items():
+                if sensor_key not in interval_data:
+                    if interval == "min":
+                        interval_data[sensor_key] = []
+                    else:
+                        interval_data[sensor_key] = 0
+                if interval == "min":
+                    interval_data[sensor_key].append(value)
+                else:
+                    interval_data[sensor_key] += value
 
-        for interval in self.config["time_intervals"]:
-        
-            match interval:
-                case "min":
-                    self.config["time_intervals"][interval]["co2"].append(sensor_value_dict["co2"])
-                    self.config["time_intervals"][interval]["temperature"].append(sensor_value_dict["temperature"])
-                    self.config["time_intervals"][interval]["humidity"].append(sensor_value_dict["humidity"])
-                    self.config["time_intervals"][interval]["pressure"].append(sensor_value_dict["pressure"])
-                case _:
-                    self.config["time_intervals"][interval]["co2"] += sensor_value_dict["co2"]
-                    self.config["time_intervals"][interval]["temperature"] += sensor_value_dict["temperature"]
-                    self.config["time_intervals"][interval]["humidity"] += sensor_value_dict["humidity"]
-                    self.config["time_intervals"][interval]["pressure"] += sensor_value_dict["pressure"]
-                    self.config["time_intervals"][interval]["count"] += 1
+            # 2. Increment count once per interval (for non‑min)
+            if interval != "min":
+                if "count" not in interval_data:
+                    interval_data["count"] = 0
+                interval_data["count"] += 1
         self.save_config(self.config)
         return self.config
 
