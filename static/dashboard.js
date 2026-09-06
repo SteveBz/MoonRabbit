@@ -215,14 +215,14 @@ function loadGlobalCO2() {
                     document.getElementById('sensor-boxes').innerHTML = '<p>No sensors found.</p>';
                     return;
                 }
-                // ---- Sort: CO2 first ----
+                // ---- Sort: co2 first, then temperature, then rest ----
                 const priority = {
                     'co2': 0,
                     'temperature': 1
                 };
                 metadataArray.sort((a, b) => {
-                    const orderA = (a.name in priority) ? priority[a.name] : 1;
-                    const orderB = (b.name in priority) ? priority[b.name] : 1;
+                    const orderA = (a.name in priority) ? priority[a.name] : 2;
+                    const orderB = (b.name in priority) ? priority[b.name] : 2;
                     return orderA - orderB;
                 });
                 metadataArray.forEach(meta => {
