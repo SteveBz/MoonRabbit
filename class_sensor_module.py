@@ -37,25 +37,7 @@ class SensorModule:
     ADDRESS = 0x76
     ADDRESS2 = 0x77
     # Map reading type to the sensor that produces it
-    SENSOR_SOURCE_MAP = {
-        'co2': 'scd30',
-        'humidity': 'bme280',
-        'pressure': 'bme280',
-        'temperature': 'bme280',
-        'wind_speed': 'vantage_pro',
-        'wind_direction': 'vantage_pro',
-        'rain_rate': 'vantage_pro',
-    }
     # Map attribute name to reading type (for building values dict)
-    ATTR_TO_READING = {
-        'co2_val': 'co2',
-        'humidity_val': 'humidity',
-        'pressure_val': 'pressure',
-        'temperature_val': 'temperature',
-        'wind_speed': 'wind_speed',
-        'wind_direction': 'wind_direction',
-        'rain_rate': 'rain_rate',
-    }
     def __init__(self):
         self.bus = smbus2.SMBus(SensorModule.PORT)
         self.device = None
@@ -63,7 +45,27 @@ class SensorModule:
         self.long = None
         #print ("__init__")
         self.I2C_status=True
+
+
+        self.SENSOR_SOURCE_MAP = {
+            'co2': 'scd30',
+            'humidity': 'bme280',
+            'pressure': 'bme280',
+            'temperature': 'bme280',
+            'wind_speed': 'vantage_pro',
+            'wind_direction': 'vantage_pro',
+            'rain_rate': 'vantage_pro',
+        }
         
+        self.ATTR_TO_READING = {
+            'co2_val': 'co2',
+            'humidity_val': 'humidity',
+            'pressure_val': 'pressure',
+            'temperature_val': 'temperature',
+            'wind_speed': 'wind_speed',
+            'wind_direction': 'wind_direction',
+            'rain_rate': 'rain_rate',
+        }
         self.timer = 0
         self.i2c = None
         self.scd = None
