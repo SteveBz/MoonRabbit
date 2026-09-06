@@ -215,6 +215,13 @@ function loadGlobalCO2() {
                     document.getElementById('sensor-boxes').innerHTML = '<p>No sensors found.</p>';
                     return;
                 }
+                // ---- Sort: CO2 first ----
+                const priority = { 'co2': 0 };
+                metadataArray.sort((a, b) => {
+                    const orderA = (a.name in priority) ? priority[a.name] : 1;
+                    const orderB = (b.name in priority) ? priority[b.name] : 1;
+                    return orderA - orderB;
+                });
                 metadataArray.forEach(meta => {
                     const name = meta.name;
                     sensors[name] = {
