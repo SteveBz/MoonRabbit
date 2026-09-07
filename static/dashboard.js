@@ -251,8 +251,18 @@ function loadGlobalCO2() {
     function updateSensorReadings() {
         fetch('/v2/sensorReadings')
             .then(res => res.json())
-            .then(dataArray => {
-                dataArray.forEach(item => {
+            .then(data => {
+                // Update location
+                if (data.latitude !== undefined) {
+                    document.getElementById('latitude').textContent = data.latitude.toFixed(4);
+                }
+                if (data.longitude !== undefined) {
+                    document.getElementById('longitude').textContent = data.longitude.toFixed(4);
+                }
+    
+                // Process readings
+                const readings = data.readings || [];
+                readings.forEach(item => {
                     const name = item.name;
                     const sensor = sensors[name];
                     if (!sensor) return;
