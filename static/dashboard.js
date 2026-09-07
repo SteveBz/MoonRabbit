@@ -270,7 +270,7 @@ function loadGlobalCO2() {
 
                     // Update value box
                     const valSpan = document.getElementById('val-' + name);
-                    if (valSpan) valSpan.textContent = value.toFixed(2);
+                    if (valSpan) valSpan.textContent = value.toFixed(1);
 
                     // Update gauge
                     Plotly.update('gauge-' + name, { value: value });
