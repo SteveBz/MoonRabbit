@@ -192,9 +192,9 @@ class SensorModule:
             print(f"DEBUG: Inserting rain_rate = {rain_rate_val}")
         else:
             print("DEBUG: rain_rate not found or None in device_readings")
-        if 'rain_rate' in self.device_readings:
-            db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'rain_rate', self.device_readings['rain_rate'])
-            print(f"DEBUG: Inserting rain_rate = {self.device_readings['rain_rate']}")
+        #if 'rain_rate' in self.device_readings:
+        #    db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'rain_rate', self.device_readings['rain_rate'])
+        #    print(f"DEBUG: Inserting rain_rate = {self.device_readings['rain_rate']}")
 
         # Now insert all weather keys (skip 'device_name')
         ignore_keys = {'weather_forecast', 'forecast', 'weather_solar_radiation', 'solar_radiation'}
