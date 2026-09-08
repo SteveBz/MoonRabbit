@@ -178,15 +178,13 @@ class SensorModule:
             source_sensor = 'bme280'
         db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'temperature', self.temperature_val)
         # Check if self has an attribute named 'wind_direction'
-        if hasattr(self, 'wind_direction'):
-            db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'wind_direction', self.wind_direction)
-        # Check if self has an attribute named 'wind_speed'
-        if hasattr(self, 'wind_speed'):
-            db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'wind_speed', self.wind_speed)
-        # Check if self has an attribute named 'rain_rate'
-        if hasattr(self, 'rain_rate'):
-            print(f"DEBUG: Inserting rain_rate = {self.rain_rate}")
-            db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'rain_rate', self.rain_rate)
+        # Insert wind/rain directly from device_readings (clean keys)
+        if 'wind_direction' in self.device_readings:
+            db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'wind_direction', self.device_readings['wind_direction'])
+        if 'wind_speed' in self.device_readings:
+            db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'wind_speed', self.device_readings['wind_speed'])
+        if 'rain_rate' in self.device_readings:
+            db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'rain_rate', self.device_readings['rain_rate'])
             print(f"DEBUG: Inserting rain_rate = {self.rain_rate}")
 
         # Now insert all weather keys (skip 'device_name')
@@ -215,11 +213,6 @@ class SensorModule:
                 values[key] = val
         
         config = sensor_values.set_time_interval_values(datetime.now().isoformat(), values)
-        #config=sensor_values.set_time_interval_values(datetime.now().isoformat(), 
-        #                                                      {'co2':self.co2_val,
-        #                                                      'humidity':self.humidity_val,
-        #                                                      'pressure': self.pressure_val,
-        #                                                      'temperature': self.temperature_val})
         
         start_time = datetime.fromisoformat(config["time_intervals"]["min"]["start"])
         end_mins = (start_time + timedelta(minutes=1)).replace(microsecond=0)      
