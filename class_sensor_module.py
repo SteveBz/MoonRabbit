@@ -179,10 +179,19 @@ class SensorModule:
         db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'temperature', self.temperature_val)
         # Check if self has an attribute named 'wind_direction'
         # Insert wind/rain directly from device_readings (clean keys)
+        print("DEBUG: device_readings keys before rain_rate check:", self.device_readings.keys())
         if 'wind_direction' in self.device_readings:
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'wind_direction', self.device_readings['wind_direction'])
         if 'wind_speed' in self.device_readings:
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'wind_speed', self.device_readings['wind_speed'])
+        # Insert wind/rain directly from device_readings (clean keys)
+        print("DEBUG: device_readings keys:", self.device_readings.keys())
+        rain_rate_val = self.device_readings.get('rain_rate')
+        if rain_rate_val is not None:
+            db_manager.insert_measurement(self.device, self.device_readings.get('device_name', 'vantage_pro'), self.lat, self.long, 'rain_rate', rain_rate_val)
+            print(f"DEBUG: Inserting rain_rate = {rain_rate_val}")
+        else:
+            print("DEBUG: rain_rate not found or None in device_readings")
         if 'rain_rate' in self.device_readings:
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'rain_rate', self.device_readings['rain_rate'])
             print(f"DEBUG: Inserting rain_rate = {self.device_readings['rain_rate']}")
