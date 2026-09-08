@@ -186,6 +186,7 @@ class SensorModule:
         # Check if self has an attribute named 'rain_rate'
         if hasattr(self, 'rain_rate'):
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'rain_rate', self.rain_rate)
+            print(f"DEBUG: Inserting rain_rate = {self.rain_rate}")
 
         # Now insert all weather keys (skip 'device_name')
         ignore_keys = {'weather_forecast', 'forecast', 'weather_solar_radiation', 'solar_radiation'}
@@ -439,6 +440,7 @@ class SensorModule:
                                     # ---- Wind/rain readings ----
                                     if "rain_rate" in name:
                                         self.rain_rate = value
+                                        print(f"DEBUG: Rain rate set to {value}")   # <-- add this line
                                         collected.add('rain_rate')
                                     if "wind_speed" in name:
                                         self.wind_speed = value
@@ -457,7 +459,7 @@ class SensorModule:
                 indiClient.disconnectServer()
                 print(self.device_readings)
                 break
-                  
+        print(f"DEBUG: Final rain_rate = {self.rain_rate}")
         return co2_val
         
 if __name__ == "__main__":
