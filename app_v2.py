@@ -20,11 +20,11 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:5000"}})
 # ==============================================================
 SENSOR_METADATA = {
     "temperature": {"unit": "°C", "min": -10, "max": 50, "reference": 23, "color": "#B22222"},
-    "humidity":    {"unit": "%",   "min": 0,   "max": 100, "reference": 50, "color": "#00008B"},
+    "humidity":    {"unit": "%",   "min": 20,   "max": 100, "reference": 50, "color": "#00008B"},
     "pressure":    {"unit": "hPa", "min": 850, "max": 1100, "reference": 1000, "color": "#FF4500"},
-    "co2":         {"unit": "ppm", "min": 200, "max": 1000, "reference": 420, "color": "#008080"},
+    "co2":         {"unit": "ppm", "min": 300, "max": 1000, "reference": 420, "color": "#008080"},
     "sky_temperature": {"unit": "°C", "min": -30, "max": 50, "reference": 0, "color": "#8A2BE2"},
-    "rain_rate":   {"unit": "mm/h", "min": 0, "max": 50, "reference": 0, "color": "#1E90FF"},
+    "rain_rate":   {"unit": "mm/h", "min": 0, "max": 30, "reference": 0, "color": "#1E90FF"},
     "wind_speed":  {"unit": "m/s", "min": 0, "max": 30, "reference": 0, "color": "#32CD32"},
     "wind_direction": {"unit": "°", "min": 0, "max": 360, "reference": 0, "color": "#FFD700"},
     "rain":        {"unit": "mm", "min": 0, "max": 500, "reference": 0, "color": "#00BFFF"}
