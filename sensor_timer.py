@@ -13,12 +13,12 @@ logger = logging.getLogger(__name__)
 
 def periodic_task():
     n=0
-    # print ("periodic_task")
+    print ("periodic_task")
     start = time.time()
     start_time = datetime.now()
     while True:
         n=n+1
-        #print (f"while True {n}")
+        print (f"while True {n}")
         sensor=SensorModule()
         temperature, pressure, humidity, co2, lattitude, longitude = sensor.get_sensor_readings()
         last = time.time()
