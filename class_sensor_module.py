@@ -185,6 +185,7 @@ class SensorModule:
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'wind_speed', self.wind_speed)
         # Check if self has an attribute named 'rain_rate'
         if hasattr(self, 'rain_rate'):
+            print(f"DEBUG: Inserting rain_rate = {self.rain_rate}")
             db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, 'rain_rate', self.rain_rate)
             print(f"DEBUG: Inserting rain_rate = {self.rain_rate}")
 
@@ -296,29 +297,6 @@ class SensorModule:
             for reading_type, sensor_type in self.SENSOR_SOURCE_MAP.items():
                 if reading_type in interval_data:
                     insert_record_from_value(self, table, sensor_type, reading_type, config)
-        #if interval == "min":
-        #    # CO2
-        #    insert_record_from_array(self, table, 'scd30', 'co2', config)
-   # 
-   #         # Pressure
-   #         insert_record_from_array(self, table, 'bme280', 'pressure', config)
-   #         
-   #         # Humidity
-   #         insert_record_from_array(self, table, 'bme280', 'humidity', config)
-   #         
-   #         # Temperature
-   #         insert_record_from_array(self, table, 'bme280', 'temperature', config)
-   #     else:            # CO2
-   #         insert_record_from_value(self, table, 'scd30', 'co2', config)
-   # 
-   #         # Pressure
-   #         insert_record_from_value(self, table, 'bme280', 'pressure', config)
-   #         
-   #         # Humidity
-   #         insert_record_from_value(self, table, 'bme280', 'humidity', config)
-   #         
-   #         # Temperature
-   #         insert_record_from_value(self, table, 'bme280', 'temperature', config)
         
     def read_values(self):
         """
