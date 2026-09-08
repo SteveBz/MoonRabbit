@@ -422,6 +422,7 @@ class SensorModule:
                                     value = widget.getValue()
                                     # ---- Store weather readings and overwrite BME values ----
                                     if "weather" in name:
+                                        print(f"DEBUG: {name} = {value}")   # <-- add this
                                         clean_name = name.replace("weather_", "")   # remove prefix
                                         # Normalise barometer to pressure
                                         if "barometer" in clean_name or "pressure" in clean_name:
