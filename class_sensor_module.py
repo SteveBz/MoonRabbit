@@ -243,6 +243,14 @@ class SensorModule:
                 if key in duplicate_weather_keys:
                     continue
                 db_manager.insert_measurement(self.device, sensor_type, self.lat, self.long, key, value)
+                log_message = (
+                    f"{datetime.now().isoformat()} - "
+                    f"Latitude: {self.lat}, "
+                    f"Longitude: {self.long}, "
+                    f"{key}: {value}"
+                )
+                # Log the message
+                logger.info(log_message)
         
         
         values = {}
