@@ -122,6 +122,7 @@ class SensorModule:
         self._mqtt_lock = threading.Lock()
         self._first_mqtt_message = threading.Event()
         self._stop_watchdog = threading.Event()
+        self._last_vantage_update = 0.0
         self._ensure_vantage_connected()          # one attempt at startup
         threading.Thread(target=self._vantage_watchdog, daemon=True).start()
         self._mqtt_client = mqtt.Client()
@@ -174,6 +175,7 @@ class SensorModule:
             elif "rain_rate"      in tail: self.device_readings["rain_rate"]      = value
             self.device_readings["device_name"] = "vantage_pro"
         self._first_mqtt_message.set()
+        self._last_vantage_update = time.time()
 
     def _vantage_property_present(self):
         """True iff the Vantage driver is loaded and its CONNECTION property exists."""
@@ -230,7 +232,8 @@ class SensorModule:
         
         self.co2_val = self.read_values()
         # If Vantage was present at startup, override BME280 values with latest MQTT readings
-        if self.use_vantage:
+        vantage_fresh = (time.time() - self._last_vantage_update) < 60
+        if vantage_fresh and self.device_readings:
             with self._mqtt_lock:
                 if "temperature" in self.device_readings:
                     self.temperature_val = self.device_readings["temperature"]
@@ -265,7 +268,9 @@ class SensorModule:
         # CO2 always comes from the SCD30
         db_manager.insert_measurement(self.device, 'scd30', self.lat, self.long, 'co2', self.co2_val)
 
-        if self.use_vantage:
+
+        vantage_fresh = (time.time() - self._last_vantage_update) < 60
+        if vantage_fresh and self.device_readings:
             # One insert per reading type, values from MQTT cache
             source_sensor = self.device_readings.get("device_name", "vantage_pro")
             logger.info(f"DEBUG: use_vantage=True, source_sensor={source_sensor}")
