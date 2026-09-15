@@ -309,6 +309,9 @@ class SensorModule:
         logger.info (f"{interval} aggregate")
         def insert_record_from_array(self, table, sensor_type, reading_type, config):
             sensor_reading_array = config["time_intervals"][interval][reading_type]
+            if not sensor_reading_array:
+                logger.info(f"DEBUG: skipping empty array for {reading_type}")
+                return
             db_manager.insert_aggregate_data(table, mean_time, self.device, sensor_type, self.lat, self.long, reading_type, 
                 sum(sensor_reading_array)/len(sensor_reading_array), 
                 max(sensor_reading_array), 
@@ -317,6 +320,9 @@ class SensorModule:
         def insert_record_from_value(self, table, sensor_type, reading_type, config):
             sensor_readings = config["time_intervals"][interval]
             #print(sensor_readings)
+            if not sensor_readings.get("count"):
+                logger.info(f"DEBUG: skipping zero-count interval for {reading_type}")
+                return
             db_manager.insert_aggregate_data(table, mean_time, self.device, sensor_type, self.lat, self.long, reading_type, 
                 sensor_readings[reading_type]/sensor_readings["count"], 
                 0, # max - sort out later 
