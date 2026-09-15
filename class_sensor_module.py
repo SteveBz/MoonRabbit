@@ -126,6 +126,7 @@ class SensorModule:
         # MQTT client for receiving Vantage weather data from indi2mqtt
         self.device_readings = {}
         self._mqtt_lock = threading.Lock()
+        self._first_mqtt_message = threading.Event()
         self._mqtt_client = mqtt.Client()
         self._mqtt_client.on_connect = self._on_mqtt_connect
         self._mqtt_client.on_message = self._on_mqtt_message
@@ -133,10 +134,11 @@ class SensorModule:
         try:
             self._mqtt_client.connect("localhost", 1883, 60)
             self._mqtt_client.loop_start()
-            time.sleep(3)   # allow a few seconds for retained/first Vantage messages
+            
+            got = self._first_mqtt_message.wait(timeout=30)
             with self._mqtt_lock:
-                self.use_vantage = bool(self.device_readings)
-            logger.info(f"Vantage present at startup: {self.use_vantage}")
+                self.use_vantage = got and bool(self.device_readings)
+            logger.info(f"Vantage present at startup: {self.use_vantage} (got_message={got})")
             logger.info("MQTT client connected to localhost:1883")
         except Exception as e:
             logger.error(f"MQTT connect failed: {e}")
@@ -172,6 +174,7 @@ class SensorModule:
             elif "wind_direction" in tail: self.device_readings["wind_direction"] = value
             elif "rain_rate"      in tail: self.device_readings["rain_rate"]      = value
             self.device_readings["device_name"] = "vantage_pro"
+        self._first_mqtt_message.set()
     def reset_i2c(self, port):
         try:
             bus = SMBus(port)
