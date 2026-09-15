@@ -134,10 +134,6 @@ class SensorModule:
             self._mqtt_client.connect("localhost", 1883, 60)
             self._mqtt_client.loop_start()
             
-            got = self._first_mqtt_message.wait(timeout=30)
-            with self._mqtt_lock:
-                self.use_vantage = got and bool(self.device_readings)
-            logger.info(f"Vantage present at startup: {self.use_vantage} (got_message={got})")
             logger.info("MQTT client connected to localhost:1883")
         except Exception as e:
             logger.error(f"MQTT connect failed: {e}")
@@ -289,7 +285,7 @@ class SensorModule:
         if vantage_fresh and self.device_readings:
             # One insert per reading type, values from MQTT cache
             source_sensor = self.device_readings.get("device_name", "vantage_pro")
-            logger.info(f"DEBUG: use_vantage=True, source_sensor={source_sensor}")
+            logger.info(f"DEBUG: vantage_fresh=True, source_sensor={source_sensor}")
             logger.info(f"DEBUG: device_readings keys = {list(self.device_readings.keys())}")
             for key in ('temperature', 'humidity', 'pressure',
                         'wind_speed', 'wind_direction', 'rain_rate'):
@@ -304,7 +300,7 @@ class SensorModule:
         else:
             # No Vantage: temp/hum/pressure come from the BME280 values
             source_sensor = 'bme280'
-            logger.info(f"DEBUG: use_vantage=False, inserting bme280 temp/hum/pressure")
+            logger.info("DEBUG: vantage_fresh=False, inserting bme280 temp/hum/pressure")
             db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'temperature', self.temperature_val)
             db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'humidity',    self.humidity_val)
             db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'pressure',    self.pressure_val)
