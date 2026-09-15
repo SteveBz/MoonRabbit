@@ -19,6 +19,7 @@ import time
 import logging
 import threading
 import paho.mqtt.client as mqtt
+import subprocess
 
 # Set up logging
 logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
@@ -127,6 +128,9 @@ class SensorModule:
         self.device_readings = {}
         self._mqtt_lock = threading.Lock()
         self._first_mqtt_message = threading.Event()
+        self._stop_watchdog = threading.Event()
+        self._ensure_vantage_connected()          # one attempt at startup
+        threading.Thread(target=self._vantage_watchdog, daemon=True).start()
         self._mqtt_client = mqtt.Client()
         self._mqtt_client.on_connect = self._on_mqtt_connect
         self._mqtt_client.on_message = self._on_mqtt_message
@@ -147,6 +151,8 @@ class SensorModule:
         lock.release_lock(force=True)
 
     def __del__(self):
+        if getattr(self, "_stop_watchdog", None):
+            self._stop_watchdog.set()
         if getattr(self, "_mqtt_client", None):
             try:
                 self._mqtt_client.loop_stop()
@@ -175,6 +181,47 @@ class SensorModule:
             elif "rain_rate"      in tail: self.device_readings["rain_rate"]      = value
             self.device_readings["device_name"] = "vantage_pro"
         self._first_mqtt_message.set()
+
+    def _vantage_property_present(self):
+        """True iff the Vantage driver is loaded and its CONNECTION property exists."""
+        try:
+            r = subprocess.run(
+                ["indi_getprop", "-h", "localhost", "Vantage.CONNECTION.*"],
+                capture_output=True, text=True, timeout=5
+            )
+            return "CONNECT=" in r.stdout
+        except Exception:
+            return False
+    
+    def _ensure_vantage_connected(self):
+        """If driver is loaded and device disconnected, send CONNECT. Idempotent."""
+        if not self._vantage_property_present():
+            return                                    # nothing to act on
+        try:
+            r = subprocess.run(
+                ["indi_getprop", "-h", "localhost", "Vantage.CONNECTION.CONNECT"],
+                capture_output=True, text=True, timeout=5
+            )
+            if "=On" in r.stdout:
+                return                                # already connected
+        except Exception:
+            return
+        try:
+            subprocess.run(
+                ["indi_setprop",
+                 "Vantage.CONNECTION.CONNECT=On",
+                 "Vantage.CONNECTION.DISCONNECT=Off"],
+                timeout=5, capture_output=True
+            )
+            logger.info("Sent CONNECT to Vantage")
+        except Exception as e:
+            logger.warning(f"Vantage CONNECT failed: {e}")
+    
+    def _vantage_watchdog(self):
+        while not self._stop_watchdog.is_set():
+            self._ensure_vantage_connected()
+            self._stop_watchdog.wait(60)
+            
     def reset_i2c(self, port):
         try:
             bus = SMBus(port)
