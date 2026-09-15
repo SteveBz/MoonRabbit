@@ -24,13 +24,6 @@ import subprocess
 # Set up logging
 logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
-# import the PyIndi module
-try:
-    import PyIndi
-    from class_pyindi_client import IndiClient
-except:
-    logger.info (f"Pyindi not installed")
-    
 
 import json
 #from class_shipLog import logShipping
