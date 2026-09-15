@@ -195,7 +195,7 @@ class SensorModule:
             return                                    # nothing to act on
         try:
             r = subprocess.run(
-                ["indi_getprop", "-h", "localhost", "Vantage.CONNECTION.CONNECT"],
+                ["/usr/bin/indi_getprop", "-h", "localhost", "Vantage.CONNECTION.CONNECT"],
                 capture_output=True, text=True, timeout=5
             )
             if "=On" in r.stdout:
@@ -204,7 +204,7 @@ class SensorModule:
             return
         try:
             subprocess.run(
-                ["indi_setprop",
+                ["/usr/bin/indi_setprop",
                  "Vantage.CONNECTION.CONNECT=On",
                  "Vantage.CONNECTION.DISCONNECT=Off"],
                 timeout=5, capture_output=True
