@@ -182,11 +182,18 @@ class SensorModule:
         """True iff the Vantage driver is loaded and its CONNECTION property exists."""
         try:
             r = subprocess.run(
-                ["indi_getprop", "-h", "localhost", "Vantage.CONNECTION.*"],
+                ["/usr/bin/indi_getprop", "-h", "localhost", "Vantage.CONNECTION.*"],
                 capture_output=True, text=True, timeout=5
             )
             return "CONNECT=" in r.stdout
-        except Exception:
+        except FileNotFoundError:
+            logger.warning("indi_getprop not found — check PATH or use absolute path")
+            return False
+        except subprocess.TimeoutExpired:
+            logger.warning("indi_getprop timed out")
+            return False
+        except Exception as e:
+            logger.warning(f"Vantage property check failed: {e}")
             return False
     
     def _ensure_vantage_connected(self):
@@ -200,8 +207,16 @@ class SensorModule:
             )
             if "=On" in r.stdout:
                 return                                # already connected
-        except Exception:
-            return
+        except FileNotFoundError:
+            logger.warning("indi_getprop not found — check PATH or use absolute path")
+            return False
+        except subprocess.TimeoutExpired:
+            logger.warning("indi_getprop timed out")
+            return False
+        except Exception as e:
+            logger.warning(f"Vantage property check failed: {e}")
+            return False
+    
         try:
             subprocess.run(
                 ["/usr/bin/indi_setprop",
