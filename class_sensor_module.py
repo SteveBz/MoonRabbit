@@ -24,7 +24,7 @@ import subprocess
 # Set up logging
 logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
-
+import os
 import json
 #from class_shipLog import logShipping
 from class_file_lock import FileLock
@@ -35,6 +35,7 @@ class SensorModule:
     # Map reading type to the sensor that produces it
     # Map attribute name to reading type (for building values dict)
     def __init__(self):
+        logger.info(f"PATH = {os.environ.get('PATH')}")
         self.bus = smbus2.SMBus(SensorModule.PORT)
         self.device = None
         self.lat = None
