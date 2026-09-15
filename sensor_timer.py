@@ -16,10 +16,10 @@ def periodic_task():
     print ("periodic_task")
     start = time.time()
     start_time = datetime.now()
+    sensor=SensorModule()
     while True:
         n=n+1
         print (f"while True {n}")
-        sensor=SensorModule()
         temperature, pressure, humidity, co2, lattitude, longitude = sensor.get_sensor_readings()
         last = time.time()
         logger.info(f"This job started at {start_time} and runs every {round((last-start)/n, 1)} seconds. {n:,}th event")
