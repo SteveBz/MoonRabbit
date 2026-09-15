@@ -195,6 +195,10 @@ class SensorModule:
                     self.humidity_val = self.device_readings["humidity"]
                 if "pressure" in self.device_readings:
                     self.pressure_val = self.device_readings["pressure"]
+                # Wind and rain for aggregate tracking
+                self.wind_speed     = self.device_readings.get("wind_speed")
+                self.wind_direction = self.device_readings.get("wind_direction")
+                self.rain_rate      = self.device_readings.get("rain_rate")
         # Allow for zero value temp or hum in BME280
         if self.humidity_val==0 and self.hum != 0:
             self.humidity_val=self.hum
@@ -215,43 +219,32 @@ class SensorModule:
         lock.acquire_lock(wait=True)
         db_manager = DatabaseManager('measurement.db')
 
+        # CO2 always comes from the SCD30
         db_manager.insert_measurement(self.device, 'scd30', self.lat, self.long, 'co2', self.co2_val)
+
         if self.use_vantage:
+            # One insert per reading type, values from MQTT cache
             source_sensor = self.device_readings.get("device_name", "vantage_pro")
-        else:
-            source_sensor = 'bme280'
-        db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'humidity', self.humidity_val)
-        db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'pressure', self.pressure_val)
-        db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'temperature', self.temperature_val)
-        if self.use_vantage:
-            for key in ('wind_direction', 'wind_speed', 'rain_rate'):
+            logger.info(f"DEBUG: use_vantage=True, source_sensor={source_sensor}")
+            logger.info(f"DEBUG: device_readings keys = {list(self.device_readings.keys())}")
+            for key in ('temperature', 'humidity', 'pressure',
+                        'wind_speed', 'wind_direction', 'rain_rate'):
                 if key in self.device_readings:
-                    db_manager.insert_measurement(self.device, self.device_readings["device_name"], self.lat, self.long, key, self.device_readings[key])
-            ignore_keys = {'weather_forecast', 'forecast', 'weather_solar_radiation', 'solar_radiation'}
-            duplicate_weather_keys = {
-                'weather_wind_direction', 'weather_rain_rate', 'weather_wind_speed',
-                'pressure', 'temperature', 'barometer', 'humidity',
-                'wind_speed', 'wind_direction', 'rain_rate'
-            }
-            weather_data = self.device_readings.copy()
-            sensor_type = weather_data.get('device_name', 'vantage')
-            for key, value in weather_data.items():
-                if key == 'device_name':
-                    continue
-                if key in ignore_keys:
-                    continue
-                if key in duplicate_weather_keys:
-                    continue
-                db_manager.insert_measurement(self.device, sensor_type, self.lat, self.long, key, value)
-                log_message = (
-                    f"{datetime.now().isoformat()} - "
-                    f"Latitude: {self.lat}, "
-                    f"Longitude: {self.long}, "
-                    f"{key}: {value}"
-                )
-                # Log the message
-                logger.info(log_message)
-        
+                    value = self.device_readings[key]
+                    logger.info(f"DEBUG: inserting {key} = {value} (sensor={source_sensor})")
+                    db_manager.insert_measurement(
+                        self.device, source_sensor, self.lat, self.long,
+                        key, value)
+                else:
+                    logger.info(f"DEBUG: {key} not in device_readings, skipping")
+        else:
+            # No Vantage: temp/hum/pressure come from the BME280 values
+            source_sensor = 'bme280'
+            logger.info(f"DEBUG: use_vantage=False, inserting bme280 temp/hum/pressure")
+            db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'temperature', self.temperature_val)
+            db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'humidity',    self.humidity_val)
+            db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'pressure',    self.pressure_val)
+
         
         values = {}
         for attr, key in self.ATTR_TO_READING.items():
