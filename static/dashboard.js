@@ -210,11 +210,14 @@ function loadGlobalCO2() {
         gaugeContainer.appendChild(gaugeDiv);
 
         // History chart
-        const historyContainer = document.getElementById('history-container');
-        const histDiv = document.createElement('div');
-        histDiv.className = 'history-divs';
-        histDiv.id = 'history-' + name;
-        historyContainer.appendChild(histDiv);
+        // Skip the standalone CO₂ history chart – CO₂ is shown as y2 on every other chart
+        if (name !== 'co2') {
+            const historyContainer = document.getElementById('history-container');
+            const histDiv = document.createElement('div');
+            histDiv.className = 'history-divs';
+            histDiv.id = 'history-' + name;
+            historyContainer.appendChild(histDiv);
+        }
     }
 
     // ---- Create Plotly charts ----
@@ -287,7 +290,16 @@ function loadGlobalCO2() {
                 showgrid: false,
                 color: '#008080'
             },
-            
+
+
+            legend: {
+                x: 0.02, y: 0.98,
+                xanchor: 'left', yanchor: 'top',
+                bgcolor: 'rgba(255,255,255,0.7)',
+                bordercolor: '#ccc',
+                borderwidth: 1,
+                font: { size: 11 }
+            },
             font: { size: 14, color: '#7f7f7f' },
             colorway: [meta.color || '#1f77b4', '#008080'],
             width: sizes.chartWidth,
