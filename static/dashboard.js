@@ -99,29 +99,31 @@ function loadGlobalCO2() {
     }
     
     // ---- Helper: build Plotly shapes for night periods ----
+
     function buildNightShapes(xMin, xMax, lat, lng) {
         const shapes = [];
         if (lat === null || lng === null) return shapes;
+        if (!(xMin instanceof Date) || !(xMax instanceof Date)) return shapes;
+        if (xMin >= xMax) return shapes;
     
-        // Start one day before the visible range to catch the first night
+        // Start at noon the day before xMin so we catch the first night
         let day = new Date(xMin);
-        day.setHours(0, 0, 0, 0);
+        day.setHours(12, 0, 0, 0);
         day.setDate(day.getDate() - 1);
     
+        let prevSunset = null;
         while (day.getTime() <= xMax.getTime() + 86400000) {
             const { sunrise, sunset } = getSunTimes(day, lat, lng);
-            if (sunrise && sunset) {
-                // Night before this day's sunrise
-                const nightStart = new Date(day);
-                nightStart.setDate(nightStart.getDate() - 1);
-                nightStart.setHours(18, 0, 0, 0);   // fallback start
-                const prevSunset = getSunTimes(nightStart, lat, lng).sunset;
-                if (prevSunset) {
+            if (prevSunset && sunrise) {
+                // Clip to visible window
+                const start = prevSunset < xMin ? xMin : prevSunset;
+                const end   = sunrise   > xMax ? xMax : sunrise;
+                if (start < end) {
                     shapes.push({
                         type: 'rect',
                         xref: 'x', yref: 'paper',
-                        x0: prevSunset.toISOString(),
-                        x1: sunrise.toISOString(),
+                        x0: start.toISOString(),
+                        x1: end.toISOString(),
                         y0: 0, y1: 1,
                         fillcolor: 'rgba(0, 0, 50, 0.10)',
                         line: { width: 0 },
@@ -129,6 +131,7 @@ function loadGlobalCO2() {
                     });
                 }
             }
+            prevSunset = sunset;
             day.setDate(day.getDate() + 1);
         }
         return shapes;
@@ -315,13 +318,17 @@ function loadGlobalCO2() {
             .then(data => {
                 // Update location
 
-                if (data.latitude !== undefined) {
+                if (data.latitude !== undefined && data.longitude !== undefined) {
                     currentLat = parseFloat(data.latitude);
-                    document.getElementById('latitude').textContent = currentLat.toFixed(4);
-                }
-                if (data.longitude !== undefined) {
                     currentLng = parseFloat(data.longitude);
+                    document.getElementById('latitude').textContent = currentLat.toFixed(4);
                     document.getElementById('longitude').textContent = currentLng.toFixed(4);
+                
+                    // First time we know the location → apply shading to the already‑drawn charts
+                    if (!window._nightShadingApplied) {
+                        window._nightShadingApplied = true;
+                        applyNightShading();
+                    }
                 }
                 
                 // Process readings
@@ -362,6 +369,24 @@ function loadGlobalCO2() {
         fetch(url)
             .then(res => res.json())
             .then(data => {
+                // 1. Compute the union of all sensor time ranges
+                let xMin = null, xMax = null;
+                Object.keys(data).forEach(name => {
+                    const pairs = data[name] || [];
+                    if (pairs.length === 0) return;
+                    const sorted = pairs.map(p => new Date(p[0])).sort((a,b) => a - b);
+                    const first = sorted[0];
+                    const last  = sorted[sorted.length - 1];
+                    if (xMin === null || first < xMin) xMin = first;
+                    if (xMax === null || last  > xMax) xMax = last;
+                });
+    
+                // 2. Build shapes once (clipped to xMin..xMax)
+                const shapes = (xMin && xMax)
+                    ? buildNightShapes(xMin, xMax, currentLat, currentLng)
+                    : [];
+    
+                // 3. Update each chart: data + shapes in a single call
                 Object.keys(data).forEach(name => {
                     const sensor = sensors[name];
                     if (!sensor) return;
@@ -372,33 +397,35 @@ function loadGlobalCO2() {
                     const yArr = sorted.map(p => p.y);
                     sensor.xArray = xArr;
                     sensor.yArray = yArr;
-                    Plotly.update('history-' + name, {
-                        x: [xArr],
-                        y: [yArr]
-                    });
+                    Plotly.update('history-' + name,
+                        { x: [xArr], y: [yArr] },
+                        { shapes: shapes });   // <- layout update in the same call
                 });
-                // ---- Apply night shading ----
-                applyNightShading();
             })
             .catch(err => console.error('History refresh error:', err));
     }
+
     function applyNightShading() {
         if (currentLat === null || currentLng === null) return;
     
-        // Determine time range from any sensor's xArray
-        const anySensor = Object.values(sensors)[0];
-        if (!anySensor || !anySensor.xArray || anySensor.xArray.length === 0) return;
-    
-        const xMin = new Date(Math.min(...anySensor.xArray.map(d => d.getTime())));
-        const xMax = new Date(Math.max(...anySensor.xArray.map(d => d.getTime())));
+        // Union range across all sensors that already have data
+        let xMin = null, xMax = null;
+        Object.values(sensors).forEach(s => {
+            if (!s.xArray || s.xArray.length === 0) return;
+            const first = s.xArray[0];
+            const last  = s.xArray[s.xArray.length - 1];
+            if (xMin === null || first < xMin) xMin = first;
+            if (xMax === null || last  > xMax) xMax = last;
+        });
+        if (!xMin || !xMax) return;
     
         const shapes = buildNightShapes(xMin, xMax, currentLat, currentLng);
-    
         Object.keys(sensors).forEach(name => {
             Plotly.relayout('history-' + name, { shapes: shapes });
         });
     }
 
+    
     function startPolling() {
         if (pollInterval) clearInterval(pollInterval);
         pollInterval = setInterval(() => {
