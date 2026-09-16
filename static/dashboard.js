@@ -73,6 +73,11 @@ function loadGlobalCO2() {
     let pollInterval = null;
     const sensors = {};
 
+    // Global CO₂ history (shared as y2 trace on every other chart)
+    let co2XArray = [];
+    let co2YArray = [];
+    let co2Meta = null;
+    
     // Location state for night shading
     let currentLat = null;
     let currentLng = null;
@@ -246,14 +251,45 @@ function loadGlobalCO2() {
         }];
         Plotly.newPlot('gauge-' + name, gaugeData, gaugeLayout);
 
+        // ---- History chart ----
+        // Skip the standalone CO₂ chart – CO₂ will be shown as y2 on every other chart.
+        if (name === 'co2') {
+            return;
+        }
+
+        const co2Trace = {
+            x: [],
+            y: [],
+            name: 'CO₂',
+            mode: 'lines',
+            type: 'scatter',
+            yaxis: 'y2',
+            line: { color: '#008080', width: 1.5 },
+            opacity: 0.5
+        };
+
+        
         // History chart
         const lineLayout = {
             autosize: true,
             title: { text: `${displayName} (${meta.unit || ''})` },
             xaxis: { type: 'date' },
-            yaxis: { range: [meta.min || 0, meta.max || 100] },
+
+            yaxis: {
+                title: displayName,
+                range: [meta.min || 0, meta.max || 100]
+            },
+            yaxis2: {
+                title: 'CO₂ (ppm)',
+                overlaying: 'y',
+                side: 'right',
+                range: [co2Meta?.min || 200, co2Meta?.max || 1000],
+                showgrid: false,
+                color: '#008080'
+            },
+            
             font: { size: 14, color: '#7f7f7f' },
-            colorway: [meta.color || '#1f77b4'],
+            colorway: [meta.color || '#1f77b4', '#008080'],
             width: sizes.chartWidth,
             height: sizes.chartHeight,
             margin: { t: 40, b: 40, pad: 5 }
@@ -267,7 +303,9 @@ function loadGlobalCO2() {
         };
         sensor.trace = trace;
         sensor.layout = lineLayout;
-        Plotly.newPlot('history-' + name, [trace], lineLayout);
+
+        sensor.hasCo2Axis = true;
+        Plotly.newPlot('history-' + name, [trace, co2Trace], lineLayout);
     }
 
     // ---- Initialisation ----
@@ -291,6 +329,7 @@ function loadGlobalCO2() {
                 });
                 metadataArray.forEach(meta => {
                     const name = meta.name;
+                    if (name === 'co2') co2Meta = meta;
                     sensors[name] = {
                         meta: meta,
                         xArray: [],
@@ -332,32 +371,59 @@ function loadGlobalCO2() {
                 }
                 
                 // Process readings
+
                 const readings = data.readings || [];
                 readings.forEach(item => {
                     const name = item.name;
                     const sensor = sensors[name];
                     if (!sensor) return;
                     const value = parseFloat(item.value);
-
+                
                     // Update value box
                     const valSpan = document.getElementById('val-' + name);
                     if (valSpan) valSpan.textContent = value.toFixed(1);
-
+                
                     // Update gauge
                     Plotly.update('gauge-' + name, { value: value });
-
+                
                     // Append to history (if not paused)
-                    if (!pollingPaused) {
+                    if (pollingPaused) return;
+                
+                    if (name === 'co2') {
+                        // CO₂ has no standalone chart – store globally and push to y2 of every other chart
+                        co2XArray.push(new Date());
+                        co2YArray.push(value);
+                        if (co2XArray.length > MAX_POINTS) {
+                            co2XArray.shift();
+                            co2YArray.shift();
+                        }
+                        Object.keys(sensors).forEach(otherName => {
+                            const other = sensors[otherName];
+                            if (other.hasCo2Axis) {
+                                Plotly.update('history-' + otherName, {
+                                    x: [other.xArray.slice(), co2XArray.slice()],
+                                    y: [other.yArray.slice(), co2YArray.slice()]
+                                });
+                            }
+                        });
+                    } else {
                         sensor.xArray.push(new Date());
                         sensor.yArray.push(value);
                         if (sensor.xArray.length > MAX_POINTS) {
                             sensor.xArray.shift();
                             sensor.yArray.shift();
                         }
-                        Plotly.update('history-' + name, {
-                            x: [sensor.xArray.slice()],
-                            y: [sensor.yArray.slice()]
-                        });
+                        if (sensor.hasCo2Axis) {
+                            Plotly.update('history-' + name, {
+                                x: [sensor.xArray.slice(), co2XArray.slice()],
+                                y: [sensor.yArray.slice(), co2YArray.slice()]
+                            });
+                        } else {
+                            Plotly.update('history-' + name, {
+                                x: [sensor.xArray.slice()],
+                                y: [sensor.yArray.slice()]
+                            });
+                        }
                     }
                 });
             })
@@ -369,42 +435,65 @@ function loadGlobalCO2() {
         fetch(url)
             .then(res => res.json())
             .then(data => {
-                // 1. Compute the union of all sensor time ranges
+                // ---- 1. Store CO₂ globally ----
+                const co2Pairs = data['co2'] || [];
+                const co2Sorted = co2Pairs
+                    .map(p => ({ x: new Date(p[0]), y: p[1] }))
+                    .sort((a, b) => a.x - b.x);
+                co2XArray = co2Sorted.map(p => p.x);
+                co2YArray = co2Sorted.map(p => p.y);
+    
+                // ---- 2. Compute overall time range ----
                 let xMin = null, xMax = null;
-                Object.keys(data).forEach(name => {
-                    const pairs = data[name] || [];
-                    if (pairs.length === 0) return;
-                    const sorted = pairs.map(p => new Date(p[0])).sort((a,b) => a - b);
-                    const first = sorted[0];
-                    const last  = sorted[sorted.length - 1];
+                const consider = arr => {
+                    if (!arr.length) return;
+                    const first = arr[0];
+                    const last = arr[arr.length - 1];
                     if (xMin === null || first < xMin) xMin = first;
-                    if (xMax === null || last  > xMax) xMax = last;
+                    if (xMax === null || last > xMax) xMax = last;
+                };
+                consider(co2XArray);
+                Object.keys(data).forEach(name => {
+                    if (name === 'co2') return;
+                    const pairs = data[name] || [];
+                    if (!pairs.length) return;
+                    const times = pairs.map(p => new Date(p[0])).sort((a, b) => a - b);
+                    consider(times);
                 });
     
-                // 2. Build shapes once (clipped to xMin..xMax)
+                // ---- 3. Night shading ----
                 const shapes = (xMin && xMax)
                     ? buildNightShapes(xMin, xMax, currentLat, currentLng)
                     : [];
     
-                // 3. Update each chart: data + shapes in a single call
+                // ---- 4. Update each chart's y1 (and y2 = CO₂) ----
                 Object.keys(data).forEach(name => {
+                    if (name === 'co2') return;    // no standalone CO₂ chart
                     const sensor = sensors[name];
                     if (!sensor) return;
                     const pairs = data[name] || [];
-                    const sorted = pairs.map(p => ({ x: new Date(p[0]), y: p[1] }))
-                                       .sort((a,b) => a.x - b.x);
+                    const sorted = pairs
+                        .map(p => ({ x: new Date(p[0]), y: p[1] }))
+                        .sort((a, b) => a.x - b.x);
                     const xArr = sorted.map(p => p.x);
                     const yArr = sorted.map(p => p.y);
                     sensor.xArray = xArr;
                     sensor.yArray = yArr;
-                    Plotly.update('history-' + name,
-                        { x: [xArr], y: [yArr] },
-                        { shapes: shapes });   // <- layout update in the same call
+    
+                    if (sensor.hasCo2Axis) {
+                        Plotly.update('history-' + name,
+                            { x: [xArr, co2XArray], y: [yArr, co2YArray] },
+                            { shapes: shapes });
+                    } else {
+                        Plotly.update('history-' + name,
+                            { x: [xArr], y: [yArr] },
+                            { shapes: shapes });
+                    }
                 });
             })
             .catch(err => console.error('History refresh error:', err));
     }
-
+    
     function applyNightShading() {
         if (currentLat === null || currentLng === null) return;
     
