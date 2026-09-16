@@ -73,6 +73,67 @@ function loadGlobalCO2() {
     let pollInterval = null;
     const sensors = {};
 
+    // Location state for night shading
+    let currentLat = null;
+    let currentLng = null;
+    
+    // ---- Helper: compute sunrise/sunset for a given date ----
+    function getSunTimes(date, lat, lng) {
+        const rad = Math.PI / 180;
+        const d = Math.floor(date.valueOf() / 86400000 - 0.5 + 2440588 - 2451545) + 0.5 - lng / 360;
+        const M = (357.5291 + 0.98560028 * d) % 360;
+        const C = 1.9148 * Math.sin(M * rad) + 0.02 * Math.sin(2 * M * rad) + 0.0003 * Math.sin(3 * M * rad);
+        const L = (M + C + 180 + 102.9372) % 360;
+        const Jtransit = 2451545 + d + 0.0053 * Math.sin(M * rad) - 0.0069 * Math.sin(2 * L * rad);
+        const sinDec = Math.sin(L * rad) * Math.sin(23.44 * rad);
+        const cosDec = Math.cos(Math.asin(sinDec));
+        const cosH = (Math.sin(-0.833 * rad) - Math.sin(lat * rad) * sinDec) / (Math.cos(lat * rad) * cosDec);
+        if (cosH > 1) return { sunrise: null, sunset: null };   // polar night
+        if (cosH < -1) return { sunrise: null, sunset: null };  // polar day
+        const H = Math.acos(cosH) / rad;
+        const toDate = j => new Date((j - 2440587.5) * 86400000);
+        return {
+            sunrise: toDate(Jtransit - H / 360),
+            sunset:  toDate(Jtransit + H / 360)
+        };
+    }
+    
+    // ---- Helper: build Plotly shapes for night periods ----
+    function buildNightShapes(xMin, xMax, lat, lng) {
+        const shapes = [];
+        if (lat === null || lng === null) return shapes;
+    
+        // Start one day before the visible range to catch the first night
+        let day = new Date(xMin);
+        day.setHours(0, 0, 0, 0);
+        day.setDate(day.getDate() - 1);
+    
+        while (day.getTime() <= xMax.getTime() + 86400000) {
+            const { sunrise, sunset } = getSunTimes(day, lat, lng);
+            if (sunrise && sunset) {
+                // Night before this day's sunrise
+                const nightStart = new Date(day);
+                nightStart.setDate(nightStart.getDate() - 1);
+                nightStart.setHours(18, 0, 0, 0);   // fallback start
+                const prevSunset = getSunTimes(nightStart, lat, lng).sunset;
+                if (prevSunset) {
+                    shapes.push({
+                        type: 'rect',
+                        xref: 'x', yref: 'paper',
+                        x0: prevSunset.toISOString(),
+                        x1: sunrise.toISOString(),
+                        y0: 0, y1: 1,
+                        fillcolor: 'rgba(0, 0, 50, 0.10)',
+                        line: { width: 0 },
+                        layer: 'below'
+                    });
+                }
+            }
+            day.setDate(day.getDate() + 1);
+        }
+        return shapes;
+    }
+    
     // ---- Helper: clean sensor name for display ----
     function getDisplayName(raw) {
         // Special cases
@@ -253,13 +314,16 @@ function loadGlobalCO2() {
             .then(res => res.json())
             .then(data => {
                 // Update location
+
                 if (data.latitude !== undefined) {
-                    document.getElementById('latitude').textContent = data.latitude.toFixed(4);
+                    currentLat = parseFloat(data.latitude);
+                    document.getElementById('latitude').textContent = currentLat.toFixed(4);
                 }
                 if (data.longitude !== undefined) {
-                    document.getElementById('longitude').textContent = data.longitude.toFixed(4);
+                    currentLng = parseFloat(data.longitude);
+                    document.getElementById('longitude').textContent = currentLng.toFixed(4);
                 }
-    
+                
                 // Process readings
                 const readings = data.readings || [];
                 readings.forEach(item => {
@@ -313,8 +377,26 @@ function loadGlobalCO2() {
                         y: [yArr]
                     });
                 });
+                // ---- Apply night shading ----
+                applyNightShading();
             })
             .catch(err => console.error('History refresh error:', err));
+    }
+    function applyNightShading() {
+        if (currentLat === null || currentLng === null) return;
+    
+        // Determine time range from any sensor's xArray
+        const anySensor = Object.values(sensors)[0];
+        if (!anySensor || !anySensor.xArray || anySensor.xArray.length === 0) return;
+    
+        const xMin = new Date(Math.min(...anySensor.xArray.map(d => d.getTime())));
+        const xMax = new Date(Math.max(...anySensor.xArray.map(d => d.getTime())));
+    
+        const shapes = buildNightShapes(xMin, xMax, currentLat, currentLng);
+    
+        Object.keys(sensors).forEach(name => {
+            Plotly.relayout('history-' + name, { shapes: shapes });
+        });
     }
 
     function startPolling() {
