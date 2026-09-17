@@ -269,7 +269,7 @@ function loadGlobalCO2() {
                 threshold: {
                     line: { color: 'red', width: 4 },
                     thickness: 0.75,
-                    value: meta.max * 0.9 || 90
+                    value: meta.max * 0.9 || 90Plotly.update
                 }
             }
         }];
@@ -440,7 +440,7 @@ function loadGlobalCO2() {
                                 Plotly.update('history-' + otherName, {
                                     x: [co2XArray.slice(), other.xArray.slice()],
                                     y: [co2YArray.slice(), other.yArray.slice()]
-                                });
+                                }, { shapes: shapes });
                             }
                         });
                     } else {
@@ -454,12 +454,12 @@ function loadGlobalCO2() {
                             Plotly.update('history-' + name, {
                                 x: [co2XArray.slice(), sensor.xArray.slice()],
                                 y: [co2YArray.slice(), sensor.yArray.slice()]
-                            });
+                            }, { shapes: shapes });
                         } else {
                             Plotly.update('history-' + name, {
                                 x: [sensor.xArray.slice()],
                                 y: [sensor.yArray.slice()]
-                            });
+                            }, { shapes: shapes });
                         }
                     }
                 });
