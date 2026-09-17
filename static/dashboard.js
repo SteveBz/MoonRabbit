@@ -269,7 +269,7 @@ function loadGlobalCO2() {
                 threshold: {
                     line: { color: 'red', width: 4 },
                     thickness: 0.75,
-                    value: meta.max * 0.9 || 90Plotly.update
+                    value: meta.max * 0.9 || 90
                 }
             }
         }];
@@ -439,7 +439,7 @@ function loadGlobalCO2() {
                                 Plotly.update('history-' + otherName, {
                                     x: [co2XArray.slice(), other.xArray.slice()],
                                     y: [co2YArray.slice(), other.yArray.slice()]
-                                }, { shapes: shapes });
+                                });
                             }
                         });
                     } else {
@@ -453,12 +453,12 @@ function loadGlobalCO2() {
                             Plotly.update('history-' + name, {
                                 x: [co2XArray.slice(), sensor.xArray.slice()],
                                 y: [co2YArray.slice(), sensor.yArray.slice()]
-                            }, { shapes: shapes });
+                            });
                         } else {
                             Plotly.update('history-' + name, {
                                 x: [sensor.xArray.slice()],
                                 y: [sensor.yArray.slice()]
-                            }, { shapes: shapes });
+                            });
                         }
                     }
                 });
@@ -561,7 +561,7 @@ function loadGlobalCO2() {
     }
 
     // Compute the night/day shapes for the current data window, if applicable
-    function currentShapes() {
+    function currentShapes(rightBufferMs = 0) {
         if (currentDuration !== '1_week' && currentDuration !== '1_month') return [];
         if (currentLat === null || currentLng === null) return [];
     
@@ -575,6 +575,7 @@ function loadGlobalCO2() {
         });
         if (!xMin || !xMax) return [];
     
+        xMax = new Date(xMax.getTime() + rightBufferMs);
         return buildNightShapes(xMin, xMax, currentLat, currentLng);
     }
     function startPolling() {
