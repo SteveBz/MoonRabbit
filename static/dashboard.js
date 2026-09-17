@@ -562,7 +562,7 @@ function loadGlobalCO2() {
 
     // Compute the night/day shapes for the current data window, if applicable
     function currentShapes(rightBufferMs = 0) {
-        if (currentDuration !== '1_week' && currentDuration !== '1_month') return [];
+        if (currentDuration !== '1_day' && currentDuration !== '1_week' && currentDuration !== '1_month') return [];
         if (currentLat === null || currentLng === null) return [];
     
         let xMin = null, xMax = null;
