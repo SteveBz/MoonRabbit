@@ -267,10 +267,8 @@ function loadGlobalCO2() {
             mode: 'lines+markers',
             type: 'scatter',
             yaxis: 'y2',
-            line:   { color: 'rgba(56, 56, 56, 0.6)', width: 2 },
-            marker: { color: 'rgba(56, 56, 56, 0.4)' },
-            fill: 'tozeroy',
-            fillcolor: 'rgba(56, 56, 56, 0.3)'
+            line: { color: '#008080', width: 2 },
+            opacity: 0.5
         };
 
         
@@ -290,7 +288,7 @@ function loadGlobalCO2() {
                 side: 'right',
                 range: [co2Meta?.min || 200, co2Meta?.max || 1000],
                 showgrid: false,
-                color: '#383838'
+                color: '#008080'
             },
 
 
@@ -303,7 +301,7 @@ function loadGlobalCO2() {
                 font: { size: 11 }
             },
             font: { size: 14, color: '#7f7f7f' },
-            colorway: ['#383838', meta.color || '#1f77b4'],
+            colorway: [meta.color || '#1f77b4', '#008080'],
             width: sizes.chartWidth,
             height: sizes.chartHeight,
             margin: { t: 40, b: 40, pad: 5 }
@@ -319,7 +317,7 @@ function loadGlobalCO2() {
         sensor.layout = lineLayout;
 
         sensor.hasCo2Axis = true;
-        Plotly.newPlot('history-' + name, [co2Trace, trace], lineLayout);
+        Plotly.newPlot('history-' + name, [trace, co2Trace], lineLayout);
     }
 
     // ---- Initialisation ----
@@ -415,8 +413,8 @@ function loadGlobalCO2() {
                             const other = sensors[otherName];
                             if (other.hasCo2Axis) {
                                 Plotly.update('history-' + otherName, {
-                                    x: [co2XArray.slice(), other.xArray.slice()],
-                                    y: [co2YArray.slice(), other.yArray.slice()]
+                                    x: [other.xArray.slice(), co2XArray.slice()],
+                                    y: [other.yArray.slice(), co2YArray.slice()]
                                 });
                             }
                         });
@@ -429,8 +427,8 @@ function loadGlobalCO2() {
                         }
                         if (sensor.hasCo2Axis) {
                             Plotly.update('history-' + name, {
-                                x: [co2XArray.slice(), sensor.xArray.slice()],
-                                y: [co2YArray.slice(), sensor.yArray.slice()]
+                                x: [sensor.xArray.slice(), co2XArray.slice()],
+                                y: [sensor.yArray.slice(), co2YArray.slice()]
                             });
                         } else {
                             Plotly.update('history-' + name, {
@@ -496,7 +494,7 @@ function loadGlobalCO2() {
     
                     if (sensor.hasCo2Axis) {
                         Plotly.update('history-' + name,
-                            { x: [co2XArray, xArr], y: [co2YArray, yArr] },
+                            { x: [xArr, co2XArray], y: [yArr, co2YArray] },
                             { shapes: shapes });
                     } else {
                         Plotly.update('history-' + name,
