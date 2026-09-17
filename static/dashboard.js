@@ -400,7 +400,7 @@ function loadGlobalCO2() {
                 
                     // First time we know the location → apply shading to the already‑drawn charts
                     if (!window._nightShadingApplied &&
-                        (currentDuration === '1_week' || currentDuration === '1_month')) {
+                        (currentDuration === '1_day' || currentDuration === '1_week' || currentDuration === '1_month')) {
                         window._nightShadingApplied = true;
                         applyNightShading();
                     }
@@ -505,7 +505,7 @@ function loadGlobalCO2() {
                 });
     
                 // ---- 3. Night shading ----
-                const showShading = (currentDuration === '1_week' || currentDuration === '1_month');
+                const showShading = (currentDuration === '1_day' || currentDuration === '1_week' || currentDuration === '1_month');
                 const shapes = (showShading && xMin && xMax)
                     ? buildNightShapes(xMin, xMax, currentLat, currentLng)
                     : [];
@@ -540,7 +540,7 @@ function loadGlobalCO2() {
     
     function applyNightShading() {
         if (currentLat === null || currentLng === null) return;
-        if (currentDuration !== '1_week' && currentDuration !== '1_month') return;
+        if (currentDuration !== '1_day' && currentDuration !== '1_week' && currentDuration !== '1_month') return;
     
         // Union range across all sensors that already have data
         let xMin = null, xMax = null;
