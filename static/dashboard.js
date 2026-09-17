@@ -409,6 +409,7 @@ function loadGlobalCO2() {
                 // Process readings
 
                 const readings = data.readings || [];
+                const shapes = currentShapes();
                 readings.forEach(item => {
                     const name = item.name;
                     const sensor = sensors[name];
@@ -553,7 +554,23 @@ function loadGlobalCO2() {
         });
     }
 
+    // Compute the night/day shapes for the current data window, if applicable
+    function currentShapes() {
+        if (currentDuration !== '1_week' && currentDuration !== '1_month') return [];
+        if (currentLat === null || currentLng === null) return [];
     
+        let xMin = null, xMax = null;
+        Object.values(sensors).forEach(s => {
+            if (!s.xArray || s.xArray.length === 0) return;
+            const first = s.xArray[0];
+            const last  = s.xArray[s.xArray.length - 1];
+            if (xMin === null || first < xMin) xMin = first;
+            if (xMax === null || last  > xMax) xMax = last;
+        });
+        if (!xMin || !xMax) return [];
+    
+        return buildNightShapes(xMin, xMax, currentLat, currentLng);
+    }
     function startPolling() {
         if (pollInterval) clearInterval(pollInterval);
         pollInterval = setInterval(() => {
