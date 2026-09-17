@@ -268,7 +268,9 @@ function loadGlobalCO2() {
             type: 'scatter',
             yaxis: 'y2',
             line:   { color: '#383838', width: 2 },
-            marker: { color: '#383838' }
+            marker: { color: '#383838' },
+            fill: 'tozeroy',
+            fillcolor: 'rgba(56, 56, 56, 0.5)'
         };
 
         
