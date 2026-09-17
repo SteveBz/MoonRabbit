@@ -301,7 +301,7 @@ function loadGlobalCO2() {
                 font: { size: 11 }
             },
             font: { size: 14, color: '#7f7f7f' },
-            colorway: [meta.color || '#1f77b4', '#008080'],
+            colorway: [meta.color || '#1f77b4', '#383838'],
             width: sizes.chartWidth,
             height: sizes.chartHeight,
             margin: { t: 40, b: 40, pad: 5 }
