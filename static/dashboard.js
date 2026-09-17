@@ -409,7 +409,6 @@ function loadGlobalCO2() {
                 // Process readings
 
                 const readings = data.readings || [];
-                const shapes = currentShapes();
                 readings.forEach(item => {
                     const name = item.name;
                     const sensor = sensors[name];
@@ -462,6 +461,13 @@ function loadGlobalCO2() {
                             }, { shapes: shapes });
                         }
                     }
+                });
+                
+                // Recompute shading from the freshly updated data window
+                const shapes = currentShapes(5 * 60 * 1000);
+                Object.keys(sensors).forEach(name => {
+                    if (name === 'co2') return;
+                    Plotly.relayout('history-' + name, { shapes: shapes });
                 });
             })
             .catch(err => console.error('Polling error:', err));
