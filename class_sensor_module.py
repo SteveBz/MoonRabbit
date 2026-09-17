@@ -42,7 +42,7 @@ class SensorModule:
         self.long = None
         #print ("__init__")
         self.I2C_status=True
-
+        self._mqtt_reconnect_attempts = 0
 
         self.SENSOR_SOURCE_MAP = {
             'co2': 'scd30',
@@ -227,6 +227,35 @@ class SensorModule:
     def _vantage_watchdog(self):
         while not self._stop_watchdog.is_set():
             self._ensure_vantage_connected()
+
+            # MQTT staleness check
+            if self._last_vantage_update > 0:
+                silence = time.time() - self._last_vantage_update
+                
+                if silence > 300:                            # 5 minutes → restart indi2mqtt 
+                    logger.warning(f"MQTT silent for {silence:.0f}s — restarting indi2mqtt via supervisor")
+                    try:
+                        subprocess.run(
+                            ["sudo", "supervisorctl", "restart", "indi2mqtt"],
+                            timeout=15, capture_output=True
+                        )
+                    except Exception as e:
+                        logger.error(f"supervisorctl restart failed: {e}")
+                    time.sleep(10)                            # let indi2mqtt settle
+                    self._last_vantage_update = time.time()  # avoid immediate re-trigger
+                elif silence > 180:                     # 3 minutes with no messages
+                    logger.warning(f"MQTT silent for {silence:.0f}s — reconnecting client")
+                    try:
+                        self._mqtt_client.loop_stop()
+                        self._mqtt_client.disconnect()
+                    except Exception:
+                        pass
+                    try:
+                        self._mqtt_client.connect("localhost", 1883, 60)
+                        self._mqtt_client.loop_start()
+                        logger.info("MQTT client reconnected")
+                    except Exception as e:
+                        logger.error(f"MQTT reconnect failed: {e}")
             self._stop_watchdog.wait(60)
             
     def reset_i2c(self, port):
@@ -239,9 +268,20 @@ class SensorModule:
         except Exception as e:
             print(f"I2C Reset failed: {e}")
             return False
+    def _read_bme280(self):
+        try:
+            sample = bme280.sample(self.bus, SensorModule.ADDRESS, self.calibration_params)
+            self.temperature_val = sample.temperature
+            self.humidity_val    = sample.humidity
+            self.pressure_val    = sample.pressure
+        except Exception as e:
+        logger.error(f"BME280 read failed: {e}")
+        
     def get_sensor_readings(self):
         print ("get_sensor_readings")
-        
+        # Re-read BME280 first – Vantage may not be available
+        self._read_bme280()
+
         self.co2_val = self.read_values()
         # If Vantage was present at startup, override BME280 values with latest MQTT readings
         vantage_fresh = (time.time() - self._last_vantage_update) < 60
