@@ -52,5 +52,46 @@ sudo apt-get update
 #sudo apt-get install -y libdbus-1-dev pkg-config cmake
 #sudo apt-get install  -y libglib2.0-dev
 
+# --------------------------------------------------------------------------
+# Allow the SensorModule user (pi) to restart indi2mqtt via supervisorctl
+# without a password. Required by the MQTT staleness watchdog in
+# class_sensor_module.py.
+#
+# Idempotent: writes to a fixed file in /etc/sudoers.d/. Re-running replaces
+# the file with identical content rather than appending a second rule.
+# --------------------------------------------------------------------------
+SUDOERS_FILE="/etc/sudoers.d/sensor-restart-indi2mqtt"
+SUPERVISORCTL="$(command -v supervisorctl)"
+SENSOR_USER="${SUDO_USER:-pi}"
+
+if [ -z "$SUPERVISORCTL" ]; then
+    echo "WARNING: supervisorctl not found — skipping sudoers rule"
+else
+    EXPECTED_RULE="$SENSOR_USER ALL=(ALL) NOPASSWD: $SUPERVISORCTL restart indi2mqtt"
+
+    # If the file already contains the exact rule, do nothing.
+    if [ -f "$SUDOERS_FILE" ] && grep -qF -- "$EXPECTED_RULE" "$SUDOERS_FILE"; then
+        echo "Sudoers rule already installed: $SUDOERS_FILE"
+    else
+        echo "Installing sudoers rule: $SENSOR_USER may restart indi2mqtt"
+
+        TMP_SUDOERS=$(mktemp)
+        cat > "$TMP_SUDOERS" <<EOF
+# Allow the SensorModule process to restart indi2mqtt without a password.
+# Installed by MoonRabbit install.sh
+$EXPECTED_RULE
+EOF
+
+        if visudo -cf "$TMP_SUDOERS" >/dev/null 2>&1; then
+            install -m 0440 -o root -g root "$TMP_SUDOERS" "$SUDOERS_FILE"
+            echo "  Installed: $SUDOERS_FILE"
+        else
+            echo "  ERROR: sudoers syntax check failed — not installing"
+            cat "$TMP_SUDOERS"
+        fi
+        rm -f "$TMP_SUDOERS"
+    fi
+fi
+
 sudo apt-get -y autoremove
 sudo reboot
