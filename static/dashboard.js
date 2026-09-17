@@ -267,8 +267,8 @@ function loadGlobalCO2() {
             mode: 'lines+markers',
             type: 'scatter',
             yaxis: 'y2',
-            line: { color: '#383838', width: 2 },
-            opacity: 0.5
+            line:   { color: '#383838', width: 2 },
+            marker: { color: '#383838' }
         };
 
         
