@@ -288,7 +288,7 @@ function loadGlobalCO2() {
                 title: 'CO₂ (ppm)',
                 overlaying: 'y',
                 side: 'right',
-                // range: [co2Meta?.min || 200, co2Meta?.max || 1000],
+                //range: [co2Meta?.min || 200, co2Meta?.max || 1000],
                 showgrid: false,
                 color: '#383838'
             },
@@ -456,7 +456,14 @@ function loadGlobalCO2() {
                     .sort((a, b) => a.x - b.x);
                 co2XArray = co2Sorted.map(p => p.x);
                 co2YArray = co2Sorted.map(p => p.y);
-    
+                // Compute a padded y2 range from the CO₂ data
+                let co2YRange = null;
+                if (co2YArray.length) {
+                    const lo = Math.min(...co2YArray);
+                    const hi = Math.max(...co2YArray);
+                    const pad = Math.max((hi - lo) * 0.1, 5);
+                    co2YRange = [lo - pad, hi + pad];
+                }
                 // ---- 2. Compute overall time range ----
                 let xMin = null, xMax = null;
                 const consider = arr => {
@@ -493,15 +500,18 @@ function loadGlobalCO2() {
                     const yArr = sorted.map(p => p.y);
                     sensor.xArray = xArr;
                     sensor.yArray = yArr;
-    
+                    const layoutUpdate = { shapes: shapes };
+                    if (co2YRange) {
+                        layoutUpdate.yaxis2 = { range: co2YRange, autorange: false };
+                    }
                     if (sensor.hasCo2Axis) {
                         Plotly.update('history-' + name,
                             { x: [co2XArray, xArr], y: [co2YArray, yArr] },
-                            { shapes: shapes });
+                            layoutUpdate);
                     } else {
                         Plotly.update('history-' + name,
                             { x: [xArr], y: [yArr] },
-                            { shapes: shapes });
+                            layoutUpdate);
                     }
                 });
             })
