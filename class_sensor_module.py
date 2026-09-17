@@ -275,7 +275,7 @@ class SensorModule:
             self.humidity_val    = sample.humidity
             self.pressure_val    = sample.pressure
         except Exception as e:
-        logger.error(f"BME280 read failed: {e}")
+            logger.error(f"BME280 read failed: {e}")
         
     def get_sensor_readings(self):
         print ("get_sensor_readings")
