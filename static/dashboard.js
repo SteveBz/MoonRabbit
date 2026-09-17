@@ -130,8 +130,8 @@ function loadGlobalCO2() {
                         shapes.push({
                             type: 'rect',
                             xref: 'x', yref: 'paper',
-                            x0: nStart.toISOString(),
-                            x1: nEnd.toISOString(),
+                            x0: toLocalIso(nStart),
+                            x1: toLocalIso(nEnd),
                             y0: 0, y1: 1,
                             fillcolor: 'rgba(135, 206, 235, 0.10)', // day = light blue
                             line: { width: 0 },
@@ -147,8 +147,8 @@ function loadGlobalCO2() {
                     shapes.push({
                         type: 'rect',
                         xref: 'x', yref: 'paper',
-                        x0: dStart.toISOString(),
-                        x1: dEnd.toISOString(),
+                        x0: toLocalIso(dStart),
+                        x1: toLocalIso(dEnd),
                         y0: 0, y1: 1,
                         fillcolor: 'rgba(0, 0, 0, 0.15)',       // night = grey
                         line: { width: 0 },
@@ -166,17 +166,25 @@ function loadGlobalCO2() {
     // A vertical dashed line at the current time
     function nowLineShape() {
         const now = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        const localIso =
+            `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}` +
+            `T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
         return {
             type: 'line',
             xref: 'x', yref: 'paper',
-            x0: now.toISOString(),
-            x1: now.toISOString(),
+            x0: localIso,
+            x1: localIso,
             y0: 0, y1: 1,
             line: { color: 'darkgreen', width: 1.5, dash: 'dash' },
             layer: 'above'
         };
     }
-    
+    function toLocalIso(d) {
+        const pad = n => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}` +
+               `T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
     // ---- Helper: clean sensor name for display ----
     function getDisplayName(raw) {
         // Special cases
