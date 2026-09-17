@@ -268,7 +268,9 @@ function loadGlobalCO2() {
             type: 'scatter',
             yaxis: 'y2',
             line:   { color: 'rgba(56, 56, 56, 0.6)', width: 2 },
-            marker: { color: 'rgba(56, 56, 56, 0.4)' }
+            marker: { color: 'rgba(56, 56, 56, 0.4)' },
+            fill: 'tozeroy',
+            fillcolor: 'rgba(56, 56, 56, 0.3)'
         };
 
         
@@ -280,13 +282,13 @@ function loadGlobalCO2() {
 
             yaxis: {
                 title: displayName,
-                // range: [meta.min || 0, meta.max || 100]
+                range: [meta.min || 0, meta.max || 100]
             },
             yaxis2: {
                 title: 'CO₂ (ppm)',
                 overlaying: 'y',
                 side: 'right',
-                //range: [co2Meta?.min || 200, co2Meta?.max || 1000],
+                range: [co2Meta?.min || 200, co2Meta?.max || 1000],
                 showgrid: false,
                 color: '#383838'
             },
@@ -454,7 +456,7 @@ function loadGlobalCO2() {
                     .sort((a, b) => a.x - b.x);
                 co2XArray = co2Sorted.map(p => p.x);
                 co2YArray = co2Sorted.map(p => p.y);
-
+    
                 // ---- 2. Compute overall time range ----
                 let xMin = null, xMax = null;
                 const consider = arr => {
@@ -491,9 +493,7 @@ function loadGlobalCO2() {
                     const yArr = sorted.map(p => p.y);
                     sensor.xArray = xArr;
                     sensor.yArray = yArr;
-                    if (co2YRange) {
-                        layoutUpdate.yaxis2 = { range: co2YRange, autorange: false };
-                    }
+    
                     if (sensor.hasCo2Axis) {
                         Plotly.update('history-' + name,
                             { x: [co2XArray, xArr], y: [co2YArray, yArr] },
