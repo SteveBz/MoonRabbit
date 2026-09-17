@@ -319,7 +319,7 @@ function loadGlobalCO2() {
         sensor.layout = lineLayout;
 
         sensor.hasCo2Axis = true;
-        Plotly.newPlot('history-' + name, [trace, co2Trace], lineLayout);
+        Plotly.newPlot('history-' + name, [co2Trace, trace], lineLayout);
     }
 
     // ---- Initialisation ----
@@ -415,8 +415,8 @@ function loadGlobalCO2() {
                             const other = sensors[otherName];
                             if (other.hasCo2Axis) {
                                 Plotly.update('history-' + otherName, {
-                                    x: [other.xArray.slice(), co2XArray.slice()],
-                                    y: [other.yArray.slice(), co2YArray.slice()]
+                                    x: [co2XArray.slice(), other.xArray.slice()],
+                                    y: [co2YArray.slice(), other.yArray.slice()]
                                 });
                             }
                         });
@@ -429,8 +429,8 @@ function loadGlobalCO2() {
                         }
                         if (sensor.hasCo2Axis) {
                             Plotly.update('history-' + name, {
-                                x: [sensor.xArray.slice(), co2XArray.slice()],
-                                y: [sensor.yArray.slice(), co2YArray.slice()]
+                                x: [co2XArray.slice(), sensor.xArray.slice()],
+                                y: [co2YArray.slice(), sensor.yArray.slice()]
                             });
                         } else {
                             Plotly.update('history-' + name, {
@@ -496,7 +496,7 @@ function loadGlobalCO2() {
     
                     if (sensor.hasCo2Axis) {
                         Plotly.update('history-' + name,
-                            { x: [xArr, co2XArray], y: [yArr, co2YArray] },
+                            { x: [co2XArray, xArr], y: [co2YArray, yArr] },
                             { shapes: shapes });
                     } else {
                         Plotly.update('history-' + name,
