@@ -270,7 +270,7 @@ function loadGlobalCO2() {
             line:   { color: '#383838', width: 2 },
             marker: { color: '#383838' },
             fill: 'tozeroy',
-            fillcolor: 'rgba(56, 56, 56, 0.5)'
+            fillcolor: 'rgba(56, 56, 56, 0.3)'
         };
 
         
