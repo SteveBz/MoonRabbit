@@ -119,24 +119,45 @@ function loadGlobalCO2() {
         let prevSunset = null;
         while (day.getTime() <= xMax.getTime() + 86400000) {
             const { sunrise, sunset } = getSunTimes(day, lat, lng);
-            if (prevSunset && sunrise) {
-                // Clip to visible window
-                const start = prevSunset < xMin ? xMin : prevSunset;
-                const end   = sunrise   > xMax ? xMax : sunrise;
-                if (start < end) {
+    
+            if (sunrise && sunset) {
+    
+                // ---- Night: from previous evening's sunset to this morning's sunrise ----
+                if (prevSunset) {
+                    const nStart = prevSunset < xMin ? xMin : prevSunset;
+                    const nEnd   = sunrise   > xMax ? xMax : sunrise;
+                    if (nStart < nEnd) {
+                        shapes.push({
+                            type: 'rect',
+                            xref: 'x', yref: 'paper',
+                            x0: nStart.toISOString(),
+                            x1: nEnd.toISOString(),
+                            y0: 0, y1: 1,
+                            fillcolor: 'rgba(0, 0, 0, 0.15)',       // night = grey
+                            line: { width: 0 },
+                            layer: 'below'
+                        });
+                    }
+                }
+    
+                // ---- Day: from this morning's sunrise to this evening's sunset ----
+                const dStart = sunrise < xMin ? xMin : sunrise;
+                const dEnd   = sunset  > xMax ? xMax : sunset;
+                if (dStart < dEnd) {
                     shapes.push({
                         type: 'rect',
                         xref: 'x', yref: 'paper',
-                        x0: start.toISOString(),
-                        x1: end.toISOString(),
+                        x0: dStart.toISOString(),
+                        x1: dEnd.toISOString(),
                         y0: 0, y1: 1,
-                        fillcolor: 'rgba(0, 0, 50, 0.10)',
+                        fillcolor: 'rgba(135, 206, 235, 0.10)', // day = light blue
                         line: { width: 0 },
                         layer: 'below'
                     });
                 }
+    
+                prevSunset = sunset;
             }
-            prevSunset = sunset;
             day.setDate(day.getDate() + 1);
         }
         return shapes;
