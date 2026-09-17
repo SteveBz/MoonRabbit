@@ -264,10 +264,10 @@ function loadGlobalCO2() {
             x: [],
             y: [],
             name: 'CO₂',
-            mode: 'lines',
+            mode: 'lines+markers',
             type: 'scatter',
             yaxis: 'y2',
-            line: { color: '#008080', width: 1.5 },
+            line: { color: '#008080', width: 2 },
             opacity: 0.5
         };
 
