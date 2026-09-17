@@ -119,7 +119,7 @@ function loadGlobalCO2() {
         let prevSunset = null;
         while (day.getTime() <= xMax.getTime() + 86400000) {
             const { sunrise, sunset } = getSunTimes(day, lat, lng);
-    
+    // Day and night are inverted for an unknown reason.
             if (sunrise && sunset) {
     
                 // ---- Night: from previous evening's sunset to this morning's sunrise ----
@@ -133,7 +133,7 @@ function loadGlobalCO2() {
                             x0: nStart.toISOString(),
                             x1: nEnd.toISOString(),
                             y0: 0, y1: 1,
-                            fillcolor: 'rgba(0, 0, 0, 0.15)',       // night = grey
+                            fillcolor: 'rgba(135, 206, 235, 0.10)', // day = light blue
                             line: { width: 0 },
                             layer: 'below'
                         });
@@ -150,7 +150,7 @@ function loadGlobalCO2() {
                         x0: dStart.toISOString(),
                         x1: dEnd.toISOString(),
                         y0: 0, y1: 1,
-                        fillcolor: 'rgba(135, 206, 235, 0.10)', // day = light blue
+                        fillcolor: 'rgba(0, 0, 0, 0.15)',       // night = grey
                         line: { width: 0 },
                         layer: 'below'
                     });
