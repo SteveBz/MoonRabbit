@@ -545,6 +545,7 @@ function loadGlobalCO2() {
     
         const shapes = buildNightShapes(xMin, xMax, currentLat, currentLng);
         Object.keys(sensors).forEach(name => {
+            if (name === 'co2') return;    // no standalone CO₂ chart
             Plotly.relayout('history-' + name, { shapes: shapes });
         });
     }
