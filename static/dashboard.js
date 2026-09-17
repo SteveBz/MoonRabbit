@@ -162,6 +162,20 @@ function loadGlobalCO2() {
         }
         return shapes;
     }
+
+    // A vertical dashed line at the current time
+    function nowLineShape() {
+        const now = new Date();
+        return {
+            type: 'line',
+            xref: 'x', yref: 'paper',
+            x0: now.toISOString(),
+            x1: now.toISOString(),
+            y0: 0, y1: 1,
+            line: { color: 'darkgreen', width: 1.5, dash: 'dash' },
+            layer: 'above'
+        };
+    }
     
     // ---- Helper: clean sensor name for display ----
     function getDisplayName(raw) {
@@ -506,9 +520,10 @@ function loadGlobalCO2() {
     
                 // ---- 3. Night shading ----
                 const showShading = (currentDuration === '1_day' || currentDuration === '1_week' || currentDuration === '1_month');
-                const shapes = (showShading && xMin && xMax)
-                    ? buildNightShapes(xMin, xMax, currentLat, currentLng)
-                    : [];
+                const shapes = [nowLineShape()];
+                if (showShading && xMin && xMax) {
+                    shapes.push(...buildNightShapes(xMin, xMax, currentLat, currentLng));
+                }
     
                 // ---- 4. Update each chart's y1 (and y2 = CO₂) ----
                 Object.keys(data).forEach(name => {
@@ -562,9 +577,12 @@ function loadGlobalCO2() {
 
     // Compute the night/day shapes for the current data window, if applicable
     function currentShapes(rightBufferMs = 0) {
-        if (currentDuration !== '1_day' && currentDuration !== '1_week' && currentDuration !== '1_month') return [];
-        if (currentLat === null || currentLng === null) return [];
-    
+        if (currentDuration !== '1_day' && currentDuration !== '1_week' && currentDuration !== '1_month') {
+            return [nowLineShape()];
+        }
+        if (currentLat === null || currentLng === null) {
+            return [nowLineShape()];
+        }
         let xMin = null, xMax = null;
         Object.values(sensors).forEach(s => {
             if (!s.xArray || s.xArray.length === 0) return;
@@ -573,10 +591,10 @@ function loadGlobalCO2() {
             if (xMin === null || first < xMin) xMin = first;
             if (xMax === null || last  > xMax) xMax = last;
         });
-        if (!xMin || !xMax) return [];
+        if (!xMin || !xMax) return [nowLineShape()];
     
         xMax = new Date(xMax.getTime() + rightBufferMs);
-        return buildNightShapes(xMin, xMax, currentLat, currentLng);
+        return [nowLineShape(), ...buildNightShapes(xMin, xMax, currentLat, currentLng)];
     }
     function startPolling() {
         if (pollInterval) clearInterval(pollInterval);
