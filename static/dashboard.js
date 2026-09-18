@@ -426,6 +426,7 @@ function loadGlobalCO2() {
                     currentDuration = btnText;
                 }
                 refreshHistory();
+                updateSensorReadings();
                 startPolling();
             })
             .catch(err => console.error('Init error:', err));
