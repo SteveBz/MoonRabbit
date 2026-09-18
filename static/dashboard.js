@@ -403,8 +403,8 @@ function loadGlobalCO2() {
                     'co2': 0,
                     'temperature': 1,
                     'humidity': 2,
-                    'wind_speed': 3,
-                    'wind_direction': 4,
+                    'wind_speed': 4,
+                    'wind_direction': 3,
                     'rain_rate': 5,
                     'pressure': 99   // last
                 };
