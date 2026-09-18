@@ -327,14 +327,16 @@ function loadGlobalCO2() {
                 title: displayName,
                 range: [meta.min || 0, meta.max || 100]
             },
-            yaxis2: {
-                title: 'CO₂ (ppm)',
-                overlaying: 'y',
-                side: 'right',
-                range: [co2Meta?.min || 200, co2Meta?.max || 1000],
-                showgrid: false,
-                color: '#383838'
-            },
+            if (name !== 'co2') {
+                yaxis2: {
+                    title: 'CO₂ (ppm)',
+                    overlaying: 'y',
+                    side: 'right',
+                    range: [co2Meta?.min || 200, co2Meta?.max || 1000],
+                    showgrid: false,
+                    color: '#383838'
+                },
+            }
 
 
             legend: {
