@@ -72,6 +72,7 @@ function loadGlobalCO2() {
     let pollingPaused = false;
     let pollInterval = null;
     const sensors = {};
+    window.sensors = sensors;    // debug hook
 
     // Global CO₂ history (shared as y2 trace on every other chart)
     let co2XArray = [];
