@@ -254,7 +254,7 @@ function loadGlobalCO2() {
 
         // History chart
         // Skip the standalone CO₂ history chart – CO₂ is shown as y2 on every other chart
-        if (name !== 'co2') {
+        if (name !== 'xco2') { // was strip co2. Remove x.
             const historyContainer = document.getElementById('history-container');
             const histDiv = document.createElement('div');
             histDiv.className = 'history-divs';
@@ -299,9 +299,9 @@ function loadGlobalCO2() {
 
         // ---- History chart ----
         // Skip the standalone CO₂ chart – CO₂ will be shown as y2 on every other chart.
-        if (name === 'co2') {
-            return;
-        }
+        // if (name === 'co2') {
+        //     return;
+       //  }
 
         const co2Trace = {
             x: [],
@@ -488,7 +488,7 @@ function loadGlobalCO2() {
                 // Recompute shading from the freshly updated data window
                 const shapes = currentShapes(5 * 60 * 1000);
                 Object.keys(sensors).forEach(name => {
-                    if (name === 'co2') return;
+                    //if (name === 'co2') return;
                     Plotly.relayout('history-' + name, { shapes: shapes });
                 });
             })
@@ -519,7 +519,7 @@ function loadGlobalCO2() {
                 };
                 consider(co2XArray);
                 Object.keys(data).forEach(name => {
-                    if (name === 'co2') return;
+                    //if (name === 'co2') return;
                     const pairs = data[name] || [];
                     if (!pairs.length) return;
                     const times = pairs.map(p => new Date(p[0])).sort((a, b) => a - b);
@@ -535,7 +535,7 @@ function loadGlobalCO2() {
     
                 // ---- 4. Update each chart's y1 (and y2 = CO₂) ----
                 Object.keys(data).forEach(name => {
-                    if (name === 'co2') return;    // no standalone CO₂ chart
+                    //if (name === 'co2') return;    // no standalone CO₂ chart
                     const sensor = sensors[name];
                     if (!sensor) return;
                     const pairs = data[name] || [];
@@ -578,7 +578,7 @@ function loadGlobalCO2() {
     
         const shapes = buildNightShapes(xMin, xMax, currentLat, currentLng);
         Object.keys(sensors).forEach(name => {
-            if (name === 'co2') return;    // no standalone CO₂ chart
+            //if (name === 'co2') return;    // no standalone CO₂ chart
             Plotly.relayout('history-' + name, { shapes: shapes });
         });
     }
