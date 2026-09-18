@@ -479,6 +479,12 @@ function loadGlobalCO2() {
                             co2XArray.shift();
                             co2YArray.shift();
                         }
+                        // Update the CO₂ standalone chart (line + pre-industrial ref)
+                        const y280 = new Array(co2XArray.length).fill(280);
+                        Plotly.update('history-co2',
+                            { x: [co2XArray.slice(), co2XArray.slice()],
+                              y: [co2YArray.slice(), y280] });
+                        // Update y2 overlay on every other chart
                         Object.keys(sensors).forEach(otherName => {
                             const other = sensors[otherName];
                             if (other.hasCo2Axis) {
@@ -578,14 +584,19 @@ function loadGlobalCO2() {
                         ? [...shapes, preindustrialLineShape()]
                         : shapes;
 
-                    if (sensor.hasCo2Axis) {
+                    if (name === 'co2') {
+                        const y280 = new Array(xArr.length).fill(280);
+                        Plotly.update('history-' + name,
+                            { x: [xArr, xArr], y: [yArr, y280] },
+                            { shapes: shapes });
+                    } else if (sensor.hasCo2Axis) {
                         Plotly.update('history-' + name,
                             { x: [co2XArray, xArr], y: [co2YArray, yArr] },
-                            { shapes: chartShapes  });
+                            { shapes: shapes });
                     } else {
                         Plotly.update('history-' + name,
                             { x: [xArr], y: [yArr] },
-                            { shapes: chartShapes  });
+                            { shapes: shapes });
                     }
                 });
             })
