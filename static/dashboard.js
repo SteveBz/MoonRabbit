@@ -163,16 +163,16 @@ function loadGlobalCO2() {
         return shapes;
     }
 
-    function preindustrialLineShape() {
-        return {
-            type: 'line',
-            xref: 'paper', yref: 'y',
-            x0: 0, x1: 1,
-            y0: 280, y1: 280,
-            line: { color: 'black', width: 1.5, dash: 'dash' },
-            layer: 'above'
-        };
-    }
+
+    const preindustrialTrace = {
+        x: [],
+        y: [],
+        name: 'Pre-industrial (280 ppm)',
+        mode: 'lines',
+        type: 'scatter',
+        line: { color: 'black', width: 1.5, dash: 'dash' },
+        hoverinfo: 'skip'
+    };
     
     // A vertical dashed line at the current time
     function nowLineShape() {
@@ -383,7 +383,7 @@ function loadGlobalCO2() {
 
         sensor.hasCo2Axis = (name !== 'co2');
         if (name === 'co2') {
-            Plotly.newPlot('history-' + name, [trace], lineLayout);
+            Plotly.newPlot('history-' + name, [trace, preindustrialTrace], lineLayout);
         } else {
             Plotly.newPlot('history-' + name, [co2Trace, trace], lineLayout);
         }
