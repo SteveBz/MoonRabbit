@@ -256,7 +256,7 @@ function loadGlobalCO2() {
         `;
         boxContainer.appendChild(box);
 
-        // Gauge
+        // Gaugee
         const gaugeContainer = document.getElementById('gauge-container');
         const gaugeDiv = document.createElement('div');
         gaugeDiv.className = 'gauge-box';
@@ -518,10 +518,7 @@ function loadGlobalCO2() {
                 // Recompute shading from the freshly updated data window
                 const shapes = currentShapes(5 * 60 * 1000);
                 Object.keys(sensors).forEach(name => {
-                    const chartShapes = (name === 'co2')
-                        ? [...shapes, preindustrialLineShape()]
-                        : shapes;
-                    Plotly.relayout('history-' + name, { shapes: chartShapes });
+                    Plotly.relayout('history-' + name, { shapes: shapes });
                 });
             })
             .catch(err => console.error('Polling error:', err));
@@ -580,10 +577,6 @@ function loadGlobalCO2() {
                     sensor.yArray = yArr;
     
                     // CO₂ chart gets an extra reference line at 280 ppm
-                    const chartShapes = (name === 'co2')
-                        ? [...shapes, preindustrialLineShape()]
-                        : shapes;
-
                     if (name === 'co2') {
                         const y280 = new Array(xArr.length).fill(280);
                         Plotly.update('history-' + name,
