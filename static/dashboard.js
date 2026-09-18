@@ -363,8 +363,12 @@ function loadGlobalCO2() {
         sensor.trace = trace;
         sensor.layout = lineLayout;
 
-        sensor.hasCo2Axis = true;
-        Plotly.newPlot('history-' + name, [co2Trace, trace], lineLayout);
+        sensor.hasCo2Axis = (name !== 'co2');
+        if (name === 'co2') {
+            Plotly.newPlot('history-' + name, [trace], lineLayout);
+        } else {
+            Plotly.newPlot('history-' + name, [co2Trace, trace], lineLayout);
+        }
     }
 
     // ---- Initialisation ----
