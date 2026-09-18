@@ -306,7 +306,7 @@ function loadGlobalCO2() {
         const co2Trace = {
             x: [],
             y: [],
-            name: 'CO₂',
+            name: 'CO\u2082',
             mode: 'lines+markers',
             type: 'scatter',
             yaxis: 'y2',
@@ -327,18 +327,6 @@ function loadGlobalCO2() {
                 title: displayName,
                 range: [meta.min || 0, meta.max || 100]
             },
-            if (name !== 'co2') {
-                yaxis2: {
-                    title: 'CO₂ (ppm)',
-                    overlaying: 'y',
-                    side: 'right',
-                    range: [co2Meta?.min || 200, co2Meta?.max || 1000],
-                    showgrid: false,
-                    color: '#383838'
-                },
-            }
-
-
             legend: {
                 x: 0.02, y: 0.98,
                 xanchor: 'left', yanchor: 'top',
@@ -353,6 +341,18 @@ function loadGlobalCO2() {
             height: sizes.chartHeight,
             margin: { t: 40, b: 40, pad: 5 }
         };
+        // Add the y2 axis only on the non-CO₂ charts
+        if (name !== 'co2') {
+            lineLayout.yaxis2 = {
+                title: 'CO\u2082 (ppm)',
+                overlaying: 'y',
+                side: 'right',
+                range: [co2Meta?.min || 200, co2Meta?.max || 1000],
+                showgrid: false,
+                color: '#383838'
+            };
+        }
+
         const trace = {
             x: [],
             y: [],
