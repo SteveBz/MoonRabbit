@@ -401,7 +401,12 @@ function loadGlobalCO2() {
                 // ---- Sort: co2 first, then temperature, then rest ----
                 const priority = {
                     'co2': 0,
-                    'temperature': 1
+                    'temperature': 1,
+                    'humidity': 2,
+                    'wind_speed': 3,
+                    'wind_direction': 4,
+                    'rain_rate': 5,
+                    'pressure': 99   // last
                 };
                 metadataArray.sort((a, b) => {
                     const orderA = (a.name in priority) ? priority[a.name] : 2;
