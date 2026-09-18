@@ -163,6 +163,17 @@ function loadGlobalCO2() {
         return shapes;
     }
 
+    function preindustrialLineShape() {
+        return {
+            type: 'line',
+            xref: 'paper', yref: 'y',
+            x0: 0, x1: 1,
+            y0: 280, y1: 280,
+            line: { color: 'black', width: 1.5, dash: 'dash' },
+            layer: 'above'
+        };
+    }
+    
     // A vertical dashed line at the current time
     function nowLineShape() {
         const now = new Date();
@@ -360,6 +371,13 @@ function loadGlobalCO2() {
             mode: 'lines+markers',
             type: 'scatter'
         };
+
+        if (name === 'co2') {
+            trace.line   = { color: '#383838' };
+            trace.marker = { color: '#383838' };
+            trace.fill = 'tozeroy';
+            trace.fillcolor = 'rgba(56, 56, 56, 0.5)';   // same anthracite at 50% opacity
+        }
         sensor.trace = trace;
         sensor.layout = lineLayout;
 
@@ -494,8 +512,10 @@ function loadGlobalCO2() {
                 // Recompute shading from the freshly updated data window
                 const shapes = currentShapes(5 * 60 * 1000);
                 Object.keys(sensors).forEach(name => {
-                    //if (name === 'co2') return;
-                    Plotly.relayout('history-' + name, { shapes: shapes });
+                    const chartShapes = (name === 'co2')
+                        ? [...shapes, preindustrialLineShape()]
+                        : shapes;
+                    Plotly.relayout('history-' + name, { shapes: chartShapes });
                 });
             })
             .catch(err => console.error('Polling error:', err));
@@ -553,14 +573,19 @@ function loadGlobalCO2() {
                     sensor.xArray = xArr;
                     sensor.yArray = yArr;
     
+                    // CO₂ chart gets an extra reference line at 280 ppm
+                    const chartShapes = (name === 'co2')
+                        ? [...shapes, preindustrialLineShape()]
+                        : shapes;
+
                     if (sensor.hasCo2Axis) {
                         Plotly.update('history-' + name,
                             { x: [co2XArray, xArr], y: [co2YArray, yArr] },
-                            { shapes: shapes });
+                            { shapes: chartShapes  });
                     } else {
                         Plotly.update('history-' + name,
                             { x: [xArr], y: [yArr] },
-                            { shapes: shapes });
+                            { shapes: chartShapes  });
                     }
                 });
             })
