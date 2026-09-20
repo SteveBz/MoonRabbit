@@ -335,6 +335,7 @@
 }
 
 .home-content .graph-box .gaugeCharts .gauge-list{
+    display: flex;
     align-items: center;
     flex-flow: row wrap;
     justify-content: center;
@@ -418,6 +419,7 @@
   }
 
   .home-content .graph-box .gaugeCharts .gauge-list{
+      display: flex;
       flex: 1 1 100%;
       width: 100%;
       align-items: center;
