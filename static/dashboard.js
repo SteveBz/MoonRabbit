@@ -695,6 +695,16 @@ function loadGlobalCO2() {
         }, 300);
     });
 
+    window.addEventListener('load', function() {
+        const sizes = getSizes();
+        Object.keys(sensors).forEach(name => {
+            Plotly.relayout('gauge-' + name, {
+                width: sizes.gaugeWidth,
+                height: sizes.gaugeHeight
+            });
+        });
+    });
+    
     // ---- Start ----
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
