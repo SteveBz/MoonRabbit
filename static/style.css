@@ -15,7 +15,7 @@
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 16px;
+    font-size: 16px;e
     border-radius: 5px; /* Rounded corners */
     cursor: pointer;
     transition-duration: 0.4s; /* Smooth hover transition */
@@ -329,8 +329,8 @@
   margin: 0 0px 0 0;
   border-radius: 0px;
 }
+.gauge-box {
 /* Reduce vertical spacing between gauge charts */
-    width: 100% !important;
   margin-bottom: 0px; /* Adjust as needed */
 }
 
