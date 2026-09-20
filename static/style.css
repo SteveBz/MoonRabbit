@@ -335,8 +335,10 @@
 }
 
 .home-content .graph-box .gaugeCharts .gauge-list{
-  align-items: center;
-  flex-flow: column nowrap;
+    align-items: center;
+    flex-flow: row wrap;
+    justify-content: center;
+    gap: 10px;
 }
 /* Adjustments for smaller screens */
 @media screen and (max-width: 768px) {
@@ -417,12 +419,14 @@
 
   .home-content .graph-box .gaugeCharts .gauge-list{
     align-items: center;
-    flex-flow: column nowrap;
+    flex-flow: row wrap;
+    justify-content: center;
+    gap: 10px;
   }
   /* Adjust individual gauge chart width */
-  .home-content .graph-box .gaugeCharts .gauge-box {
-    width: 100%; /* Adjust width as needed */
-    margin-bottom: 20px; /* Add bottom margin between charts */
+  .home-content .graph-box .gaugeCharts .gauge-box {    
+    width: calc(50% - 5px);
+    margin-bottom: 10px; /* Bottom margin between charts */
   }
   /* Hide history charts on mobile */
   .home-content .graph-box .history-charts {
