@@ -9,7 +9,7 @@
 }
 .updateButton {
     background-color: #4CAF50; /* Green background */
-    border: none;
+    border: none;e
     color: white;
     /* padding: 10px 20px; Add padding to make the button larger */
     text-align: center;
@@ -421,14 +421,14 @@
   .home-content .graph-box .gaugeCharts .gauge-list{
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 4px;
+      gap: 0;
       width: 100%;
       padding: 0;
   }
   .home-content .graph-box .gaugeCharts .gauge-box {
       width: 80% !important;
       height: 180px;
-      margin: 0 0 8px 0;
+      margin: 0 0 0 0;
   }
   
   /* Hide history charts on mobile */
