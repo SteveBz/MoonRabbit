@@ -435,10 +435,6 @@
   width: 100%; /* Set width to 100% for mobile devices */
   margin-bottom: 20px; /* Add bottom margin between charts */
   }
-  /* Make Plotly charts responsive */
-  .plotly-graph-div {
-    width: 100% !important; /* Override Plotly's fixed width */
-  }
   /* Hide the .ddn box label in mobile mode */
   label[for="time-range"] {
     display: none;
