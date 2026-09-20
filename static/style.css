@@ -330,7 +330,7 @@
   border-radius: 0px;
 }
 /* Reduce vertical spacing between gauge charts */
-.gauge-box {
+    width: 100% !important;
   margin-bottom: 0px; /* Adjust as needed */
 }
 
@@ -416,19 +416,10 @@
     display: flex;
     align-items: center;
   }
-
-  .home-content .graph-box .gaugeCharts .gauge-list{
-      .home-content .graph-box .gaugeCharts .gauge-list{
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      width: 100%;
-  }
-  }
   /* Adjust individual gauge chart width */
   .home-content .graph-box .gaugeCharts .gauge-box {    
-    width: calc(50% - 5px) !important;
-    margin-bottom: 10px; /* Bottom margin between charts */
+    width: 100% !important;
+    margin-bottom: 0;
   }
   /* Hide history charts on mobile */
   .home-content .graph-box .history-charts {
