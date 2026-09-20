@@ -232,7 +232,6 @@ function loadGlobalCO2() {
         const h = document.documentElement.clientHeight;
         const isNarrow = w < 768;
         return {
-            gaugeWidth: Math.min(250, w * 0.9),
             gaugeWidth: isNarrow ? Math.floor(w * 0.44) : Math.min(250, w * 0.9),
             gaugeHeight: 200,
             chartWidth: Math.min(900, w * 0.95),
