@@ -418,10 +418,12 @@
   }
 
   .home-content .graph-box .gaugeCharts .gauge-list{
-    align-items: center;
-    flex-flow: row wrap;
-    justify-content: center;
-    gap: 10px;
+      flex: 1 1 100%;
+      width: 100%;
+      align-items: center;
+      flex-flow: row wrap;
+      justify-content: center;
+      gap: 10px;
   }
   /* Adjust individual gauge chart width */
   .home-content .graph-box .gaugeCharts .gauge-box {    
