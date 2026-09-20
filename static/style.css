@@ -335,10 +335,11 @@
 }
 
 .home-content .graph-box .gaugeCharts .gauge-list{
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      width: 100%;
+    display: flex;
+    align-items: center;
+    flex-flow: row wrap;
+    justify-content: center;
+    gap: 10px;
 }
 /* Adjustments for smaller screens */
 @media screen and (max-width: 768px) {
