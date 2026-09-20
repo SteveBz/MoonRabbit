@@ -285,8 +285,7 @@ function loadGlobalCO2() {
 
         // Gauge
         const gaugeLayout = {
-            width: sizes.gaugeWidth,
-            height: sizes.gaugeHeight,
+            responsive: true,
             margin: { t: 10, b: 0, l: 40, r: 0 }
         };
         const gaugeData = [{
@@ -682,26 +681,12 @@ function loadGlobalCO2() {
         resizeTimeout = setTimeout(() => {
             const sizes = getSizes();
             Object.keys(sensors).forEach(name => {
-                Plotly.relayout('gauge-' + name, {
-                    width: sizes.gaugeWidth,
-                    height: sizes.gaugeHeight
-                });
                 Plotly.relayout('history-' + name, {
                     width: sizes.chartWidth,
                     height: sizes.chartHeight
                 });
             });
         }, 300);
-    });
-
-    window.addEventListener('load', function() {
-        const sizes = getSizes();
-        Object.keys(sensors).forEach(name => {
-            Plotly.relayout('gauge-' + name, {
-                width: sizes.gaugeWidth,
-                height: sizes.gaugeHeight
-            });
-        });
     });
     
     // ---- Start ----
