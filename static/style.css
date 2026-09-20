@@ -421,14 +421,16 @@
   .home-content .graph-box .gaugeCharts .gauge-list{
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 4px;
       width: 100%;
+      padding: 0;
   }
   .home-content .graph-box .gaugeCharts .gauge-box {
       width: 80% !important;
       height: 180px;
-      margin: 0 auto 10px auto;
+      margin: 0 0 8px 0;
   }
+  
   /* Hide history charts on mobile */
   .home-content .graph-box .history-charts {
     display: none;
