@@ -425,7 +425,7 @@
   }
   /* Adjust individual gauge chart width */
   .home-content .graph-box .gaugeCharts .gauge-box {    
-    width: calc(50% - 5px);
+    width: calc(50% - 5px) !important;
     margin-bottom: 10px; /* Bottom margin between charts */
   }
   /* Hide history charts on mobile */
