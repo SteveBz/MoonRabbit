@@ -307,6 +307,11 @@ function loadGlobalCO2() {
                 }
             }
         }];
+        if (name === 'wind_direction') {
+            gaugeData[0].gauge.axis.tickmode = 'array';
+            gaugeData[0].gauge.axis.tickvals = [0, 90, 180, 270, 360];
+            gaugeData[0].gauge.axis.ticktext = ['N','E','S','W','N'];
+        }
         Plotly.newPlot('gauge-' + name, gaugeData, gaugeLayout);
 
         // ---- History chart ----
