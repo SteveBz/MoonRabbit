@@ -15,21 +15,6 @@ sudo cp *.conf /etc/supervisor/conf.d/
 # Install required Python packages within the virtual environment
 pip3 install flask flask-cors smbus2 RPi.bme280 adafruit-blinka==8.40.0 adafruit-circuitpython-scd30 pandas requests psutil pandas sqlalchemy  paho-mqtt
 
-# NEW: build and install indi2mqtt from source
-cd /home/pi
-if [ ! -d indi2mqtt ]; then
-    git clone https://github.com/rkaczorek/indi2mqtt.git
-fi
-cd indi2mqtt
-
-# Point at the local broker (upstream defaults to a hard-coded IP)
-sed -i 's|^#define MQTT_HOST .*|#define MQTT_HOST "localhost"|' indi2mqtt.h
-
-mkdir -p build
-cd build
-cmake -DCMAKE_INSTALL_PREFIX=/usr ..
-make
-
 # REMOVED: pyindi-client install
 # pip install pyindi-client --no-cache-dir
 
