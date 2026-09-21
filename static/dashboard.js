@@ -364,6 +364,11 @@ function loadGlobalCO2() {
                 color: '#383838'
             };
         }
+        if (name === 'wind_direction') {
+            lineLayout.yaxis.tickmode = 'array';
+            lineLayout.yaxis.tickvals = [0, 45, 90, 135, 180, 225, 270, 315, 360];
+            lineLayout.yaxis.ticktext = ['N','NE','E','SE','S','SW','W','NW','N'];
+        }
 
         const trace = {
             x: [],
