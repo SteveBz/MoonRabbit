@@ -1,4 +1,0 @@
-tox
-black
-black[jupyter]
-pytest
