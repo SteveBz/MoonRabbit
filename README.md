@@ -137,6 +137,7 @@ cd MoonRabbit/
 python3 -m venv venv
 . venv/bin/activate
 sh install3.sh
+sh install-sw.sh
 sh install.sh
 ```
 
