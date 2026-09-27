@@ -164,6 +164,11 @@ class SensorModule:
         
         logger.info(f"have_sht41={self.have_sht41}  have_sgp41={self.have_sgp41}")
 
+        # Re-attribute T/H to SHT41 for aggregates if it's present
+        if self.have_sht41:
+            self.SENSOR_SOURCE_MAP['temperature'] = 'sht41'
+            self.SENSOR_SOURCE_MAP['humidity']    = 'sht41'
+        
         # MQTT client for receiving Vantage weather data from indi2mqtt
         self.device_readings = {}
         self._mqtt_lock = threading.Lock()
@@ -322,12 +327,25 @@ class SensorModule:
             self.pressure_val    = sample.pressure
         except Exception as e:
             logger.error(f"BME280 read failed: {e}")
-        
+
+    def _read_sht41(self):
+        """If SHT41 present, override BME280 temperature/humidity with its readings."""
+        if not self.have_sht41:
+            return
+        try:
+            self.temperature_val = self.sht41.temperature
+            self.humidity_val    = self.sht41.relative_humidity
+        except Exception as e:
+            logger.error(f"SHT41 read failed: {e}")
+    
     def get_sensor_readings(self):
         print ("get_sensor_readings")
         # Re-read BME280 first – Vantage may not be available
         self._read_bme280()
-
+        
+        # SHT41 (if present) overrides BME280 T/H before SCD30 offset calc
+        self._read_sht41()
+        
         self.co2_val = self.read_values()
         # If Vantage was present at startup, override BME280 values with latest MQTT readings
         vantage_fresh = (time.time() - self._last_vantage_update) < 60
@@ -384,13 +402,12 @@ class SensorModule:
                 else:
                     logger.info(f"DEBUG: {key} not in device_readings, skipping")
         else:
-            # No Vantage: temp/hum/pressure come from the BME280 values
-            source_sensor = 'bme280'
-            logger.info("DEBUG: vantage_fresh=False, inserting bme280 temp/hum/pressure")
-            db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'temperature', self.temperature_val)
-            db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'humidity',    self.humidity_val)
-            db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long, 'pressure',    self.pressure_val)
-
+            # No Vantage: pressure is always BME280; temp/hum come from SHT41 if present
+            th_sensor = 'sht41' if self.have_sht41 else 'bme280'
+            logger.info(f"DEBUG: vantage_fresh=False, inserting temp/hum from {th_sensor}, pressure from bme280")
+            db_manager.insert_measurement(self.device, th_sensor,  self.lat, self.long, 'temperature', self.temperature_val)
+            db_manager.insert_measurement(self.device, th_sensor,  self.lat, self.long, 'humidity',    self.humidity_val)
+            db_manager.insert_measurement(self.device, 'bme280',   self.lat, self.long, 'pressure',    self.pressure_val)    
         
         values = {}
         for attr, key in self.ATTR_TO_READING.items():
