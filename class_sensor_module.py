@@ -1,11 +1,26 @@
 import smbus2 # pip3 install smbus2
-import bme280 # pip3 install RPi.bme280
 import math
 import busio # pip3 install adafruit-blinka
 import board # pip3 install adafruit-blinka RPI.GPIO
 
+
+import bme280 # pip3 install RPi.bme280
 #import adafruit_scd4x #pip3 install adafruit-circuitpython-scd4x
 import adafruit_scd30 # pip3 install adafruit-circuitpython-scd30
+# --- New sensors (SHT41 temp/humidity, SGP41 VOC/NOx) ---
+# pip install adafruit-circuitpython-sht4x adafruit-circuitpython-sgp41
+try:
+    from adafruit_sht4x import SHT4x
+    SHT4X_AVAILABLE = True
+except ImportError:
+    SHT4X_AVAILABLE = False
+
+try:
+    from adafruit_sgp41 import SGP41
+    SGP41_AVAILABLE = True
+except ImportError:
+    SGP41_AVAILABLE = False
+
 from urllib.request import urlopen
 from class_config_mgt import ConfigManager
 from datetime import datetime, timedelta
@@ -73,6 +88,10 @@ class SensorModule:
         self.temp = None
         self.hum = None
         self.co2 = None
+        self.sht41 = None
+        self.sgp41 = None
+        self.have_sht41 = False
+        self.have_sgp41 = False
         config_manager = ConfigManager("config.json")
         self.lat=config_manager.get_lat()
         self.long=config_manager.get_long()
@@ -117,6 +136,30 @@ class SensorModule:
         self.pressure_val = sample_reading.pressure
         self.scd = adafruit_scd30.SCD30(i2c_bus=self.i2c, ambient_pressure = int(self.pressure_val))
         self.scd.self_calibration_enabled=False
+
+        # --- SHT41 (temperature + humidity) ---
+        if SHT4X_AVAILABLE:
+            try:
+                self.sht41 = SHT4x(self.i2c)
+                self.have_sht41 = True
+                logger.info("SHT41: opened OK")
+            except Exception as e:
+                logger.error(f"SHT41: failed to open -> {e}")
+        else:
+            logger.warning("SHT41: library not installed")
+        
+        # --- SGP41 (VOC / NOx) ---
+        if SGP41_AVAILABLE:
+            try:
+                self.sgp41 = SGP41(self.i2c)
+                self.have_sgp41 = True
+                logger.info("SGP41: opened OK")
+            except Exception as e:
+                logger.error(f"SGP41: failed to open -> {e}")
+        else:
+            logger.warning("SGP41: library not installed")
+        
+        logger.info(f"have_sht41={self.have_sht41}  have_sgp41={self.have_sgp41}")
 
         # MQTT client for receiving Vantage weather data from indi2mqtt
         self.device_readings = {}
