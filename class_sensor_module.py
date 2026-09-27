@@ -24,6 +24,12 @@ except Exception as e:
     traceback.print_exc()
     SGP41_AVAILABLE = False
 
+from adafruit_sgp41.gas_index_algorithm import (
+    GasIndexAlgorithm,
+    ALGORITHM_TYPE_VOC,
+    ALGORITHM_TYPE_NOX,
+)
+
 from urllib.request import urlopen
 from class_config_mgt import ConfigManager
 from datetime import datetime, timedelta
@@ -95,6 +101,16 @@ class SensorModule:
         self.sgp41 = None
         self.have_sht41 = False
         self.have_sgp41 = False
+
+        self.voc_index   = None
+        self.nox_index   = None
+        self.voc_raw     = None
+        self.nox_raw     = None
+        self._voc_alg    = None
+        self._nox_alg    = None
+        self._sgp41_lock = threading.Lock()
+        self._stop_sgp41 = threading.Event()
+        
         config_manager = ConfigManager("config.json")
         self.lat=config_manager.get_lat()
         self.long=config_manager.get_long()
@@ -151,16 +167,36 @@ class SensorModule:
         else:
             logger.warning("SHT41: library not installed")
         
-        # --- SGP41 (VOC / NOx) ---
+        # --- SGP41 (VOC / NOx) ---# --- SGP41 (VOC / NOx) ---
         if SGP41_AVAILABLE:
             try:
                 self.sgp41 = SGP41(self.i2c)
-                self.have_sgp41 = True
                 logger.info("SGP41: opened OK")
+        
+                # 10 s conditioning — best if sensor has been off >10 h
+                logger.info("SGP41: running conditioning (10 s)...")
+                self.sgp41.conditioning()
+                logger.info("SGP41: conditioning complete")
+        
+                # Gas Index Algorithm instances (1 Hz sampling internally)
+                self._voc_alg = GasIndexAlgorithm(ALGORITHM_TYPE_VOC)
+                self._nox_alg = GasIndexAlgorithm(ALGORITHM_TYPE_NOX)
+        
+                self.have_sgp41 = True
+                threading.Thread(target=self._sgp41_sampler, daemon=True).start()
+                logger.info("SGP41: 1 Hz sampler thread started")
             except Exception as e:
-                logger.error(f"SGP41: failed to open -> {e}")
+                logger.error(f"SGP41: init failed -> {e}")
+                self.have_sgp41 = False
         else:
             logger.warning("SGP41: library not installed")
+        
+        # Register VOC/NOx in the source/attribute maps if SGP41 is present
+        if self.have_sgp41:
+            self.SENSOR_SOURCE_MAP['voc'] = 'sgp41'
+            self.SENSOR_SOURCE_MAP['nox'] = 'sgp41'
+            self.ATTR_TO_READING['voc_index'] = 'voc'
+            self.ATTR_TO_READING['nox_index'] = 'nox'
         
         logger.info(f"have_sht41={self.have_sht41}  have_sgp41={self.have_sgp41}")
 
@@ -193,6 +229,8 @@ class SensorModule:
         lock.release_lock(force=True)
 
     def __del__(self):
+        if getattr(self, "_stop_sgp41", None):
+            self._stop_sgp41.set()
         if getattr(self, "_stop_watchdog", None):
             self._stop_watchdog.set()
         if getattr(self, "_mqtt_client", None):
@@ -337,7 +375,41 @@ class SensorModule:
             self.humidity_val    = self.sht41.relative_humidity
         except Exception as e:
             logger.error(f"SHT41 read failed: {e}")
+
+    def _sgp41_sampler(self):
+        """Sample SGP41 at 1 Hz, run gas index algorithms, cache latest indices."""
+        next_tick = time.monotonic()
+        while not self._stop_sgp41.is_set():
+            try:
+                t = self.temperature_val if self.temperature_val is not None else 25.0
+                h = self.humidity_val    if self.humidity_val    is not None else 50.0
+                t = max(-10.0, min(50.0,  t))
+                h = max(  0.0, min(100.0, h))
     
+                self.sgp41.temperature = t
+                self.sgp41.relative_humidity = h
+    
+                voc_raw, nox_raw = self.sgp41.measure_raw()
+                voc_idx = self._voc_alg.process(voc_raw)
+                nox_idx = self._nox_alg.process(nox_raw)
+    
+                with self._sgp41_lock:
+                    self.voc_raw   = voc_raw
+                    self.nox_raw   = nox_raw
+                    self.voc_index = voc_idx
+                    self.nox_index = nox_idx
+            except Exception as e:
+                logger.error(f"SGP41 sample failed: {e}")
+    
+            # Maintain a strict 1 Hz cadence regardless of how long the I2C call took
+            next_tick += 1.0
+            sleep_for = next_tick - time.monotonic()
+            if sleep_for > 0:
+                self._stop_sgp41.wait(sleep_for)
+            else:
+                next_tick = time.monotonic()  # we fell behind; resync
+                
+
     def get_sensor_readings(self):
         print ("get_sensor_readings")
         # Re-read BME280 first – Vantage may not be available
@@ -345,6 +417,10 @@ class SensorModule:
         
         # SHT41 (if present) overrides BME280 T/H before SCD30 offset calc
         self._read_sht41()
+
+        with self._sgp41_lock:
+            voc_idx = self.voc_index
+            nox_idx = self.nox_index
         
         self.co2_val = self.read_values()
         # If Vantage was present at startup, override BME280 values with latest MQTT readings
@@ -383,7 +459,10 @@ class SensorModule:
 
         # CO2 always comes from the SCD30
         db_manager.insert_measurement(self.device, 'scd30', self.lat, self.long, 'co2', self.co2_val)
-
+        if voc_idx is not None:
+            db_manager.insert_measurement(self.device, 'sgp41', self.lat, self.long, 'voc', voc_idx)
+        if nox_idx is not None:
+            db_manager.insert_measurement(self.device, 'sgp41', self.lat, self.long, 'nox', nox_idx)
 
         vantage_fresh = (time.time() - self._last_vantage_update) < 60
         if vantage_fresh and self.device_readings:
@@ -457,7 +536,9 @@ class SensorModule:
             f"Temperature: {self.temperature_val:.1f} *C, "
             f"Humidity: {self.humidity_val:.1f} %, "
             f"CO2: {int(self.co2_val):,d} ppm, "
-            f"Pressure: {int(self.pressure_val):,d} mBars"
+            f"Pressure: {int(self.pressure_val):,d} mBars, "
+            f"VOC: {voc_idx if voc_idx is not None else 'n/a'}, "
+            f"NOx: {nox_idx if nox_idx is not None else 'n/a'}"
         )
         
         # Log the message
