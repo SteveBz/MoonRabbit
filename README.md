@@ -64,9 +64,18 @@ Swap Memory is 100 MB
 ```
 sudo nano /etc/rpi/swap.conf
 ```
-Add swap size, 1024 MB
+Check swap size, 1024 MB
 ```
+[Zram]
+#RamMultiplier=1
+#MaxSizeMiB=2048
+#FixedSizeMiB=
+# Writeback settings (for zram+file mechanism):
+#WritebackTrigger=auto
+#WritebackInitialDelay=180min
+#WritebackPeriodicInterval=24h
 zram-size = 1024M
+
 ```
 Use Control-s to save the changes and control-x to exit nano.
 Then reboot Moon Rabbit, to apply the changes.
