@@ -219,6 +219,8 @@ function loadGlobalCO2() {
         if (name.includes('humidity')) return 'bxs-droplet-half';
         if (name.includes('pressure') || name.includes('barometer')) return 'bxs-tachometer';
         if (name.includes('co2') || name.includes('carbon')) return 'bxs-flask';
+        if (name.includes('voc'))  return 'bxs-leaf';
+        if (name.includes('nox'))  return 'bxs-flame';
         if (name.includes('wind_speed') || name.includes('speed')) return 'bx-wind';
         if (name.includes('wind_direction') || name.includes('direction')) return 'bxs-compass';
         if (name.includes('rain')) return 'bxs-cloud-rain';
@@ -414,9 +416,11 @@ function loadGlobalCO2() {
                     'co2': 0,
                     'temperature': 1,
                     'humidity': 2,
-                    'wind_speed': 4,
                     'wind_direction': 3,
-                    'rain_rate': 5,
+                    'voc': 4,
+                    'nox': 5,
+                    'wind_speed': 9,
+                    'rain_rate': 10,
                     'pressure': 99   // last
                 };
                 metadataArray.sort((a, b) => {
@@ -480,7 +484,11 @@ function loadGlobalCO2() {
                 
                     // Update value box
                     const valSpan = document.getElementById('val-' + name);
-                    if (valSpan) valSpan.textContent = value.toFixed(1);
+                    if (valSpan) {
+                        valSpan.textContent = (name === 'voc' || name === 'nox')
+                            ? Math.round(value).toString()
+                            : value.toFixed(1);
+                    }
                 
                     // Update gauge
                     Plotly.update('gauge-' + name, { value: value });
