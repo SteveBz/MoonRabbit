@@ -16,9 +16,12 @@ except ImportError:
     SHT4X_AVAILABLE = False
 
 try:
-    from adafruit_sgp41 import SGP41
+    from adafruit_sgp41.sgp41 import SGP41
     SGP41_AVAILABLE = True
-except ImportError:
+except Exception as e:
+    import traceback
+    logger.error(f"SGP41 import failed: {type(e).__name__}: {e}")
+    traceback.print_exc()
     SGP41_AVAILABLE = False
 
 from urllib.request import urlopen
