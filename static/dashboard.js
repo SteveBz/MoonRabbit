@@ -201,6 +201,8 @@ function loadGlobalCO2() {
     function getDisplayName(raw) {
         // Special cases
         if (raw === 'co2') return 'CO\u2082';
+        if (raw === 'voc') return 'VOC';
+        if (raw === 'nox') return 'NOx';
         let name = raw;
         // Remove 'weather_' prefix
         if (name.startsWith('weather_')) {
