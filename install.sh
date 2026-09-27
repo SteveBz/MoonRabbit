@@ -15,6 +15,7 @@ sudo cp *.conf /etc/supervisor/conf.d/
 . venv/bin/activate
 # Install required Python packages within the virtual environment
 pip3 install flask flask-cors smbus2 RPi.bme280 adafruit-blinka==8.40.0 adafruit-circuitpython-scd30 pandas requests psutil pandas sqlalchemy  paho-mqtt
+pip install adafruit-circuitpython-sht4x adafruit-circuitpython-sgp41
 
 # REMOVED: pyindi-client install
 # pip install pyindi-client --no-cache-dir
