@@ -177,7 +177,7 @@ class SensorModule:
         self._last_vantage_update = 0.0
         self._ensure_vantage_connected()          # one attempt at startup
         threading.Thread(target=self._vantage_watchdog, daemon=True).start()
-        self._mqtt_client = mqtt.Client()
+        self._mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
         self._mqtt_client.on_connect = self._on_mqtt_connect
         self._mqtt_client.on_message = self._on_mqtt_message
         self.use_vantage = False
