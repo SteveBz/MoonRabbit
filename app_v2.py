@@ -23,6 +23,8 @@ SENSOR_METADATA = {
     "humidity":    {"unit": "%",   "min": 20,   "max": 100, "reference": 50, "color": "#00008B"},
     "pressure":    {"unit": "hPa", "min": 850, "max": 1100, "reference": 1000, "color": "#FF4500"},
     "co2":         {"unit": "ppm", "min": 200, "max": 1000, "reference": 420, "color": "#383838"},
+    "voc":         {"unit": "idx", "min": 0,   "max": 500, "reference": 100, "color": "#228B22"},
+    "nox":         {"unit": "idx", "min": 0,   "max": 500, "reference": 1,   "color": "#8B0000"},
     "sky_temperature": {"unit": "°C", "min": -30, "max": 50, "reference": 0, "color": "#8A2BE2"},
     "rain_rate":   {"unit": "mm/h", "min": 0, "max": 30, "reference": 0, "color": "#1E90FF"},
     "wind_speed":  {"unit": "m/s", "min": 0, "max": 30, "reference": 0, "color": "#32CD32"},
