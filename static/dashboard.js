@@ -227,6 +227,7 @@ function loadGlobalCO2() {
         if (name.includes('wind_direction') || name.includes('direction')) return 'bxs-compass';
         if (name.includes('rain')) return 'bxs-cloud-rain';
         if (name.includes('solar')) return 'bxs-sun';
+        if (name.includes('lux') || name.includes('light')) return 'bx-sun';
         // default
         return 'bxs-dashboard';
     }
@@ -421,6 +422,7 @@ function loadGlobalCO2() {
                     'wind_direction': 3,
                     'voc': 4,
                     'nox': 5,
+                    'lux': 8,
                     'wind_speed': 9,
                     'rain_rate': 10,
                     'pressure': 99   // last
