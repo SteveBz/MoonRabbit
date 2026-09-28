@@ -663,8 +663,33 @@ class SensorModule:
 
                 # check if external reference temperature is available
                 if hasattr(self, "temperature_val") and self.temperature_val != 0 and self.temp != 0:
-                    self.temperature_offset = self.temp - self.temperature_val
-                    self.scd.temperature_offset = self.temperature_offset
+                    raw_offset = self.temp - self.temperature_val
+                    offset = max(0.0, min(655.35, raw_offset))
+                
+                    # Log whenever the situation is unusual — negative offset, or clamp active
+                    if raw_offset < 0:
+                        logger.warning(
+                            f"SCD30 offset negative: scd30={self.temp:.2f} °C, "
+                            f"reference={self.temperature_val:.2f} °C, "
+                            f"raw_offset={raw_offset:.2f} °C — clamping to 0"
+                        )
+                    elif raw_offset > 10.0:
+                        logger.warning(
+                            f"SCD30 offset unusually large: scd30={self.temp:.2f} °C, "
+                            f"reference={self.temperature_val:.2f} °C, "
+                            f"raw_offset={raw_offset:.2f} °C"
+                        )
+                
+                    self.temperature_offset = offset
+                    try:
+                        self.scd.temperature_offset = offset
+                    except Exception as e:
+                        logger.warning(
+                            f"SCD30 temperature_offset rejected: {e} "
+                            f"(scd30={self.temp:.2f} °C, "
+                            f"reference={self.temperature_val:.2f} °C, "
+                            f"clamped_offset={offset:.2f} °C)"
+                        )
                     
                 co2_val = self.co2
                 if self.co2 < MAX_VALID_CO2:
