@@ -214,6 +214,15 @@ function loadGlobalCO2() {
         name = name.replace(/\b\w/g, c => c.toUpperCase());
         return name;
     }
+
+    function degreesToCompass(deg) {
+        if (deg === null || deg === undefined || isNaN(deg)) return '--';
+        const points = ['N','NNE','NE','ENE','E','ESE','SE','SSE',
+                        'S','SSW','SW','WSW','W','WNW','NW','NNW'];
+        const idx = Math.round(((deg % 360) + 360) % 360 / 22.5) % 16;
+        return points[idx];
+    }
+    
     function getIconForSensor(rawName) {
         const name = rawName.toLowerCase();
         console.log('getIconForSensor:', rawName);   // ADD THIS
@@ -494,9 +503,17 @@ function loadGlobalCO2() {
                     // Update value box
                     const valSpan = document.getElementById('val-' + name);
                     if (valSpan) {
-                        valSpan.textContent = (name === 'voc' || name === 'nox')
-                            ? Math.round(value).toString()
-                            : value.toFixed(1);
+                        if (name === 'wind_direction') {
+                            const speedItem = readings.find(r => r.name === 'wind_speed');
+                            const speed = speedItem ? parseFloat(speedItem.value) : null;
+                            valSpan.textContent = (speed !== null && speed < 0.5)
+                                ? 'Calm'
+                                : degreesToCompass(value);
+                        } else if (name === 'voc' || name === 'nox') {
+                            valSpan.textContent = Math.round(value).toString();
+                        } else {
+                            valSpan.textContent = value.toFixed(1);
+                        }
                     }
                 
                     // Update gauge
