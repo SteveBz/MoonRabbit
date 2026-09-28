@@ -30,6 +30,12 @@ from adafruit_sgp41.gas_index_algorithm import (
     ALGORITHM_TYPE_NOX,
 )
 
+try:
+    from adafruit_tsl2591 import TSL2591
+    TSL2591_AVAILABLE = True
+except ImportError:
+    TSL2591_AVAILABLE = False
+
 from urllib.request import urlopen
 from class_config_mgt import ConfigManager
 from datetime import datetime, timedelta
@@ -110,6 +116,15 @@ class SensorModule:
         self._nox_alg    = None
         self._sgp41_lock = threading.Lock()
         self._stop_sgp41 = threading.Event()
+        
+        self.tsl2591 = None
+        self.have_tsl2591 = False
+        self.lux_val = None
+        self.visible_val = None
+        self.infrared_val = None
+        self.full_spectrum_val = None
+
+
         
         config_manager = ConfigManager("config.json")
         self.lat=config_manager.get_lat()
@@ -205,6 +220,30 @@ class SensorModule:
             self.SENSOR_SOURCE_MAP['temperature'] = 'sht41'
             self.SENSOR_SOURCE_MAP['humidity']    = 'sht41'
         
+        # --- TSL2591 (luminosity) ---
+        if TSL2591_AVAILABLE:
+            try:
+                self.tsl2591 = TSL2591(self.i2c)
+                # Defaults are GAIN_MED (25x) and INTEGRATIONTIME_100MS.
+                # For outdoor/bright conditions, reduce gain to GAIN_LOW.
+                # For very dim conditions, increase to GAIN_HIGH or GAIN_MAX.
+                self.have_tsl2591 = True
+                logger.info("TSL2591: opened OK")
+            except Exception as e:
+                logger.error(f"TSL2591: failed to open -> {e}")
+        else:
+            logger.warning("TSL2591: library not installed")
+        
+        if self.have_tsl2591:
+            self.SENSOR_SOURCE_MAP['lux']          = 'tsl2591'
+            self.SENSOR_SOURCE_MAP['visible']      = 'tsl2591'
+            self.SENSOR_SOURCE_MAP['infrared']     = 'tsl2591'
+            self.SENSOR_SOURCE_MAP['full_spectrum'] = 'tsl2591'
+            self.ATTR_TO_READING['lux_val']           = 'lux'
+            self.ATTR_TO_READING['visible_val']       = 'visible'
+            self.ATTR_TO_READING['infrared_val']      = 'infrared'
+            self.ATTR_TO_READING['full_spectrum_val'] = 'full_spectrum'
+
         # MQTT client for receiving Vantage weather data from indi2mqtt
         self.device_readings = {}
         self._mqtt_lock = threading.Lock()
@@ -408,8 +447,19 @@ class SensorModule:
                 self._stop_sgp41.wait(sleep_for)
             else:
                 next_tick = time.monotonic()  # we fell behind; resync
-                
-
+                    
+    def _read_tsl2591(self):
+        """Read lux, visible, infrared, and full spectrum from the TSL2591."""
+        if not self.have_tsl2591:
+            return
+        try:
+            self.lux_val           = self.tsl2591.lux
+            self.visible_val       = self.tsl2591.visible
+            self.infrared_val      = self.tsl2591.infrared
+            self.full_spectrum_val = self.tsl2591.full_spectrum
+        except Exception as e:
+            logger.error(f"TSL2591 read failed: {e}")
+            
     def get_sensor_readings(self):
         print ("get_sensor_readings")
         # Re-read BME280 first – Vantage may not be available
@@ -418,6 +468,8 @@ class SensorModule:
         # SHT41 (if present) overrides BME280 T/H before SCD30 offset calc
         self._read_sht41()
 
+        self._read_tsl2591()
+        
         with self._sgp41_lock:
             voc_idx = self.voc_index
             nox_idx = self.nox_index
@@ -463,7 +515,10 @@ class SensorModule:
             db_manager.insert_measurement(self.device, 'sgp41', self.lat, self.long, 'voc', voc_idx)
         if nox_idx is not None:
             db_manager.insert_measurement(self.device, 'sgp41', self.lat, self.long, 'nox', nox_idx)
-
+        
+        if self.lux_val is not None:
+            db_manager.insert_measurement(self.device, 'tsl2591', self.lat, self.long, 'lux', self.lux_val)
+        
         vantage_fresh = (time.time() - self._last_vantage_update) < 60
         if vantage_fresh and self.device_readings:
             # One insert per reading type, values from MQTT cache
