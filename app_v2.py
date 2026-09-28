@@ -96,12 +96,14 @@ def v2_sensor_readings():
     
     # Return both readings and location
     conf = ConfigManager("config.json")
-    latitude = conf.get_lat()
+    latitude  = conf.get_lat()
     longitude = conf.get_long()
+    device_id = conf.get_device_id()
     return jsonify({
-        "readings": readings,
-        "latitude": latitude,
-        "longitude": longitude
+        "readings":  readings,
+        "latitude":  latitude,
+        "longitude": longitude,
+        "device_id": device_id
     })
 
 @app.route('/v2/refreshHistory', methods=['GET'])
