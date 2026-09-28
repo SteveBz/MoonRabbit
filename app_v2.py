@@ -29,7 +29,8 @@ SENSOR_METADATA = {
     "rain_rate":   {"unit": "mm/h", "min": 0, "max": 30, "reference": 0, "color": "#1E90FF"},
     "wind_speed":  {"unit": "m/s", "min": 0, "max": 30, "reference": 0, "color": "#32CD32"},
     "wind_direction": {"unit": "°", "min": 0, "max": 360, "reference": 0, "color": "#FFD700"},
-    "rain":        {"unit": "mm", "min": 0, "max": 500, "reference": 0, "color": "#00BFFF"}
+    "rain":        {"unit": "mm", "min": 0, "max": 500, "reference": 0, "color": "#00BFFF"},
+    "lux":           {"unit": "lux",  "min": 0, "max": 100000, "reference": 0, "color": "#FFD700"}
 }
 
 def get_active_sensor_types():
