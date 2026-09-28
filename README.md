@@ -2,7 +2,7 @@
 A Raspberry Pi powered CO2 monitoring station using Python and Flask  
 
 ![Alt text](Screenshot%202026-09-26%20205319.png)
-![Alt text](Screenshot%202024-06-08%20091122.png)
+![Alt text](Screenshot%202026-09-28%20210626.png)
 
 If starting with blank micro SD card:
 ## Flash the Micro SD card with the Rapberry Pi Imager 
