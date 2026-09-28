@@ -477,6 +477,11 @@ function loadGlobalCO2() {
                     }
                 }
                 
+                if (data.device_id !== undefined && data.device_id !== null) {
+                    const devEl = document.getElementById('device-id');
+                    if (devEl) devEl.textContent = data.device_id;
+                }
+                
                 // Process readings
 
                 const readings = data.readings || [];
