@@ -614,6 +614,18 @@ class SensorModule:
             if not sensor_reading_array:
                 logger.info(f"DEBUG: skipping empty array for {reading_type}")
                 return
+            if reading_type == 'wind_direction':
+                sin_sum = sum(math.sin(math.radians(d)) for d in sensor_reading_array)
+                cos_sum = sum(math.cos(math.radians(d)) for d in sensor_reading_array)
+                mean_val = math.degrees(math.atan2(sin_sum, cos_sum)) % 360
+                # max/min are meaningless on a circular scale — record 0 for both
+                max_val = 0
+                min_val = 0
+            else:
+                mean_val = sum(sensor_reading_array) / len(sensor_reading_array)
+                max_val = max(sensor_reading_array)
+                min_val = min(sensor_reading_array)
+            
             db_manager.insert_aggregate_data(table, mean_time, self.device, sensor_type, self.lat, self.long, reading_type, 
                 sum(sensor_reading_array)/len(sensor_reading_array), 
                 max(sensor_reading_array), 
