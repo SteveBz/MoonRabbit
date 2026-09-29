@@ -432,7 +432,7 @@ function loadGlobalCO2() {
                     'voc': 4,
                     'nox': 5,
                     'lux': 8,
-                    'wind_speed': 9,
+                    'wind_speed': 3.5,
                     'rain_rate': 10,
                     'pressure': 99   // last
                 };
