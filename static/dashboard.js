@@ -509,7 +509,7 @@ function loadGlobalCO2() {
                             valSpan.textContent = (speed !== null && speed < 0.5)
                                 ? 'Calm'
                                 : degreesToCompass(value);
-                        } else if (name === 'voc' || name === 'nox') {
+                        } else if (name === 'voc' || name === 'nox'|| name === 'pressure'|| name === 'co2'|| name === 'humidity') {
                             valSpan.textContent = Math.round(value).toString();
                         } else {
                             valSpan.textContent = value.toFixed(1);
