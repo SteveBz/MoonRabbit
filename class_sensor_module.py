@@ -7,6 +7,11 @@ import board # pip3 install adafruit-blinka RPI.GPIO
 import bme280 # pip3 install RPi.bme280
 #import adafruit_scd4x #pip3 install adafruit-circuitpython-scd4x
 import adafruit_scd30 # pip3 install adafruit-circuitpython-scd30
+
+import logging
+logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # --- New sensors (SHT41 temp/humidity, SGP41 VOC/NOx) ---
 # pip install adafruit-circuitpython-sht4x adafruit-circuitpython-sgp41
 try:
@@ -46,14 +51,10 @@ from class_database_mgt import DatabaseManager
 # for logging
 import sys
 import time
-import logging
 import threading
 import paho.mqtt.client as mqtt
 import subprocess
 
-# Set up logging
-logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
-logger = logging.getLogger(__name__)
 import os
 import json
 #from class_shipLog import logShipping
@@ -62,6 +63,7 @@ class SensorModule:
     PORT = 1
     ADDRESS = 0x76
     ADDRESS2 = 0x77
+    CUMULATIVE_KEYS = {'rain_mm'}
     # Map reading type to the sensor that produces it
     # Map attribute name to reading type (for building values dict)
     def __init__(self):
@@ -82,6 +84,8 @@ class SensorModule:
             'wind_speed': 'vantage_pro',
             'wind_direction': 'vantage_pro',
             'rain_rate': 'vantage_pro',
+            'rain_mm':   'vantage_pro',
+            'rain_today':'vantage_pro',
         }
         
         self.ATTR_TO_READING = {
@@ -92,7 +96,13 @@ class SensorModule:
             'wind_speed': 'wind_speed',
             'wind_direction': 'wind_direction',
             'rain_rate': 'rain_rate',
+            'rain_mm': 'rain_mm',
         }
+        
+        self._last_rain_time = None
+        self.rain_today = 0.0        # mm since midnight
+        self._rain_day = None        # date of current total
+        
         self.timer = 0
         self.i2c = None
         self.scd = None
@@ -124,8 +134,6 @@ class SensorModule:
         self.infrared_val = None
         self.full_spectrum_val = None
 
-
-        
         config_manager = ConfigManager("config.json")
         self.lat=config_manager.get_lat()
         self.long=config_manager.get_long()
@@ -297,7 +305,19 @@ class SensorModule:
                 self.device_readings["pressure"] = value
             elif "wind_speed"     in tail: self.device_readings["wind_speed"]     = value
             elif "wind_direction" in tail: self.device_readings["wind_direction"] = value
-            elif "rain_rate"      in tail: self.device_readings["rain_rate"]      = value
+            elif "rain_rate"      in tail:
+                self.device_readings["rain_rate"] = value
+                now = time.time()
+                if self._last_rain_time is not None:
+                    dt_h = (now - self._last_rain_time) / 3600.0
+                    # Guard against long gaps (watchdog restart, broker down)
+                    if dt_h < 0.1:
+                        inc = value * dt_h
+                        self.device_readings["rain_mm"] = (
+                            self.device_readings.get("rain_mm", 0.0) + inc
+                        )
+                        self.rain_today += inc
+                self._last_rain_time = now
             self.device_readings["device_name"] = "vantage_pro"
         self._first_mqtt_message.set()
         self._last_vantage_update = time.time()
@@ -464,10 +484,8 @@ class SensorModule:
         print ("get_sensor_readings")
         # Re-read BME280 first – Vantage may not be available
         self._read_bme280()
-        
         # SHT41 (if present) overrides BME280 T/H before SCD30 offset calc
         self._read_sht41()
-
         self._read_tsl2591()
         
         with self._sgp41_lock:
@@ -475,6 +493,11 @@ class SensorModule:
             nox_idx = self.nox_index
         
         self.co2_val = self.read_values()
+        today = datetime.now().date()
+        if self._rain_day != today:
+            self.rain_today = 0.0
+            self._rain_day = today
+        self.device_readings["rain_today"] = self.rain_today
         # If Vantage was present at startup, override BME280 values with latest MQTT readings
         vantage_fresh = (time.time() - self._last_vantage_update) < 60
         if vantage_fresh and self.device_readings:
@@ -489,6 +512,7 @@ class SensorModule:
                 self.wind_speed     = self.device_readings.get("wind_speed")
                 self.wind_direction = self.device_readings.get("wind_direction")
                 self.rain_rate      = self.device_readings.get("rain_rate")
+                self.rain_mm        = self.device_readings.get("rain_mm", 0.0)
         # Allow for zero value temp or hum in BME280
         if self.humidity_val==0 and self.hum != 0:
             self.humidity_val=self.hum
@@ -526,9 +550,14 @@ class SensorModule:
             logger.info(f"DEBUG: vantage_fresh=True, source_sensor={source_sensor}")
             logger.info(f"DEBUG: device_readings keys = {list(self.device_readings.keys())}")
             for key in ('temperature', 'humidity', 'pressure',
-                        'wind_speed', 'wind_direction', 'rain_rate'):
+                        'wind_speed', 'wind_direction', 'rain_rate',
+                        'rain_mm', 'rain_today'):
                 if key in self.device_readings:
-                    value = self.device_readings[key]
+                    if key == 'rain_mm':
+                        with self._mqtt_lock:
+                            value = self.device_readings.get("rain_mm", 0.0)
+                    else:
+                        value = self.device_readings[key]
                     logger.info(f"DEBUG: inserting {key} = {value} (sensor={source_sensor})")
                     db_manager.insert_measurement(
                         self.device, source_sensor, self.lat, self.long,
@@ -548,7 +577,13 @@ class SensorModule:
             val = getattr(self, attr, None)
             if val is not None:
                 values[key] = val
-        
+
+        # Snapshot taken into `values`; now safe to reset the accumulator.
+        # The MQTT thread may have added more since we read it — reset under lock.
+        with self._mqtt_lock:
+            self.device_readings["rain_mm"] = 0.0
+            self.rain_mm = 0.0
+
         config = sensor_values.set_time_interval_values(datetime.now().isoformat(), values)
         
         start_time = datetime.fromisoformat(config["time_intervals"]["min"]["start"])
@@ -626,10 +661,8 @@ class SensorModule:
                 max_val = max(sensor_reading_array)
                 min_val = min(sensor_reading_array)
             
-            db_manager.insert_aggregate_data(table, mean_time, self.device, sensor_type, self.lat, self.long, reading_type, 
-                sum(sensor_reading_array)/len(sensor_reading_array), 
-                max(sensor_reading_array), 
-                min(sensor_reading_array))
+            db_manager.insert_aggregate_data(table, mean_time, self.device, sensor_type, self.lat, self.long, reading_type,
+                mean_val, max_val, min_val)
                 
         def insert_record_from_value(self, table, sensor_type, reading_type, config):
             sensor_readings = config["time_intervals"][interval]
@@ -637,8 +670,9 @@ class SensorModule:
             if not sensor_readings.get("count"):
                 logger.info(f"DEBUG: skipping zero-count interval for {reading_type}")
                 return
+            divisor = 1 if reading_type in self.CUMULATIVE_KEYS else sensor_readings["count"]
             db_manager.insert_aggregate_data(table, mean_time, self.device, sensor_type, self.lat, self.long, reading_type, 
-                sensor_readings[reading_type]/sensor_readings["count"], 
+                sensor_readings[reading_type]/ divisor, 
                 0, # max - sort out later 
                 0) # min - sort out later
 
@@ -647,7 +681,16 @@ class SensorModule:
         
         if interval == "min":
             for reading_type, sensor_type in self.SENSOR_SOURCE_MAP.items():
-                if reading_type in interval_data:
+                if reading_type not in interval_data:
+                    continue
+                if reading_type in self.CUMULATIVE_KEYS:
+                    arr = interval_data[reading_type]
+                    if arr:
+                        db_manager.insert_aggregate_data(
+                            table, mean_time, self.device,
+                            sensor_type, self.lat, self.long, reading_type,
+                            sum(arr), max(arr), min(arr))
+                else:
                     insert_record_from_array(self, table, sensor_type, reading_type, config)
         else:  # hour or day
             for reading_type, sensor_type in self.SENSOR_SOURCE_MAP.items():
