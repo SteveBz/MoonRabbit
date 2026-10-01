@@ -257,6 +257,22 @@ function loadGlobalCO2() {
     function createSensorElements(name, meta) {
         const displayName = getDisplayName(name);
         const iconClass = getIconForSensor(name);
+        // Wind speed and direction are combined into one box
+        if (name === 'wind_speed' || name === 'wind_direction') {
+            // still create gauge + history containers
+            const gaugeContainer = document.getElementById('gauge-container');
+            const gaugeDiv = document.createElement('div');
+            gaugeDiv.className = 'gauge-box';
+            gaugeDiv.id = 'gauge-' + name;
+            gaugeContainer.appendChild(gaugeDiv);
+        
+            const historyContainer = document.getElementById('history-container');
+            const histDiv = document.createElement('div');
+            histDiv.className = 'history-divs';
+            histDiv.id = 'history-' + name;
+            historyContainer.appendChild(histDiv);
+            return;
+        }
         // Value box
         const boxContainer = document.getElementById('sensor-boxes');
         const box = document.createElement('div');
@@ -452,6 +468,28 @@ function loadGlobalCO2() {
                     createSensorElements(name, meta);
                 });
                 Object.keys(sensors).forEach(name => createChartsForSensor(name));
+                // Combined Wind box
+                if (sensors['wind_speed'] || sensors['wind_direction']) {
+                    const boxContainer = document.getElementById('sensor-boxes');
+                    const box = document.createElement('div');
+                    box.className = 'box';
+                    box.id = 'sensor-wind';
+                    box.innerHTML = `
+                        <div class="right-side">
+                            <div class="box-topic">Wind</div>
+                            <div class="number" id="val-wind">--</div>
+                        </div>
+                        <i class="bx bx-wind readings" style="color:#32CD32"></i>
+                    `;
+                    // Insert where wind_speed would have been
+                    const firstWind = document.getElementById('sensor-wind_speed')
+                                   || document.getElementById('sensor-wind_direction');
+                    if (firstWind) {
+                        boxContainer.insertBefore(box, firstWind);
+                    } else {
+                        boxContainer.appendChild(box);
+                    }
+                }
 
                 // Read current dropdown selection
                 const btnText = document.querySelector('.dropbtn')?.textContent.trim().toLowerCase().replace(' ', '_');
@@ -499,7 +537,18 @@ function loadGlobalCO2() {
                     const sensor = sensors[name];
                     if (!sensor) return;
                     const value = parseFloat(item.value);
-                
+
+
+                    if (name === 'wind_speed' || name === 'wind_direction') {
+                        const spd = sensors['wind_speed']?.yArray.slice(-1)[0];
+                        const dir = sensors['wind_direction']?.yArray.slice(-1)[0];
+                        const el = document.getElementById('val-wind');
+                        if (el) {
+                            const s = (spd != null) ? spd.toFixed(0) : '--';
+                            const d = (dir != null) ? degreesToCompass(dir) : '--';
+                            el.textContent = `${s} m/s ${d}`;
+                        }
+                    }
                     // Update value box
                     const valSpan = document.getElementById('val-' + name);
                     if (valSpan) {
@@ -565,6 +614,18 @@ function loadGlobalCO2() {
                         }
                     }
                 });
+
+                // (at the very end of the readings.forEach body, after pushes)
+                if (name === 'wind_speed' || name === 'wind_direction') {
+                    const spd = sensors['wind_speed']?.yArray.slice(-1)[0];
+                    const dir = sensors['wind_direction']?.yArray.slice(-1)[0];
+                    const el = document.getElementById('val-wind');
+                    if (el) {
+                        const s = (spd != null) ? Number(spd).toFixed(0) : '--';
+                        const d = (dir != null) ? degreesToCompass(Number(dir)) : '--';
+                        el.textContent = `${s} m/s ${d}`;
+                    }
+                }
                 
                 // Recompute shading from the freshly updated data window
                 const shapes = currentShapes(5 * 60 * 1000);
