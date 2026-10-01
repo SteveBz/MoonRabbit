@@ -450,7 +450,7 @@ function loadGlobalCO2() {
                     'nox': 5,
                     'lux': 8,
                     'wind_speed': 3.5,
-                    'rain_rate': 10,
+                    'rain_rate': 3,
                     'pressure': 99   // last
                 };
                 metadataArray.sort((a, b) => {
