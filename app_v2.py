@@ -27,6 +27,8 @@ SENSOR_METADATA = {
     "nox":         {"unit": "idx", "min": 0,   "max": 500, "reference": 1,   "color": "#8B0000"},
     "sky_temperature": {"unit": "°C", "min": -30, "max": 50, "reference": 0, "color": "#8A2BE2"},
     "rain_rate":   {"unit": "mm/h", "min": 0, "max": 30, "reference": 0, "color": "#1E90FF"},
+    "rain_mm":     {"unit": "mm",   "min": 0, "max": 10, "reference": 0, "color": "#1E90FF"},
+    "rain_today":  {"unit": "mm",   "min": 0, "max": 50, "reference": 0, "color": "#1E90FF"},
     "wind_speed":  {"unit": "m/s", "min": 0, "max": 30, "reference": 0, "color": "#32CD32"},
     "wind_direction": {"unit": "°", "min": 0, "max": 360, "reference": 0, "color": "#FFD700"},
     "rain":        {"unit": "mm", "min": 0, "max": 500, "reference": 0, "color": "#00BFFF"},
