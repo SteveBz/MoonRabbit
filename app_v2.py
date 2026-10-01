@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5000"}})
+# Sensor types that are stored and aggregated but not displayed on the dashboard
+HIDDEN_TYPES = {'rain_mm'}
 
 # ==============================================================
 # NEW: Sensor metadata configuration for the generic v2 API
@@ -41,7 +43,7 @@ def get_active_sensor_types():
         cursor = db.conn.cursor()
         cursor.execute("SELECT DISTINCT type FROM sensor_measurement")
         rows = cursor.fetchall()
-        types = [row[0] for row in rows]
+        types = [row[0] for row in rows if row[0] not in HIDDEN_TYPES]
         logger.info(f"Active sensor types found: {types}")
         return types
     except Exception as e:
