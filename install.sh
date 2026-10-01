@@ -17,6 +17,7 @@ sudo cp *.conf /etc/supervisor/conf.d/
 pip3 install flask flask-cors smbus2 RPi.bme280 adafruit-blinka==8.40.0 adafruit-circuitpython-scd30 pandas requests psutil pandas sqlalchemy  paho-mqtt
 pip install adafruit-circuitpython-sht4x adafruit-circuitpython-sgp41
 pip install adafruit-circuitpython-tsl2591
+pip3 install ecowitt2mqtt
 
 # REMOVED: pyindi-client install
 # pip install pyindi-client --no-cache-dir
