@@ -479,7 +479,7 @@ function loadGlobalCO2() {
                         <div class="right-side">
                             <div class="box-topic">Wind</div>
                             <div class="number" id="val-wind">--</div>
-                            <div id="val-wind-sub" style="font-size:14px;color:#888;">--</div>
+                            <div style="font-size:14px;color:#888;">m/s</div>
                         </div>
                         <i class="bx bx-wind readings" style="color:#32CD32"></i>
                     `;
@@ -543,14 +543,11 @@ function loadGlobalCO2() {
                     if (name === 'wind_speed' || name === 'wind_direction') {
                         const spd = sensors['wind_speed']?.yArray.slice(-1)[0];
                         const dir = sensors['wind_direction']?.yArray.slice(-1)[0];
-                        const el    = document.getElementById('val-wind');
-                        const elSub = document.getElementById('val-wind-sub');
+                        const el = document.getElementById('val-wind');
                         if (el) {
-                            el.textContent = (spd != null) ? Number(spd).toFixed(0) : '--';
-                        }
-                        if (elSub) {
+                            const s = (spd != null) ? Number(spd).toFixed(0) : '--';
                             const d = (dir != null) ? degreesToCompass(Number(dir)) : '--';
-                            elSub.textContent = `m/s ${d}`;
+                            el.textContent = `${s} ${d}`;
                         }
                     }
                     
