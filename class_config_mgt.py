@@ -108,6 +108,15 @@ class ConfigManager:
         
         return status
 
+    def get_weather_source(self):
+        return self.config.get("weather_source", "none")
+
+    def set_weather_source(self, source):
+        if source not in ("vantage", "ecowitt", "none"):
+            raise ValueError(f"Invalid weather_source: {source}")
+        self.config["weather_source"] = source
+        self.save_config(self.config)
+
     def set_status(self, status):
         self.config["status"] = status
         self.save_config(self.config)
