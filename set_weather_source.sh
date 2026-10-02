@@ -1,9 +1,8 @@
 #!/bin/bash
 # Usage: sudo ./set_weather_source.sh vantage|ecowitt|none
-
 set -e
-SOURCE="$1"
 
+SOURCE="$1"
 case "$SOURCE" in
     vantage|ecowitt|none) ;;
     *) echo "Usage: $0 vantage|ecowitt|none"; exit 1 ;;
@@ -19,7 +18,17 @@ if [ ! -f "$TEMPLATE" ]; then
 fi
 
 cp "$TEMPLATE" "$TARGET"
-sed -i 's/"weather_source": *"[^"]*"/"weather_source": "'"$SOURCE"'"/' "$REPO/config.json"
+
+# Update config.json
+python3 - <<PY
+import json
+p = "$REPO/config.json"
+with open(p) as f:
+    c = json.load(f)
+c["weather_source"] = "$SOURCE"
+with open(p, "w") as f:
+    json.dump(c, f, indent=4)
+PY
 
 supervisorctl reread
 supervisorctl update
