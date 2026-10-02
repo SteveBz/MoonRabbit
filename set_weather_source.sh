@@ -9,7 +9,7 @@ case "$SOURCE" in
 esac
 
 REPO=/home/pi/MoonRabbit
-TEMPLATE="$REPO/supervisor/weather-$SOURCE.conf"
+TEMPLATE="$REPO/weather-$SOURCE.conf"
 TARGET="/etc/supervisor/conf.d/weather.conf"
 
 if [ ! -f "$TEMPLATE" ]; then
@@ -17,7 +17,7 @@ if [ ! -f "$TEMPLATE" ]; then
     exit 1
 fi
 
-cp "$TEMPLATE" "$TARGET"
+sudo cp "$TEMPLATE" "$TARGET"
 
 # Update config.json
 python3 - <<PY
@@ -30,6 +30,7 @@ with open(p, "w") as f:
     json.dump(c, f, indent=4)
 PY
 
-supervisorctl reread
-supervisorctl update
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl restart SensorTimer
 echo "Weather source set to: $SOURCE"
