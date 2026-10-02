@@ -328,8 +328,6 @@ class SensorModule:
         if key == 'pressure':
             return value * 33.8639
         return value
-
-     def _on_mqtt_message(self, client, userdata, msg):
     
     def _on_mqtt_message(self, client, userdata, msg):
         tail = msg.topic.rsplit("/", 1)[-1].lower()
