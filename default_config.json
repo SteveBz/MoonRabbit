@@ -4,6 +4,7 @@
     "status": "00 - Raw",
     "lat": 51.1,
     "long": 0.0,
+    "weather_source": "none",
     "sensor_co2": "scd30",
     "sensor_pressure": "bme280",
     "last_calibration_date": 0,
