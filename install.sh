@@ -18,13 +18,6 @@ WEATHER_SOURCE="${WEATHER_SOURCE:-none}"
 cp supervisor/weather-$WEATHER_SOURCE.conf /etc/supervisor/conf.d/weather.conf
 chmod +x set_weather_source.sh
 
-# Add sudoers rule for both feeders
-sudo tee /etc/sudoers.d/sensor-restart-indiserver >/dev/null <<EOF
-pi ALL=(ALL) NOPASSWD: /usr/bin/supervisorctl restart indi2mqtt
-pi ALL=(ALL) NOPASSWD: /usr/bin/supervisorctl restart ecowitt2mqtt
-EOF
-sudo chmod 0440 /etc/sudoers.d/sensor-restart-indiserver
-
 . venv/bin/activate
 # Install required Python packages within the virtual environment
 pip3 install flask flask-cors smbus2 RPi.bme280 adafruit-blinka==8.40.0 adafruit-circuitpython-scd30 pandas requests psutil pandas sqlalchemy  paho-mqtt
@@ -55,22 +48,25 @@ if [ -z "$SUPERVISORCTL" ]; then
     echo "WARNING: supervisorctl not found — skipping sudoers rule"
 else
     EXPECTED_RULE="$SENSOR_USER ALL=(ALL) NOPASSWD: $SUPERVISORCTL restart indi2mqtt"
+    EXPECTED_RULE2="$SENSOR_USER ALL=(ALL) NOPASSWD: $SUPERVISORCTL restart ecowitt2mqtt"
 
     # If the file already contains the exact rule, do nothing.
-    if [ -f "$SUDOERS_FILE" ] && grep -qF -- "$EXPECTED_RULE" "$SUDOERS_FILE"; then
-        echo "Sudoers rule already installed: $SUDOERS_FILE"
+    if [ -f "$SUDOERS_FILE" ] \
+       && grep -qF -- "$EXPECTED_RULE"  "$SUDOERS_FILE" \
+       && grep -qF -- "$EXPECTED_RULE2" "$SUDOERS_FILE"; then
     else
-        echo "Installing sudoers rule: $SENSOR_USER may restart indi2mqtt"
+        echo "Installing sudoers rules: $SENSOR_USER may restart indi2mqtt and ecowitt2mqtt"
 
         TMP_SUDOERS=$(mktemp)
         cat > "$TMP_SUDOERS" <<EOF
-# Allow the SensorModule process to restart indi2mqtt without a password.
+# Allow the SensorModule process to restart weather feeders without a password.
 # Installed by MoonRabbit install.sh
 $EXPECTED_RULE
+$EXPECTED_RULE2
 EOF
 
         if visudo -cf "$TMP_SUDOERS" >/dev/null 2>&1; then
-            install -m 0440 -o root -g root "$TMP_SUDOERS" "$SUDOERS_FILE"
+            sudo install -m 0440 -o root -g root "$TMP_SUDOERS" "$SUDOERS_FILE"
             echo "  Installed: $SUDOERS_FILE"
         else
             echo "  ERROR: sudoers syntax check failed — not installing"
