@@ -86,6 +86,23 @@ class SensorModule:
             'rain_rate': 'vantage_pro',
             'rain_mm':   'vantage_pro',
             'rain_today':'vantage_pro',
+            'rain_hourly': 'ecowitt',
+            'uv_index':'ecowitt',
+        }
+
+        self.ECOWITT_MAP = {
+            'tempf':         'temperature',
+            'tempc':         'temperature',
+            'humidity':      'humidity',
+            'baromrelin':    'pressure',
+            'baromabsin':    'pressure',
+            'windspeedmph':  'wind_speed',
+            'winddir':       'wind_direction',
+            'rainratein':    'rain_rate',
+            'hourlyrainin':  'rain_hourly',
+            'dailyrainin':   'rain_today',
+            'solarradiation':'solar_radiation',
+            'uv':            'uv_index',
         }
         
         self.ATTR_TO_READING = {
@@ -139,6 +156,7 @@ class SensorModule:
         self.long=config_manager.get_long()
         self.device=config_manager.get_device_id()
         self.is_registered=config_manager.is_registered()
+        self.weather_source = config_manager.get_weather_source()
         #self.bus_address=config_manager.get_bus_address()
         try:
             self.bus_address = int(config_manager.get_bus_address(), 16)  # Convert hex string to int
@@ -258,8 +276,9 @@ class SensorModule:
         self._first_mqtt_message = threading.Event()
         self._stop_watchdog = threading.Event()
         self._last_vantage_update = 0.0
-        self._ensure_vantage_connected()          # one attempt at startup
-        threading.Thread(target=self._vantage_watchdog, daemon=True).start()
+        if self.weather_source == 'vantage':
+            self._ensure_vantage_connected()          # one attempt at startup
+            threading.Thread(target=self._vantage_watchdog, daemon=True).start()
         self._mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
         self._mqtt_client.on_connect = self._on_mqtt_connect
         self._mqtt_client.on_message = self._on_mqtt_message
@@ -288,10 +307,30 @@ class SensorModule:
                 pass
         if self.bus is not None:
             self.bus.close()
-    def _on_mqtt_connect(self, client, userdata, flags, rc):
-        logger.info(f"MQTT connected (rc={rc}), subscribing to indiserver/vantage/#")
-        client.subscribe("indiserver/vantage/#")
 
+    def _on_mqtt_connect(self, client, userdata, flags, rc):
+        logger.info(f"MQTT connected (rc={rc})")
+        if self.weather_source == 'vantage':
+            client.subscribe("indiserver/vantage/#")
+        elif self.weather_source == 'ecowitt':
+            client.subscribe("ecowitt/#")
+        # 'none': no weather subscription
+
+    def _ecowitt_to_metric(self, key, value):
+        """Convert ecowitt2mqtt's imperial defaults to metric.
+        If ecowitt2mqtt is run with --output-unit-system=metric, these are no-ops."""
+        if key == 'temperature':
+            return (value - 32.0) * 5.0 / 9.0
+        if key == 'wind_speed':
+            return value * 0.44704
+        if key in ('rain_rate', 'rain_hourly', 'rain_today'):
+            return value * 25.4
+        if key == 'pressure':
+            return value * 33.8639
+        return value
+
+     def _on_mqtt_message(self, client, userdata, msg):
+    
     def _on_mqtt_message(self, client, userdata, msg):
         tail = msg.topic.rsplit("/", 1)[-1].lower()
         try:
@@ -299,26 +338,34 @@ class SensorModule:
         except (ValueError, UnicodeDecodeError):
             return
         with self._mqtt_lock:
-            if   "temperature"    in tail: self.device_readings["temperature"]    = value
-            elif "humidity"       in tail: self.device_readings["humidity"]       = value
-            elif "barometer"      in tail or "pressure" in tail:
-                self.device_readings["pressure"] = value
-            elif "wind_speed"     in tail: self.device_readings["wind_speed"]     = value
-            elif "wind_direction" in tail: self.device_readings["wind_direction"] = value
-            elif "rain_rate"      in tail:
-                self.device_readings["rain_rate"] = value
-                now = time.time()
-                if self._last_rain_time is not None:
-                    dt_h = (now - self._last_rain_time) / 3600.0
-                    # Guard against long gaps (watchdog restart, broker down)
-                    if dt_h < 0.1:
-                        inc = value * dt_h
-                        self.device_readings["rain_mm"] = (
-                            self.device_readings.get("rain_mm", 0.0) + inc
-                        )
-                        self.rain_today += inc
-                self._last_rain_time = now
-            self.device_readings["device_name"] = "vantage_pro"
+            if self.weather_source == 'ecowitt':
+                key = self.ECOWITT_MAP.get(tail)
+                if key is None:
+                    return
+                value = self._ecowitt_to_metric(key, value)
+                self.device_readings[key] = value
+                self.device_readings["device_name"] = "ecowitt"
+            else:
+                # Vantage path (unchanged)
+                if   "temperature"    in tail: self.device_readings["temperature"]    = value
+                elif "humidity"       in tail: self.device_readings["humidity"]       = value
+                elif "barometer"      in tail or "pressure" in tail:
+                    self.device_readings["pressure"] = value
+                elif "wind_speed"     in tail: self.device_readings["wind_speed"]     = value
+                elif "wind_direction" in tail: self.device_readings["wind_direction"] = value
+                elif "rain_rate"      in tail:
+                    self.device_readings["rain_rate"] = value
+                    now = time.time()
+                    if self._last_rain_time is not None:
+                        dt_h = (now - self._last_rain_time) / 3600.0
+                        if dt_h < 0.1:
+                            inc = value * dt_h
+                            self.device_readings["rain_mm"] = (
+                                self.device_readings.get("rain_mm", 0.0) + inc
+                            )
+                            self.rain_today += inc
+                    self._last_rain_time = now
+                self.device_readings["device_name"] = "vantage_pro"
         self._first_mqtt_message.set()
         self._last_vantage_update = time.time()
 
@@ -381,10 +428,11 @@ class SensorModule:
                 silence = time.time() - self._last_vantage_update
                 
                 if silence > 300:                            # 5 minutes → restart indi2mqtt 
-                    logger.warning(f"MQTT silent for {silence:.0f}s — restarting indi2mqtt via supervisor")
+                    target = 'indi2mqtt' if self.weather_source == 'vantage' else 'ecowitt2mqtt'
+                    logger.warning(f"MQTT silent for {silence:.0f}s — restarting {target} via supervisor")
                     try:
                         subprocess.run(
-                            ["sudo", "supervisorctl", "restart", "indi2mqtt"],
+                            ["sudo", "supervisorctl", "restart", target],
                             timeout=15, capture_output=True
                         )
                     except Exception as e:
