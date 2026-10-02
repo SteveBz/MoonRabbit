@@ -12,6 +12,19 @@ sudo rm /etc/supervisor/conf.d/*.conf
 # Copy new Supervisor configuration files
 sudo cp *.conf /etc/supervisor/conf.d/
 
+
+# Set up the weather source template
+WEATHER_SOURCE="${WEATHER_SOURCE:-none}"
+cp supervisor/weather-$WEATHER_SOURCE.conf /etc/supervisor/conf.d/weather.conf
+chmod +x set_weather_source.sh
+
+# Add sudoers rule for both feeders
+sudo tee /etc/sudoers.d/sensor-restart-indiserver >/dev/null <<EOF
+pi ALL=(ALL) NOPASSWD: /usr/bin/supervisorctl restart indi2mqtt
+pi ALL=(ALL) NOPASSWD: /usr/bin/supervisorctl restart ecowitt2mqtt
+EOF
+sudo chmod 0440 /etc/sudoers.d/sensor-restart-indiserver
+
 . venv/bin/activate
 # Install required Python packages within the virtual environment
 pip3 install flask flask-cors smbus2 RPi.bme280 adafruit-blinka==8.40.0 adafruit-circuitpython-scd30 pandas requests psutil pandas sqlalchemy  paho-mqtt
