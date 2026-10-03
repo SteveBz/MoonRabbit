@@ -12,7 +12,6 @@ sudo rm /etc/supervisor/conf.d/*.conf
 # Copy new Supervisor configuration files
 sudo cp *.conf /etc/supervisor/conf.d/
 
-
 # Set up the weather source template
 WEATHER_SOURCE="${WEATHER_SOURCE:-none}"
 cp supervisor/weather-$WEATHER_SOURCE.conf /etc/supervisor/conf.d/weather.conf
@@ -28,7 +27,7 @@ pip3 install ecowitt2mqtt
 # REMOVED: pyindi-client install
 # pip install pyindi-client --no-cache-dir
 
-sudo apt-get update
+#sudo apt-get update
 #sudo apt-get install -y libdbus-1-dev pkg-config cmake
 #sudo apt-get install  -y libglib2.0-dev
 
