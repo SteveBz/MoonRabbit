@@ -160,7 +160,6 @@ class DatabaseManager:
                 CREATE INDEX IF NOT EXISTS idx_sensor_measurement_months_device_sensor 
                     ON sensor_measurement_months (device_id, sensor)
             ''',
-
         ]
 
         with self.conn:
