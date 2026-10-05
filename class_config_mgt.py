@@ -147,7 +147,22 @@ class ConfigManager:
     def set_long(self, long):
         self.config["long"] = round(long,4)
         self.save_config(self.config)
-        
+
+    @staticmethod
+    def _aligned_start(interval):
+        now = datetime.now()
+        if interval == "month":
+            return now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        if interval == "day":
+            return now.replace(hour=0, minute=0, second=0, microsecond=0)
+        if interval == "hour":
+            return now.replace(minute=0, second=0, microsecond=0)
+        # "min"
+        return now.replace(second=0, microsecond=0)
+
+     def get_time_interval_values(self, interval="min"):
+
+    
     def get_time_interval_values(self, interval="min"):
         if "time_intervals" not in self.config:
             self.config["time_intervals"] = {
@@ -197,7 +212,7 @@ class ConfigManager:
 
         del self.config["time_intervals"][interval]
 
-        new_data = {"start": datetime.now().isoformat()}
+        new_data = {"start": self._aligned_start(interval).isoformat()}
         if interval == "min":
             for key in sensor_keys:
                 new_data[key] = []
