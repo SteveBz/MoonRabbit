@@ -160,9 +160,6 @@ class ConfigManager:
         # "min"
         return now.replace(second=0, microsecond=0)
 
-     def get_time_interval_values(self, interval="min"):
-
-    
     def get_time_interval_values(self, interval="min"):
         if "time_intervals" not in self.config:
             self.config["time_intervals"] = {
