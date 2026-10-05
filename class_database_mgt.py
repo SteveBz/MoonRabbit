@@ -21,6 +21,7 @@ class DatabaseManager:
         self.db_file = db_file
         self.conn = self.create_connection(db_file)
         self.create_table()
+        self.backfill_monthly_if_empty()
         
     def create_connection(self, db_file):
         """
@@ -170,6 +171,44 @@ class DatabaseManager:
             except Error as e:
                 logger.error(f"Cursor error = '{e}'")
 
+    def backfill_monthly_if_empty(self):
+        """One-off: populate sensor_measurement_months from sensor_measurement_days
+        if the monthly table has no rows yet. Safe to call repeatedly."""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM sensor_measurement_months")
+            if cursor.fetchone()[0] > 0:
+                return                          # already populated
+    
+            cursor.execute("""
+                INSERT INTO sensor_measurement_months
+                    (device_id, sensor, type, latitude, longitude, transferred,
+                     date, value, max_value, min_value)
+                SELECT device_id, sensor, type, latitude, longitude, 0,
+                       strftime('%Y-%m-01 00:00:00', date),
+                       AVG(value), MAX(max_value), MIN(min_value)
+                FROM sensor_measurement_days
+                WHERE type NOT IN ('rain_mm')
+                GROUP BY device_id, sensor, type, latitude, longitude,
+                         strftime('%Y-%m-01 00:00:00', date)
+            """)
+            cursor.execute("""
+                INSERT INTO sensor_measurement_months
+                    (device_id, sensor, type, latitude, longitude, transferred,
+                     date, value, max_value, min_value)
+                SELECT device_id, sensor, type, latitude, longitude, 0,
+                       strftime('%Y-%m-01 00:00:00', date),
+                       SUM(value), 0, 0
+                FROM sensor_measurement_days
+                WHERE type = 'rain_mm'
+                GROUP BY device_id, sensor, type, latitude, longitude,
+                         strftime('%Y-%m-01 00:00:00', date)
+            """)
+            self.conn.commit()
+            logger.info("Monthly aggregates backfilled from daily table.")
+        except sqlite3.Error as e:
+            logger.error(f"Monthly backfill failed: {e}")
+    
     def select_measurements_by_type(self, sensor_type: str) -> dict:
         """
         Query all rows in the sensor_measurement table with a specific type.
