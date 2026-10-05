@@ -135,6 +135,30 @@ class DatabaseManager:
                 CREATE INDEX IF NOT EXISTS idx_sensor_measurement_days_device_sensor 
                     ON sensor_measurement_days (device_id, sensor)
             ''',
+            '''
+                CREATE TABLE IF NOT EXISTS sensor_measurement_months (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    device_id INTEGER NOT NULL,
+                    sensor TEXT NOT NULL,
+                    type TEXT NOT NULL,
+                    latitude REAL NOT NULL,
+                    longitude REAL NOT NULL,
+                    transferred BOOLEAN NOT NULL DEFAULT 0,
+                    date TIMESTAMP NOT NULL,
+                    value REAL NOT NULL,
+                    max_value REAL NOT NULL,
+                    min_value REAL NOT NULL,
+                    UNIQUE(device_id, sensor, type, latitude, longitude, date)
+                )
+            ''',
+            '''
+                CREATE INDEX IF NOT EXISTS idx_sensor_measurement_months 
+                    ON sensor_measurement_months (date)
+            ''',
+            '''
+                CREATE INDEX IF NOT EXISTS idx_sensor_measurement_months_device_sensor 
+                    ON sensor_measurement_months (device_id, sensor)
+            ''',
 
         ]
 
@@ -211,6 +235,7 @@ class DatabaseManager:
             group_comment = ''
             groupPeriod = 'month'
             start_time = now - timedelta(days=3652)  # Approximately 10 years
+            table = 'sensor_measurement_months'
         else:
             raise ValueError(f"Invalid duration (Duration = {duration}) specified. Use 'hour', 'day', 'month', or 'year'.")
 
@@ -330,7 +355,7 @@ class DatabaseManager:
             'sensor_measurement_mins',
             'sensor_measurement_hours',
             'sensor_measurement_days',
-            'sensor_measurement_monthly'
+            'sensor_measurement_months'
         ]
     
         # Update each table
