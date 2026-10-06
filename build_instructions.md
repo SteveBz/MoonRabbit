@@ -10,7 +10,7 @@ here are the strep-by-step build instructions.
 
 | ![MR5](MR5.jpeg) | ![MR6](MR6.jpeg) |
 |:---:|:---:|
-| Place insert into hole (part 3) | Place insert into hole (part 3) |
+| Place insert into hole (part 3) | Place insert into hole (part 4) |
 
 | ![MR7](MR7.jpeg) | ![MR8](MR8.jpeg) |
 |:---:|:---:|
