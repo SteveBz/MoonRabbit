@@ -4,7 +4,7 @@ A Raspberry Pi powered CO2 monitoring station using Python and Flask
 ![Alt text](Screenshot%202026-09-26%20205319.png)
 ![Alt text](Screenshot%202026-09-28%20210626.png)
 
-Once you have 3D printed the Moon Rabbit case from the STL flies from the two files here, you can put them together with the build instructions here: build_instructions.md
+Once you have 3D printed the Moon Rabbit case from the STL flies from the two files here, you can put them together with the build instructions here: `build_instructions.md'
 
 Once you have built the Moon Rabbit
 
