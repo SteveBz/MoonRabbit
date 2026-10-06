@@ -6,9 +6,13 @@ A Raspberry Pi powered CO2 monitoring station using Python and Flask
 | Moon Rabbit Sensors  | Moon Rabbit Control Panel |
 | ![Alt text](MR30.jpeg) |  |
 
-Once you have 3D printed the Moon Rabbit case from the STL flies from the two files here  [MoonRabbitCase_v0.4.stl](MoonRabbitCase_v0.4.stl) , you can put them together with the build instructions here: [Build instructions](build_instructions.md#)
+Once you have 3D printed the Moon Rabbit case from the STL flies from the two files here  [MoonRabbitCase_v0.4.stl](MoonRabbitCase_v0.4.stl) and here [CarbonSensorStand_v0.9.stl](CarbonSensorStand_v0.9.stl), you can put them together with the build instructions here: [Build instructions](build_instructions.md#)
 
 Once you have built the Moon Rabbit
+
+You can install the software here
+
+# Software installation #
 
 If starting with blank micro SD card:
 ## Flash the Micro SD card with the Rapberry Pi Imager 
