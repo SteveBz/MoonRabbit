@@ -3,7 +3,7 @@ here are the strep-by-step build instructions.
 
 | ![MR1](MR1.jpeg) | ![MR2](MR2.jpeg) |
 |:---:|:---:|
-| Caption for image 1 | Caption for image 2 |
+| Take the Moon Rabbit case and stand | Caption for image 2 |
 | ![MR3](MR3.jpeg) | ![MR4](MR4.jpeg) |
 |:---:|:---:|
 | Raspberry Pi Zero 2 W with 3D printed case parts | Assembling the 3D printed case |
