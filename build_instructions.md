@@ -24,3 +24,9 @@ here are the strep-by-step build instructions.
 | Close-up of the Qwiic pHAT connection | Tightening the assembly screws |
 | ![MR21](MR21.jpeg) | ![MR22](MR22.jpeg) |
 | Close-up of screwdriver work | Pi Zero mounted on the green base plate |
+| ![MR23](MR23.jpeg) | ![MR24](MR24.jpeg) |
+| Assembled Pi Zero and Qwiic pHAT next to the case | Connecting the Qwiic pHAT ribbon cable |
+| ![MR25](MR25.jpeg) | ![MR26](MR26.jpeg) |
+| Securing the Qwiic pHAT to the Pi Zero stack | Close-up of tightening the assembly screws |
+| ![MR27](MR27.jpeg) |  |
+| Final components laid out before final assembly |  |
