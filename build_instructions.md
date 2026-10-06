@@ -6,11 +6,11 @@ here are the strep-by-step build instructions.
 | Take the Moon Rabbit case and stand | And four inserts and bolts |
 | ![MR3](MR3.jpeg) | ![MR4](MR4.jpeg) |
 |:---:|:---:|
-| Raspberry Pi Zero 2 W with 3D printed case parts | Assembling the 3D printed case |
+| Use soldering iron to place insert into hole (part 1) | Place insert into hole (part 2) |
 
 | ![MR5](MR5.jpeg) | ![MR6](MR6.jpeg) |
 |:---:|:---:|
-| Disassembled components on the workbench | Installing heat-set inserts with a soldering iron |
+| Place insert into hole (part 3) | Place insert into hole (part 3) |
 
 | ![MR7](MR7.jpeg) | ![MR8](MR8.jpeg) |
 |:---:|:---:|
