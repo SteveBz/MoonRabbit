@@ -2,11 +2,9 @@
 A Raspberry Pi powered CO2 monitoring station using Python and Flask  
 
 
-|![MR0](MR0.jpeg)||
-| :----------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-|    I use the HOMTRONICS electric screwdriver.  It's much easier.   | 
-
-|![Alt text](Screenshot%202026-09-26%20205319.png)|![Alt text](Screenshot%202026-09-28%20210626.png)|
+| ![Alt text](Screenshot%202026-09-26%20205319.png) | ![Alt text](Screenshot%202026-09-28%20210626.png) |
+|:---:|:---:|
+| Moon Rabbit Sensors  | Mo0n Rabbit Control Panel |
 
 Once you have 3D printed the Moon Rabbit case from the STL flies from the two files here, you can put them together with the build instructions here: [Build instructions](build_instructions.md#)
 
