@@ -1,8 +1,11 @@
 # Moon Rabbit CO2 Sensor Build Instructions
 here are the strep-by-step build instructions.
 
-| ![MR1](MR1.jpeg) | ![MR2](MR2.jpeg) |
+
+| ![MR0](MR0.jpeg) | |
 |:---:|:---:|
+| HOMTRONICS electric screwdriver | |
+| ![MR1](MR1.jpeg) | ![MR2](MR2.jpeg) |
 | Take the Moon Rabbit case and stand | And four inserts and bolts |
 | ![MR3](MR3.jpeg) | ![MR4](MR4.jpeg) |
 | Use soldering iron to place insert into hole (part 1) | Place insert into hole (part 2) |
@@ -30,3 +33,7 @@ here are the strep-by-step build instructions.
 | Securing the Qwiic pHAT to the Pi Zero stack | Close-up of tightening the assembly screws |
 | ![MR27](MR27.jpeg) |  |
 | Final components laid out before final assembly |  |
+| ![MR28](MR28.jpeg) | ![MR29](MR29.jpeg) |
+| Partial assembly of the electronics and case | Close-up of the Qwiic pHAT and sensor stack |
+| ![MR31](MR31.jpeg) |  |
+| Lexar 32GB microSD card and Integral card reader ||
