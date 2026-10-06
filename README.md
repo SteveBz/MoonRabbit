@@ -1,7 +1,6 @@
 # Moon Rabbit CO2 Sensor (Raspberry Pi, scd30, bme280, flask & python)
 A Raspberry Pi powered CO2 monitoring station using Python and Flask  
 
-
 | ![Alt text](Screenshot%202026-09-26%20205319.png) | ![Alt text](Screenshot%202026-09-28%20210626.png) |
 |:---:|:---:|
 | Moon Rabbit Sensors  | Mo0n Rabbit Control Panel |
