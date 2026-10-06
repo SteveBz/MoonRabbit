@@ -1,5 +1,5 @@
-# Moon Rabbit CO2 Sensor (Raspberry Pi, scd30, bme280, flask & python)
-A Raspberry Pi powered CO2 monitoring station using Python and Flask. It starts with the SCD30 CO2 sensor and the BME280 temperature, humidity and pressure sensor.  It can easily be upgraded to included the SHT41 sensor with greater precision for temperature and humidity and the SGP41 for NOx and VOC air quality sensor.  It is also compatible with a number of weather stations, Notably the Davies Vantage Pro Series, the Ambient Weather station and Ecowitt stations.
+# Moon Rabbit CO<sub>2</sub> Sensor (Raspberry Pi, scd30, bme280, flask & python)
+A Raspberry Pi powered CO<sub>2</sub> monitoring station using Python and Flask. It starts with the SCD30 CO2 sensor and the BME280 temperature, humidity and pressure sensor.  It can easily be upgraded to included the SHT41 sensor with greater precision for temperature and humidity and the SGP41 for NOx and VOC air quality sensor.  It is also compatible with a number of weather stations, Notably the Davies Vantage Pro Series, the Ambient Weather station and Ecowitt stations.
 
 | ![Alt text](Screenshot%202026-09-26%20205319.png) | ![Alt text](Screenshot%202026-09-28%20210626.png) |
 |:---:|:---:|
