@@ -9,7 +9,7 @@ here are the strep-by-step build instructions.
 | ![MR5](MR5.jpeg) | ![MR6](MR6.jpeg) |
 | Place insert into hole (part 3) | Place insert into hole (part 4) |
 | ![MR7](MR7.jpeg) | ![MR8](MR8.jpeg) |
-| Close-up of heat-set insert installation | Using pliers to hold the insert |
+| Place insert into hole (part 5) | Finished article with four inserts |
 | ![MR9](MR9.jpeg) | ![MR10](MR10.jpeg) |
 | Applying heat to the insert | Securing the insert with a screwdriver |
 | ![MR11](MR11.jpeg) | ![MR12](MR12.jpeg) |
