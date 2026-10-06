@@ -53,6 +53,7 @@ else
     if [ -f "$SUDOERS_FILE" ] \
        && grep -qF -- "$EXPECTED_RULE"  "$SUDOERS_FILE" \
        && grep -qF -- "$EXPECTED_RULE2" "$SUDOERS_FILE"; then
+       :
     else
         echo "Installing sudoers rules: $SENSOR_USER may restart indi2mqtt and ecowitt2mqtt"
 
