@@ -665,24 +665,24 @@ class SensorModule:
         retval=(self.temperature_val, self.pressure_val, self.humidity_val, self.co2_val, self.lat, self.long)
             
         # Construct the message as a single formatted string
-        lux_str  = f"Lux: {self.lux_val:.0f}" if self.lux_val is not None else "Lux: n/a"
-        voc_str  = f"VOC: {voc_idx}" if voc_idx is not None else "VOC: n/a"
-        nox_str  = f"NOx: {nox_idx}" if nox_idx is not None else "NOx: n/a"
-        scd_t_str = f"SCD30_T: {self.temp:.1f} *C" if self.temp is not None else "SCD30_T: n/a"
-        
+        lux_str   = f"Lux: {self.lux_val:.0f}, " if self.lux_val is not None else ""
+        voc_str   = f"VOC: {voc_idx}, "           if voc_idx is not None else ""
+        nox_str   = f"NOx: {nox_idx}, "           if nox_idx is not None else ""
+        scd_t_str = f"SCD30_T: {self.temp:.1f} *C, " if self.temp is not None else ""
+
         log_message = (
             f"{datetime.now().isoformat()} - "
             f"Latitude: {self.lat}, "
             f"Longitude: {self.long}, "
             f"Temperature: {self.temperature_val:.1f} *C, "
-            f"{scd_t_str}, "
+            f"{scd_t_str}"
             f"Humidity: {self.humidity_val:.1f} %, "
             f"CO2: {int(self.co2_val):,d} ppm, "
             f"Pressure: {int(self.pressure_val):,d} mBars, "
-            f"{lux_str}, "
-            f"{voc_str}, "
+            f"{lux_str}"
+            f"{voc_str}"
             f"{nox_str}"
-        )
+        ).rstrip(", ")
         # Log the message
         logger.info(log_message)
         
