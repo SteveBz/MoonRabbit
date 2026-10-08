@@ -4,10 +4,10 @@ A Raspberry Pi powered CO<sub>2</sub> monitoring station using Python and Flask.
 
 It is a micro server which attaches to your WiFi to give you 24x7 CO<sub>2</sub> and other climate indicators.
 
-| ![Alt text](Screenshot%202026-09-26%20205319.png) | ![Alt text](Screenshot%202026-09-28%20210626.png) |
+| ![Alt text](images/Screenshot%202026-09-26%20205319.png) | ![Alt text](images/Screenshot%202026-09-28%20210626.png) |
 |:---:|:---:|
 | Moon Rabbit Sensors  | Moon Rabbit Control Panel |
-| ![Alt text](MR30.jpeg) |  |
+| ![Alt text](images/MR30.jpeg) |  |
 
 # 3D Print Moon Rabbit base and cover
 
