@@ -8,6 +8,7 @@ It is a micro server which attaches to your WiFi to give you 24x7 CO<sub>2</sub>
 |:---:|:---:|
 | Moon Rabbit Sensors  | Moon Rabbit Control Panel |
 | ![Alt text](images/MR30.jpeg) |  |
+| 3D printed case with Raspberry Pi Zero 2, qwiic pHat, SCD30 and BME280.  | Moon Rabbit Control Panel |
 
 # 3D Print Moon Rabbit base and cover
 
