@@ -1,5 +1,8 @@
 # Moon Rabbit CO2 Sensor Build Instructions
 
+> **You are here:** physical build — printing, assembly, wiring.
+> Jump to: [README](README.md) · [BOM](BOM.md) · [SOFTWARE BUILD](SOFTWARE_BUILD.md) · [CALIBRATION](CALIBRATION.md)
+
 Here are the strep-by-step build instructions.
 
 |                          ![MR0](images/MR0.jpeg)                          |                                                                                                                                                                          |
