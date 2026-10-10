@@ -691,7 +691,7 @@ function loadGlobalCO2() {
                     if (el) {
                         const s = (spd != null) ? Number(spd).toFixed(0) : '--';
                         const d = (dir != null) ? degreesToCompass(Number(dir)) : '--';
-                        el.textContent = `${s} m/s ${d}`;
+                        el.textContent = `${s} ${d}`;
                     }
                 }
                 
