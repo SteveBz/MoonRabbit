@@ -47,7 +47,7 @@ Everything required to build one Moon Rabbit station. Prices are indicative (GBP
 
 | Item | Notes |
 |------|-------|
-| Electric screwdriver | e.g. Holm — speeds assembly |
+| Electric screwdriver | e.g. Homtronics 37 in 1 electric screwdriver — speeds assembly |
 | Miniware TS101 soldering iron | Heat-set inserts, pin headers |
 | Solder, 0.6–0.8 mm lead-free | Fine-pitch work |
 | Soldering stand / helping hands | Holds small boards during soldering |
