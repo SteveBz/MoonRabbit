@@ -548,9 +548,9 @@ class SensorModule:
         vantage_fresh = (time.time() - self._last_vantage_update) < 60
         if vantage_fresh and self.device_readings:
             with self._mqtt_lock:
-                if "temperature" in self.device_readings:
+                if "temperature" in self.device_readings and not self.have_sht41:
                     self.temperature_val = self.device_readings["temperature"]
-                if "humidity" in self.device_readings:
+                if "humidity" in self.device_readings and not self.have_sht41:
                     self.humidity_val = self.device_readings["humidity"]
                 if "pressure" in self.device_readings:
                     self.pressure_val = self.device_readings["pressure"]
@@ -599,6 +599,8 @@ class SensorModule:
                         'wind_speed', 'wind_direction', 'rain_rate',
                         'rain_mm', 'rain_today'):
                 if key in self.device_readings:
+                    if self.have_sht41 and key in ('temperature', 'humidity'):
+                        continue
                     if key == 'rain_mm':
                         with self._mqtt_lock:
                             value = self.device_readings.get("rain_mm", 0.0)
@@ -610,6 +612,12 @@ class SensorModule:
                         key, value)
                 else:
                     logger.info(f"DEBUG: {key} not in device_readings, skipping")
+            if self.have_sht41:
+                logger.info("DEBUG: SHT41 present — inserting T/H from sht41")
+                db_manager.insert_measurement(self.device, 'sht41', self.lat, self.long,
+                                              'temperature', self.temperature_val)
+                db_manager.insert_measurement(self.device, 'sht41', self.lat, self.long,
+                                              'humidity',    self.humidity_val)
         else:
             # No Vantage: pressure is always BME280; temp/hum come from SHT41 if present
             th_sensor = 'sht41' if self.have_sht41 else 'bme280'
