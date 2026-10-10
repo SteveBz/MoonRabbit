@@ -2,8 +2,8 @@
 
 Installation and configuration of the Moon Rabbit software stack on the Raspberry Pi Zero 2.
 
-> For the physical build, see [BUILD.md](BUILD.md). For the parts list, see [BOM.md](BOM.md). For the project overview, see [README.md](README.md).
-
+> **You are here:** software build — OS, Python, Supervisor, MQTT.
+> Jump to: [README](README.md) · [BOM](BOM.md) · [BUILD](BUILD.md) · [CALIBRATION](CALIBRATION.md)
 
 Once you have built the Moon Rabbit
 
