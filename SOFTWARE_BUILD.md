@@ -1,24 +1,9 @@
-# Moon Rabbit CO<sub>2</sub> Sensor 
-## (Raspberry Pi Zero 2, SCD30, BME280, flask & python)
-A Raspberry Pi powered CO<sub>2</sub> monitoring station using Python and Flask. It starts with the SCD30 CO2 sensor and the BME280 temperature, humidity and pressure sensor.  It can easily be upgraded to included the SHT41 sensor with greater precision for temperature and humidity and the SGP41 for NOx and VOCs air quality sensor.  It is also compatible with a number of weather stations, notably the Davies Vantage Pro Series, the Ambient Weather station and Ecowitt stations.
+# Software Build #
 
-It is a micro server which attaches to your WiFi to give you 24x7 CO<sub>2</sub> and other climate indicators.
+Installation and configuration of the Moon Rabbit software stack on the Raspberry Pi Zero 2.
 
-| ![Alt text](images/Screenshot%202026-09-26%20205319.png) | ![Alt text](images/Screenshot%202026-09-28%20210626.png) |
-|:---:|:---:|
-| Moon Rabbit Sensors  | Moon Rabbit Control Panel |
-| ![Alt text](images/MR30.jpeg) |  |
-| 3D printed case with Raspberry Pi Zero 2, Qwiic pHat, SCD30 and BME280.  |  |
+> For the physical build, see [BUILD.md](BUILD.md). For the parts list, see [BOM.md](BOM.md). For the project overview, see [README.md](README.md).
 
-# 3D Print Moon Rabbit base and cover
-
-3D print the Moon Rabbit case from the STL flies from the two files here  [MoonRabbitCase_v0.4.stl](MoonRabbitCase_v0.4.stl) and here [CarbonSensorStand_v0.9.stl](CarbonSensorStand_v0.9.stl), 
-
-# Moon Rabbit Assembly Instructions #
-
-Assemble with the build instructions here: [Build instructions](build_instructions.md#)
-
-# Software installation #
 
 Once you have built the Moon Rabbit
 
