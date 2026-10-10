@@ -587,7 +587,8 @@ function loadGlobalCO2() {
                             valSpan.textContent = value.toFixed(1);
                         }
                     }
-                
+                    // rain_today has a box but no gauge or chart
+                    if (name === 'rain_today') return;
                     // Update gauge
                     Plotly.update('gauge-' + name, { value: value });
                 
@@ -700,6 +701,7 @@ function loadGlobalCO2() {
                 // ---- 4. Update each chart's y1 (and y2 = CO₂) ----
                 Object.keys(data).forEach(name => {
                     //if (name === 'co2') return;    // no standalone CO₂ chart
+                    if (name === 'rain_today') return;
                     const sensor = sensors[name];
                     if (!sensor) return;
                     const pairs = data[name] || [];
