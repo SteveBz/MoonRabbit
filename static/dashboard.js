@@ -857,6 +857,7 @@ function loadGlobalCO2() {
         resizeTimeout = setTimeout(() => {
             const sizes = getSizes();
             Object.keys(sensors).forEach(name => {
+                if (name === 'rain_today') return;
                 Plotly.relayout('history-' + name, {
                     width: sizes.chartWidth,
                     height: sizes.chartHeight
