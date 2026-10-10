@@ -306,7 +306,7 @@ class DatabaseManager:
             AVG(value) as mean_value, MAX(value) as max_value, MIN(value) as min_value
             FROM {table} 
             WHERE type = ? AND date >= ? 
-            -- {group_comment} GROUP BY {groupPeriod}
+            {group_comment} GROUP BY {groupPeriod}
             ORDER BY date DESC
         '''
         # Use retry_operation for executing the select query
