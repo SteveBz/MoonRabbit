@@ -8,6 +8,10 @@ import logging
 import json
 from datetime import datetime
 
+_sensor_types_cache = None
+_sensor_types_cache_time = 0
+_SENSOR_TYPES_TTL = 60   # seconds
+
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -38,12 +42,20 @@ SENSOR_METADATA = {
 }
 
 def get_active_sensor_types():
+
+    global _sensor_types_cache, _sensor_types_cache_time
+    now = time.time()
+    if _sensor_types_cache is not None and (now - _sensor_types_cache_time) < _SENSOR_TYPES_TTL:
+        return _sensor_types_cache
+
     db = DatabaseManager('measurement.db')
     try:
         cursor = db.conn.cursor()
         cursor.execute("SELECT DISTINCT type FROM sensor_measurement")
         rows = cursor.fetchall()
         types = [row[0] for row in rows if row[0] not in HIDDEN_TYPES]
+        _sensor_types_cache = types
+        _sensor_types_cache_time = now
         logger.info(f"Active sensor types found: {types}")
         return types
     except Exception as e:
