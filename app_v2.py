@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5000"}})
 # Sensor types that are stored and aggregated but not displayed on the dashboard
-HIDDEN_TYPES = set()
+HIDDEN_TYPES = {'rain_mm'}
 
 # ==============================================================
 # NEW: Sensor metadata configuration for the generic v2 API
