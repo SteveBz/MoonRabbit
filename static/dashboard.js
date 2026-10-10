@@ -293,6 +293,21 @@ function loadGlobalCO2() {
             //boxContainer.appendChild(box);
             //return;
         }
+        if (name === 'rain_rate') {
+            // Gauge and chart only — the box is combined with rain_today in the header
+            const gaugeContainer = document.getElementById('gauge-container');
+            const gd = document.createElement('div');
+            gd.className = 'gauge-box';
+            gd.id = 'gauge-' + name;
+            gaugeContainer.appendChild(gd);
+
+            const historyContainer = document.getElementById('history-container');
+            const hd = document.createElement('div');
+            hd.className = 'history-divs';
+            hd.id = 'history-' + name;
+            historyContainer.appendChild(hd);
+            return;
+        }
         // Value box
         const boxContainer = document.getElementById('sensor-boxes');
         const box = document.createElement('div');
