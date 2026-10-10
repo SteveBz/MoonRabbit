@@ -1,9 +1,9 @@
 # Bill of Materials
 
-Everything required to build one Moon Rabbit station. Prices are indicative (GBP, 2026), exclude shipping, and assume a UK/EU supplier. Substitute your preferred source.
-
 > **You are here:** bill of materials — the parts list.
 > Jump to: [README](README.md) · [BUILD](BUILD.md) · [SOFTWARE BUILD](SOFTWARE_BUILD.md) · [CALIBRATION](CALIBRATION.md)
+
+Everything required to build one Moon Rabbit station. Prices are indicative (GBP, 2026), exclude shipping, and assume a UK/EU supplier. Substitute your preferred source.
 
 ## Enclosure
 
