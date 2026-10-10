@@ -326,6 +326,10 @@ function loadGlobalCO2() {
 
     // ---- Create Plotly charts ----
     function createChartsForSensor(name) {
+        if (name === 'rain_today') {
+            // Box only — no gauge, no chart
+            return;
+        }
         const sensor = sensors[name];
         const meta = sensor.meta;
         const displayName = getDisplayName(name);
