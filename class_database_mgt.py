@@ -70,6 +70,11 @@ class DatabaseManager:
             ''',
             
             '''
+                CREATE INDEX IF NOT EXISTS idx_raw_type_date
+                    ON sensor_measurement (type, date DESC)
+            ''',
+            
+            '''
                 CREATE TABLE IF NOT EXISTS sensor_measurement_mins (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     device_id INTEGER NOT NULL,
