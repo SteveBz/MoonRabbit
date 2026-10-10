@@ -1,5 +1,8 @@
 # Calibration
 
+> **You are here:** calibration — validating and adjusting sensor readings.
+> Jump to: [README](README.md) · [BOM](BOM.md) · [BUILD](BUILD.md) · [SOFTWARE BUILD](SOFTWARE_BUILD.md)
+
 Procedures for validating and calibrating the Moon Rabbit sensors.
 
 ## CO<sub>2</sub> (SCD30)
