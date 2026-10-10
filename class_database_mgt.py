@@ -2,7 +2,7 @@ import sqlite3
 from sqlite3 import Error
 from datetime import datetime, timedelta
 import time, math
-//import pandas as pd # pip3 install pandas
+# import pandas as pd # pip3 install pandas
 import random
 import logging
 import json
