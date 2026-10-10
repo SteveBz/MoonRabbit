@@ -73,6 +73,14 @@ class DatabaseManager:
                 CREATE INDEX IF NOT EXISTS idx_raw_type_date
                     ON sensor_measurement (type, date DESC)
             ''',
+            '''CREATE INDEX IF NOT EXISTS idx_mins_type_date
+               ON sensor_measurement_mins (type, date)''',
+            '''CREATE INDEX IF NOT EXISTS idx_hours_type_date
+               ON sensor_measurement_hours (type, date)''',
+            '''CREATE INDEX IF NOT EXISTS idx_days_type_date
+               ON sensor_measurement_days (type, date)''',
+            '''CREATE INDEX IF NOT EXISTS idx_months_type_date
+               ON sensor_measurement_months (type, date)''',
             
             '''
                 CREATE TABLE IF NOT EXISTS sensor_measurement_mins (
