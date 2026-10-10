@@ -7,6 +7,7 @@ import subprocess
 import logging
 import json
 from datetime import datetime
+import time
 
 _sensor_types_cache = None
 _sensor_types_cache_time = 0
