@@ -342,7 +342,7 @@ class DatabaseManager:
 
         return [list(row) for row in binned_results]
         
-    def old(self)
+    def old(self):
         # Convert the query results to a DataFrame for easier manipulation
         df = pd.DataFrame(rows, columns=['device_id', 'id', 'date', 'sensor', 'latitude', 'longitude', 'type', 'value', 'transferred', 'sec', 'min', 'hour', 'day', 'month', 'mean_value', 'max_value', 'min_value'])
         
