@@ -275,21 +275,23 @@ function loadGlobalCO2() {
             return;
         }
         if (name === 'rain_today') {
-            // Box only — no gauge, no chart
-            const boxContainer = document.getElementById('sensor-boxes');
-            const box = document.createElement('div');
-            box.className = 'box';
-            box.id = 'sensor-' + name;
-            box.innerHTML = `
-                <div class="right-side">
-                    <div class="box-topic">Rain Today</div>
-                    <div class="number" id="val-${name}">--</div>
-                    <div style="font-size:14px;color:#888;">mm</div>
-                </div>
-                <i class="bx bxs-cloud-rain readings" style="color:#00BFFF"></i>
-            `;
-            boxContainer.appendChild(box);
+            // no box, no gauge, no chart
             return;
+            // Box only — no gauge, no chart
+            //const boxContainer = document.getElementById('sensor-boxes');
+            //const box = document.createElement('div');
+            //box.className = 'box';
+            //box.id = 'sensor-' + name;
+            //box.innerHTML = `
+            //    <div class="right-side">
+            //        <div class="box-topic">Rain Today</div>
+            //        <div class="number" id="val-${name}">--</div>
+            //        <div style="font-size:14px;color:#888;">mm</div>
+            //    </div>
+            //    <i class="bx bxs-cloud-rain readings" style="color:#00BFFF"></i>
+            //`;
+            //boxContainer.appendChild(box);
+            //return;
         }
         // Value box
         const boxContainer = document.getElementById('sensor-boxes');
@@ -513,6 +515,21 @@ function loadGlobalCO2() {
                         boxContainer.appendChild(box);
                     }
                 }
+                if (sensors['rain_rate'] || sensors['rain_today']) {
+                    const boxContainer = document.getElementById('sensor-boxes');
+                    const box = document.createElement('div');
+                    box.className = 'box';
+                    box.id = 'sensor-rain';
+                    box.innerHTML = `
+                        <div class="right-side">
+                            <div class="box-topic">Rain</div>
+                            <div class="number" id="val-rain">--</div>
+                            <div style="font-size:14px;color:#888;" id="val-rain-sub">mm/h</div>
+                        </div>
+                        <i class="bx bxs-cloud-rain readings" style="color:#1E90FF"></i>
+                    `;
+                    boxContainer.appendChild(box);
+                }
 
                 // Read current dropdown selection
                 const btnText = document.querySelector('.dropbtn')?.textContent.trim().toLowerCase().replace(' ', '_');
@@ -587,11 +604,23 @@ function loadGlobalCO2() {
                             valSpan.textContent = value.toFixed(1);
                         }
                     }
+
+                    if (name === 'rain_rate' || name === 'rain_today') {
+                        const rateEl  = document.getElementById('val-rain');
+                        const subEl   = document.getElementById('val-rain-sub');
+                        const rateItem  = readings.find(r => r.name === 'rain_rate');
+                        const todayItem = readings.find(r => r.name === 'rain_today');
+                        if (rateEl && rateItem) rateEl.textContent = Number(rateItem.value).toFixed(1);
+                        if (subEl) {
+                            const today = todayItem ? Number(todayItem.value).toFixed(1) : '--';
+                            subEl.textContent = `mm/h · ${today} mm today`;
+                        }
+                    }
                     // rain_today has a box but no gauge or chart
                     if (name === 'rain_today') return;
                     // Update gauge
                     Plotly.update('gauge-' + name, { value: value });
-                
+
                     // Append to history (if not paused)
                     if (pollingPaused) return;
                 
