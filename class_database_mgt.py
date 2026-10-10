@@ -256,9 +256,9 @@ class DatabaseManager:
             table = 'sensor_measurement_mins'
         elif duration == '1_week':
             group_comment = ''
-            groupPeriod = 'min'
+            groupPeriod = 'hour'
             start_time = now - timedelta(days=7)
-            table = 'sensor_measurement_mins'
+            table = 'sensor_measurement_hours'
         elif duration == '1_month':
             group_comment = ''
             groupPeriod = 'hour'
