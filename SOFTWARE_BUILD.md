@@ -170,10 +170,6 @@ Eg, like this, substituting your address for the example.
 192.168.1.61:9001
 ```
 
-# MoonRabbit Calibration
+---
 
-Some of the SCD30s come nicely calibrated, some are well out.  Of the two I just one was correct to about 6 ppm, and one was out by 150 ppm.
-
-I'm working on calibration both by using a known concentration source and other means. 
-
-Watch this space.
+*See [CALIBRATION.md](CALIBRATION.md) for sensor calibration procedures.*
