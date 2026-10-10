@@ -593,16 +593,16 @@ function loadGlobalCO2() {
                     if (!sensor) return;
                     const value = parseFloat(item.value);
 
-                    if (name === 'wind_speed' || name === 'wind_direction') {
-                        const spd = sensors['wind_speed']?.yArray.slice(-1)[0];
-                        const dir = sensors['wind_direction']?.yArray.slice(-1)[0];
-                        const el = document.getElementById('val-wind');
-                        if (el) {
-                            const s = (spd != null) ? Number(spd).toFixed(0) : '--';
-                            const d = (dir != null) ? degreesToCompass(Number(dir)) : '--';
-                            el.textContent = `${s} ${d}`;
-                        }
-                    }
+                    //if (name === 'wind_speed' || name === 'wind_direction') {
+                    //    const spd = sensors['wind_speed']?.yArray.slice(-1)[0];
+                    //    const dir = sensors['wind_direction']?.yArray.slice(-1)[0];
+                    //    const el = document.getElementById('val-wind');
+                    //    if (el) {
+                    //        const s = (spd != null) ? Number(spd).toFixed(0) : '--';
+                    //        const d = (dir != null) ? degreesToCompass(Number(dir)) : '--';
+                    //        el.textContent = `${s} ${d}`;
+                    //    }
+                    //}
                     
                     // Update value box
                     const valSpan = document.getElementById('val-' + name);
