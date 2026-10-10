@@ -684,7 +684,7 @@ function loadGlobalCO2() {
                 });
 
                 // (at the very end of the readings.forEach body, after pushes)
-                if (name === 'wind_speed' || name === 'wind_direction') {
+                if (sensors['wind_speed'] || sensors['wind_direction']) {
                     const spd = sensors['wind_speed']?.yArray.slice(-1)[0];
                     const dir = sensors['wind_direction']?.yArray.slice(-1)[0];
                     const el = document.getElementById('val-wind');
@@ -698,6 +698,7 @@ function loadGlobalCO2() {
                 // Recompute shading from the freshly updated data window
                 const shapes = currentShapes(5 * 60 * 1000);
                 Object.keys(sensors).forEach(name => {
+                    if (name === 'rain_today') return;
                     Plotly.relayout('history-' + name, { shapes: shapes });
                 });
             })
@@ -795,6 +796,7 @@ function loadGlobalCO2() {
         const shapes = buildNightShapes(xMin, xMax, currentLat, currentLng);
         Object.keys(sensors).forEach(name => {
             //if (name === 'co2') return;    // no standalone CO₂ chart
+            if (name === 'rain_today') return;
             Plotly.relayout('history-' + name, { shapes: shapes });
         });
     }
