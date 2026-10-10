@@ -2,7 +2,7 @@ import sqlite3
 from sqlite3 import Error
 from datetime import datetime, timedelta
 import time, math
-import pandas as pd # pip3 install pandas
+//import pandas as pd # pip3 install pandas
 import random
 import logging
 import json
@@ -298,6 +298,51 @@ class DatabaseManager:
         if not rows:
             return []
 
+
+        # Bin the rows down to max_points using plain Python
+        total_rows = len(rows)
+        max_points = int(max_points)
+        if total_rows == 0 or max_points <= 0:
+            return []
+        bin_size = math.ceil(total_rows / max_points)
+
+        def _parse_date(s):
+            if isinstance(s, datetime):
+                return s
+            # SELECT returns 'YYYY-MM-DD HH:MM:SS' strings
+            return datetime.strptime(s[:19], '%Y-%m-%d %H:%M:%S')
+
+        binned_results = []
+        for i in range(0, total_rows, bin_size):
+            chunk = rows[i:i + bin_size]
+
+            # mean of the bin's timestamps
+            epoch_sum = sum(_parse_date(r['date']).timestamp() for r in chunk)
+            mean_date = datetime.fromtimestamp(epoch_sum / len(chunk)).isoformat()
+
+            values = [float(r['value']) for r in chunk]
+            mean_value = sum(values) / len(values)
+            max_value  = max(values)
+            min_value  = min(values)
+
+            first = chunk[0]
+            record = (
+                str(first['device_id']),
+                None,
+                str(mean_date),
+                str(first['sensor']),
+                float(first['latitude']),
+                float(first['longitude']),
+                float(mean_value),
+                float(max_value),
+                float(min_value),
+                int(first['transferred']),
+            )
+            binned_results.append(record)
+
+        return [list(row) for row in binned_results]
+        
+    def old(self)
         # Convert the query results to a DataFrame for easier manipulation
         df = pd.DataFrame(rows, columns=['device_id', 'id', 'date', 'sensor', 'latitude', 'longitude', 'type', 'value', 'transferred', 'sec', 'min', 'hour', 'day', 'month', 'mean_value', 'max_value', 'min_value'])
         
