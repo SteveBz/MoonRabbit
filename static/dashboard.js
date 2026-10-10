@@ -201,7 +201,7 @@ function loadGlobalCO2() {
     function getDisplayName(raw) {
         // Special cases
         if (raw === 'co2') return 'CO\u2082';
-        if (raw === 'rain_rate') return 'Rain';
+        if (raw === 'rain_rate') return 'Rain (mm)';
         if (raw === 'voc') return 'VOC';
         if (raw === 'nox') return 'NOx';
         let name = raw;
@@ -272,6 +272,23 @@ function loadGlobalCO2() {
             histDiv.className = 'history-divs';
             histDiv.id = 'history-' + name;
             historyContainer.appendChild(histDiv);
+            return;
+        }
+        if (name === 'rain_today') {
+            // Box only — no gauge, no chart
+            const boxContainer = document.getElementById('sensor-boxes');
+            const box = document.createElement('div');
+            box.className = 'box';
+            box.id = 'sensor-' + name;
+            box.innerHTML = `
+                <div class="right-side">
+                    <div class="box-topic">Rain Today</div>
+                    <div class="number" id="val-${name}">--</div>
+                    <div style="font-size:14px;color:#888;">mm</div>
+                </div>
+                <i class="bx bxs-cloud-rain readings" style="color:#00BFFF"></i>
+            `;
+            boxContainer.appendChild(box);
             return;
         }
         // Value box
