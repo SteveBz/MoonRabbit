@@ -1,5 +1,8 @@
 # Moon Rabbit CO<sub>2</sub> Sensor
 
+> **You are here:** project overview.
+> Jump to: [BOM](BOM.md) · [BUILD](BUILD.md) · [SOFTWARE BUILD](SOFTWARE_BUILD.md) · [CALIBRATION](CALIBRATION.md)
+> 
 **A Raspberry Pi Zero 2 CO<sub>2</sub> and climate monitoring station.**
 
 Moon Rabbit is a low-cost, open-source environmental sensor built around a Raspberry Pi Zero 2. At its core it measures **CO<sub>2</sub>** (Sensirion SCD30) and **temperature, humidity and pressure** (Bosch BME280). It can be upgraded with more precise temperature/humidity (Sensirion SHT41), air-quality gases VOC and NOx (Sensirion SGP41), sky luminosity (TSL2591), and it is compatible with a range of weather stations — notably the **Davis Vantage Pro** series, **Ambient Weather**, and **Ecowitt**.
