@@ -63,6 +63,12 @@ class DatabaseManager:
             '''
                 CREATE INDEX IF NOT EXISTS reading_index 
                     ON sensor_measurement (date, latitude, longitude, sensor, type)''',
+
+            '''
+                CREATE INDEX IF NOT EXISTS idx_raw_type
+                    ON sensor_measurement (type)
+            ''',
+            
             '''
                 CREATE TABLE IF NOT EXISTS sensor_measurement_mins (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
