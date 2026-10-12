@@ -25,7 +25,7 @@ Everything required to build one Moon Rabbit station. Prices are indicative (GBP
 | Raspberry Pi Zero 2 W **or** WH | 1 | **WH** = pre-soldered GPIO header (recommended) | Pi Hut / Adafruit |
 | 40-pin GPIO header | 1 | Only if using the non-WH board | Generic |
 | SparkFun Qwiic pHAT for Pi | 1 | I²C breakout + Qwiic socket | SparkFun |
-| Bosch BME280 breakout | 1 | Qwiic or pinout version | Adafruit / SparkFun |
+| Bosch BME280 sensor card | 1 | Qwiic or pinout version | Adafruit / SparkFun |
 | Sensirion SCD30 CO<sub>2</sub> sensor | 1 | NDIR. Qwiic version recommended | Sensirion / SparkFun |
 | Qwiic-to-Qwiic cable, 10 cm | 1 | HAT → SCD30 | SparkFun |
 | Qwiic-to-4-pin-female cable | 1 | HAT → BME280 (pinout version only) | SparkFun |
@@ -36,9 +36,9 @@ Everything required to build one Moon Rabbit station. Prices are indicative (GBP
 
 | Item | Qty | Notes | Source |
 |------|-----|-------|--------|
-| SHT41 breakout | 1 | Better humidity precision than BME280 | Adafruit / SparkFun |
-| SGP41 breakout | 1 | VOC / NOx gas sensing | Sensirion / Adafruit |
-| TSL2591 breakout | 1 | Sky luminosity (lux, IR, full spectrum) | Adafruit |
+| SHT41  sensor card | 1 | Better humidity precision than BME280 | Adafruit / SparkFun |
+| SGP41 brea sensor cardkout | 1 | VOC / NOx gas sensing | Sensirion / Adafruit |
+| TSL2591  sensor card | 1 | Sky luminosity (lux, IR, full spectrum) | Adafruit |
 | Qwiic cable, 5 cm | 2–3 | One per upgrade sensor | SparkFun |
 | IP65 enclosure, clear window | 1 | For the outdoor TSL2591 | Generic |
 | Outdoor mounting bracket | 1 | For the IP65 enclosure | Generic |
