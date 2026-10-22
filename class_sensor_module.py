@@ -535,77 +535,34 @@ class SensorModule:
             self.full_spectrum_val = self.tsl2591.full_spectrum
         except Exception as e:
             logger.error(f"TSL2591 read failed: {e}")
-        
+    
     def _restore_rain_today(self):
-        """Rebuild today's rain_today by re-integrating rain_rate readings from the DB.
+        """Restore today's peak rain_today from sensor_measurement.
     
-        Uses the same rule as _on_mqtt_message: for each reading after the first,
-        add rate × dt_h where dt_h is the gap since the previous reading, skipping
-        gaps over 0.1 h (mirroring the live gap guard — those gaps are periods the
-        process was down, and we cannot extrapolate rain across them).
-    
-        Any readings already in the DB are ground truth; the previously accumulated
-        rain_today (however wrong) is discarded."""
+        rain_today is monotonic within a day and is written on every
+        get_sensor_readings() tick, so MAX(value) for today is the peak the
+        live process observed — even across restarts, crashes, or long gaps.
+        Re-integrating from rain_rate would miss any interval longer than
+        0.1 h (the same gap guard used live, correct for continuous operation
+        but loses data across outages)."""
         today_start = datetime.now().strftime('%Y-%m-%d 00:00:00')
         try:
             db = DatabaseManager('measurement.db')
             try:
-                rows = db.select_measurements_by_type_since(
-                    'rain_rate', 'vantage_pro', today_start
+                peak = db.select_max_value_by_type_since(
+                    'rain_today', 'vantage_pro', today_start
                 )
             finally:
                 db.conn.close()
         except Exception as e:
-            logger.warning(f"rain_today rebuild failed: {e} — starting from 0")
+            logger.warning(f"rain_today restore failed: {e} — starting from 0")
             return
     
-        if not rows:
-            self._rain_day = datetime.now().date()
+        if peak is None:
             return
-    
-        total = 0.0
-        prev_ts = None
-        for row in rows:
-            ts = row.get('date')
-            if isinstance(ts, str):
-                try:
-                    ts = datetime.fromisoformat(ts)
-                except ValueError:
-                    continue
-            rate = row.get('value')
-            if rate is None or ts is None:
-                continue
-            if prev_ts is not None:
-                dt_h = (ts - prev_ts).total_seconds() / 3600.0
-                if 0 < dt_h < 0.1:
-                    total += float(rate) * dt_h
-            prev_ts = ts
-    
-        self.rain_today = total
+        self.rain_today = peak
         self._rain_day = datetime.now().date()
-        logger.info(
-            f"Rebuilt rain_today = {total:.2f} mm from {len(rows)} rain_rate readings"
-        )
-    
-    def select_measurements_by_type_since(self, sensor_type, sensor, since):
-        """
-        Return all readings of `sensor_type` from `sensor` with date >= `since`,
-        ordered oldest first. Used for re-deriving accumulated values (e.g. rain_today
-        from rain_rate) that must be reconstructed from raw data.
-        """
-        select_query = '''
-            SELECT date, value
-            FROM sensor_measurement
-            WHERE type = ? AND sensor = ? AND date >= ?
-            ORDER BY date ASC
-        '''
-        rows = self.retry_operation(
-            self._execute_select, select_query, (sensor_type, sensor, since),
-            retries=5, base_sleep_interval=1, max_sleep_interval=1
-        )
-        return rows
-
-
+        logger.info(f"Restored rain_today = {peak:.2f} mm (peak of today's rows)")
 
     
     def get_sensor_readings(self):
