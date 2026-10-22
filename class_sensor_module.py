@@ -64,6 +64,15 @@ class SensorModule:
     ADDRESS = 0x76
     ADDRESS2 = 0x77
     CUMULATIVE_KEYS = {'rain_mm'}
+
+    
+    # Per-source unit overrides. Keys not listed default to source_units.
+    # The Davis Vantage Pro protocol encodes wind speed as mph natively,
+    # independent of the console's other display-unit settings.
+    SOURCE_UNIT_OVERRIDES = {
+        'vantage': {'wind_speed': 'imperial'},
+    }
+    
     # Map reading type to the sensor that produces it
     # Map attribute name to reading type (for building values dict)
     def __init__(self):
@@ -324,7 +333,13 @@ class SensorModule:
         elif self.weather_source == 'ecowitt':
             client.subscribe("ecowitt/#")
         # 'none': no weather subscription
-
+    
+    def _units_for(self, key):
+        """Return the unit system this source sends `key` in. Falls back to
+        the configured source_units when the source has no override for `key`."""
+        overrides = self.SOURCE_UNIT_OVERRIDES.get(self.weather_source, {})
+        return overrides.get(key, self.source_units)
+    
     def _imperial_to_metric(self, key, value):
         """Convert ecowitt2mqtt's imperial defaults to metric.
         If ecowitt2mqtt is run with --output-unit-system=metric, these are no-ops."""
@@ -349,20 +364,28 @@ class SensorModule:
                 key = self.ECOWITT_MAP.get(tail)
                 if key is None:
                     return
-                if self.source_units == 'imperial':
+                if self._units_for(key) == 'imperial':
                     value = self._imperial_to_metric(key, value)
                 self.device_readings[key] = value
                 self.device_readings["device_name"] = "ecowitt"
             else:
-                # Vantage path (unchanged)
-                if   "temperature"    in tail: self.device_readings["temperature"]    = value
-                elif "humidity"       in tail: self.device_readings["humidity"]       = value
-                elif "barometer"      in tail or "pressure" in tail:
-                    self.device_readings["pressure"] = value
-                elif "wind_speed"     in tail: self.device_readings["wind_speed"]     = value
-                elif "wind_direction" in tail: self.device_readings["wind_direction"] = value
-                elif "rain_rate"      in tail:
-                    self.device_readings["rain_rate"] = value
+                # Vantage: match topic suffix to canonical key first, so we can
+                # consult _units_for(key) before storing.
+                if   "temperature"    in tail: key = "temperature"
+                elif "humidity"       in tail: key = "humidity"
+                elif "barometer"      in tail or "pressure" in tail: key = "pressure"
+                elif "wind_speed"     in tail: key = "wind_speed"
+                elif "wind_direction" in tail: key = "wind_direction"
+                elif "rain_rate"      in tail: key = "rain_rate"
+                else:
+                    return
+    
+                if self._units_for(key) == 'imperial':
+                    value = self._imperial_to_metric(key, value)
+    
+                self.device_readings[key] = value
+    
+                if key == "rain_rate":
                     now = time.time()
                     if self._last_rain_time is not None:
                         dt_h = (now - self._last_rain_time) / 3600.0
@@ -376,6 +399,7 @@ class SensorModule:
                 self.device_readings["device_name"] = "vantage_pro"
         self._first_mqtt_message.set()
         self._last_vantage_update = time.time()
+       
 
     def _vantage_property_present(self):
         """True iff the Vantage driver is loaded and its CONNECTION property exists."""
