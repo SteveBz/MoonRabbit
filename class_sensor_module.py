@@ -535,35 +535,68 @@ class SensorModule:
             self.full_spectrum_val = self.tsl2591.full_spectrum
         except Exception as e:
             logger.error(f"TSL2591 read failed: {e}")
-    
+        
     def _restore_rain_today(self):
-        """Restore today's peak rain_today from sensor_measurement.
+        """Rebuild today's rain_today by re-integrating rain_rate readings from the DB.
     
-        rain_today is monotonic within a day and is written on every
-        get_sensor_readings() tick, so MAX(value) for today is the peak the
-        live process observed — even across restarts, crashes, or long gaps.
-        Re-integrating from rain_rate would miss any interval longer than
-        0.1 h (the same gap guard used live, correct for continuous operation
-        but loses data across outages)."""
+        rain_rate is the source-of-truth rainfall reading; rain_today is only a
+        derived accumulator whose in-memory value is lost on every restart. The
+        DB holds every rain_rate sample, so re-integrating them at startup yields
+        the correct total for the day regardless of how many times the process
+        has restarted.
+    
+        Uses the same rule as _on_mqtt_message: for each sample after the first,
+        add rate × dt_h where dt_h is the gap since the previous sample, skipping
+        gaps >= 0.1 h (rain during extended process downtime cannot be recovered)."""
         today_start = datetime.now().strftime('%Y-%m-%d 00:00:00')
         try:
             db = DatabaseManager('measurement.db')
             try:
-                peak = db.select_max_value_by_type_since(
-                    'rain_today', 'vantage_pro', today_start
+                rows = db.select_measurements_by_type_since(
+                    'rain_rate', 'vantage_pro', today_start
                 )
             finally:
                 db.conn.close()
         except Exception as e:
-            logger.warning(f"rain_today restore failed: {e} — starting from 0")
+            logger.warning(f"rain_today rebuild failed: {e} — starting from 0")
             return
     
-        if peak is None:
+        if not rows:
+            self._rain_day = datetime.now().date()
             return
-        self.rain_today = peak
+    
+        total = 0.0
+        prev_ts = None
+        n_used = 0
+        n_skipped = 0
+        for row in rows:
+            ts = row.get('date')
+            if isinstance(ts, str):
+                try:
+                    ts = datetime.fromisoformat(ts)
+                except ValueError:
+                    continue
+            rate = row.get('value')
+            if rate is None or ts is None:
+                continue
+            if prev_ts is not None:
+                dt_h = (ts - prev_ts).total_seconds() / 3600.0
+                if 0 < dt_h < 0.1:
+                    total += float(rate) * dt_h
+                    n_used += 1
+                elif dt_h >= 0.1:
+                    n_skipped += 1
+            prev_ts = ts
+    
+        self.rain_today = total
         self._rain_day = datetime.now().date()
-        logger.info(f"Restored rain_today = {peak:.2f} mm (peak of today's rows)")
+        logger.info(
+            f"Rebuilt rain_today = {total:.2f} mm from {n_used} rain_rate intervals "
+            f"({n_skipped} gaps >0.1h skipped)"
+        )
 
+
+    
     
     def get_sensor_readings(self):
         print ("get_sensor_readings")
