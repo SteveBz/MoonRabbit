@@ -64,11 +64,27 @@ class ConfigManager:
             "sensor_co2": "scd30",
             "sensor_pressure": "bme280",
             "last_calibration_date": 0,
-            "last_calibration_value": 0
+            "last_calibration_value": 0,
+            "weather_source": "none",
+            "source_units": "metric",
         }
         self.save_config(default_config)
         return default_config
 
+
+    def get_source_units(self):
+        units = self.config.get("source_units", "metric")
+        if units not in ("metric", "imperial"):
+            raise ValueError(f"Invalid source_units: {units}")
+        return units
+    
+    def set_source_units(self, units):
+        if units not in ("metric", "imperial"):
+            raise ValueError(f"Invalid source_units: {units}")
+        self.config["source_units"] = units
+        self.save_config(self.config)
+
+    
     def get_bus_address(self):
         # Retrieve the bus address from config
         bus_address = self.config.get("bus_address", self.DEFAULT_BUS_ADDRESS)
@@ -112,7 +128,7 @@ class ConfigManager:
         return self.config.get("weather_source", "none")
 
     def set_weather_source(self, source):
-        if source not in ("vantage", "ecowitt", "none"):
+        if source not in ("vantage", "ecowitt", "ambient", "none"):
             raise ValueError(f"Invalid weather_source: {source}")
         self.config["weather_source"] = source
         self.save_config(self.config)
