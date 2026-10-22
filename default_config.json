@@ -5,6 +5,7 @@
     "lat": 51.1,
     "long": 0.0,
     "weather_source": "none",
+    "source_units": "metric",
     "sensor_co2": "scd30",
     "sensor_pressure": "bme280",
     "last_calibration_date": 0,
