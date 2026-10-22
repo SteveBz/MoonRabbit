@@ -117,8 +117,6 @@ class SensorModule:
             'wind_direction': 'wind_direction',
             'rain_rate': 'rain_rate',
         }
-        if self.weather_source == 'vantage':
-            self.ATTR_TO_READING['rain_mm'] = 'rain_mm'
         
         self._last_rain_time = None
         self.rain_today = 0.0        # mm since midnight
@@ -163,6 +161,9 @@ class SensorModule:
         self.is_registered=config_manager.is_registered()
         self.weather_source = config_manager.get_weather_source()
         self.source_units = config_manager.get_source_units()
+        
+        if self.weather_source == 'vantage':
+            self.ATTR_TO_READING['rain_mm'] = 'rain_mm'
         #self.bus_address=config_manager.get_bus_address()
         try:
             self.bus_address = int(config_manager.get_bus_address(), 16)  # Convert hex string to int
