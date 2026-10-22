@@ -90,21 +90,24 @@ class SensorModule:
             'uv_index':'ecowitt',
         }
 
+
         self.ECOWITT_MAP = {
-            'tempf':         'temperature',
-            'tempc':         'temperature',
-            'humidity':      'humidity',
-            'baromrelin':    'pressure',
-            'baromabsin':    'pressure',
-            'windspeedmph':  'wind_speed',
-            'winddir':       'wind_direction',
-            'rainratein':    'rain_rate',
-            'hourlyrainin':  'rain_hourly',
-            'dailyrainin':   'rain_today',
-            'solarradiation':'solar_radiation',
-            'uv':            'uv_index',
+            'tempf':          'temperature',
+            'tempc':          'temperature',
+            'humidity':       'humidity',
+            'baromrelin':     'pressure',
+            'baromrelhpa':    'pressure',
+            'baromabsin':     'pressure',
+            'baromabshpa':    'pressure',
+            'windspeedmph':   'wind_speed',
+            'windspeedkmh':   'wind_speed',
+            'winddir':        'wind_direction',
+            'rainratein':     'rain_rate',
+            'hourlyrainin':   'rain_hourly',
+            'dailyrainin':    'rain_today',
+            'solarradiation': 'solar_radiation',
+            'uv':             'uv_index',
         }
-        
         self.ATTR_TO_READING = {
             'co2_val': 'co2',
             'humidity_val': 'humidity',
@@ -113,11 +116,13 @@ class SensorModule:
             'wind_speed': 'wind_speed',
             'wind_direction': 'wind_direction',
             'rain_rate': 'rain_rate',
-            'rain_mm': 'rain_mm',
         }
+        if self.weather_source == 'vantage':
+            self.ATTR_TO_READING['rain_mm'] = 'rain_mm'
         
         self._last_rain_time = None
         self.rain_today = 0.0        # mm since midnight
+        self.rain_mm    = 0.0        # mm since last poll (Vantage only)
         self._rain_day = None        # date of current total
         
         self.timer = 0
@@ -157,6 +162,7 @@ class SensorModule:
         self.device=config_manager.get_device_id()
         self.is_registered=config_manager.is_registered()
         self.weather_source = config_manager.get_weather_source()
+        self.source_units = config_manager.get_source_units()
         #self.bus_address=config_manager.get_bus_address()
         try:
             self.bus_address = int(config_manager.get_bus_address(), 16)  # Convert hex string to int
@@ -316,7 +322,7 @@ class SensorModule:
             client.subscribe("ecowitt/#")
         # 'none': no weather subscription
 
-    def _ecowitt_to_metric(self, key, value):
+    def _imperial_to_metric(self, key, value):
         """Convert ecowitt2mqtt's imperial defaults to metric.
         If ecowitt2mqtt is run with --output-unit-system=metric, these are no-ops."""
         if key == 'temperature':
@@ -340,7 +346,8 @@ class SensorModule:
                 key = self.ECOWITT_MAP.get(tail)
                 if key is None:
                     return
-                value = self._ecowitt_to_metric(key, value)
+                if self.source_units == 'imperial':
+                    value = self._imperial_to_metric(key, value)
                 self.device_readings[key] = value
                 self.device_readings["device_name"] = "ecowitt"
             else:
@@ -539,11 +546,12 @@ class SensorModule:
             nox_idx = self.nox_index
         
         self.co2_val = self.read_values()
-        today = datetime.now().date()
-        if self._rain_day != today:
-            self.rain_today = 0.0
-            self._rain_day = today
-        self.device_readings["rain_today"] = self.rain_today
+        if self.weather_source == 'vantage':
+            today = datetime.now().date()
+            if self._rain_day != today:
+                self.rain_today = 0.0
+                self._rain_day = today
+            self.device_readings["rain_today"] = self.rain_today
         # If Vantage was present at startup, override BME280 values with latest MQTT readings
         vantage_fresh = (time.time() - self._last_vantage_update) < 60
         if vantage_fresh and self.device_readings:
@@ -558,7 +566,16 @@ class SensorModule:
                 self.wind_speed     = self.device_readings.get("wind_speed")
                 self.wind_direction = self.device_readings.get("wind_direction")
                 self.rain_rate      = self.device_readings.get("rain_rate")
-                self.rain_mm        = self.device_readings.get("rain_mm", 0.0)
+
+        # Atomically drain the Vantage rain_mm accumulator: snapshot into
+        # self.rain_mm and reset device_readings to 0 inside one lock, so no
+        # MQTT increment can land between the snapshot and the reset. Both the
+        # per-sample DB insert and the aggregation path read self.rain_mm.
+        if self.weather_source == 'vantage':
+            with self._mqtt_lock:
+                self.rain_mm = self.device_readings.get("rain_mm", 0.0)
+                self.device_readings["rain_mm"] = 0.0
+                
         # Allow for zero value temp or hum in BME280
         if self.humidity_val==0 and self.hum != 0:
             self.humidity_val=self.hum
@@ -598,12 +615,13 @@ class SensorModule:
             for key in ('temperature', 'humidity', 'pressure',
                         'wind_speed', 'wind_direction', 'rain_rate',
                         'rain_mm', 'rain_today'):
+                if key == 'rain_mm' and self.weather_source != 'vantage':
+                    continue
                 if key in self.device_readings:
                     if self.have_sht41 and key in ('temperature', 'humidity'):
                         continue
                     if key == 'rain_mm':
-                        with self._mqtt_lock:
-                            value = self.device_readings.get("rain_mm", 0.0)
+                        value = self.rain_mm
                     else:
                         value = self.device_readings[key]
                     logger.info(f"DEBUG: inserting {key} = {value} (sensor={source_sensor})")
@@ -631,13 +649,7 @@ class SensorModule:
             val = getattr(self, attr, None)
             if val is not None:
                 values[key] = val
-
-        # Snapshot taken into `values`; now safe to reset the accumulator.
-        # The MQTT thread may have added more since we read it — reset under lock.
-        with self._mqtt_lock:
-            self.device_readings["rain_mm"] = 0.0
-            self.rain_mm = 0.0
-
+                
         config = sensor_values.set_time_interval_values(datetime.now().isoformat(), values)
         
         start_time = datetime.fromisoformat(config["time_intervals"]["min"]["start"])
