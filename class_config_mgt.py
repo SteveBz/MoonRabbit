@@ -46,8 +46,7 @@ class ConfigManager:
                 return config
         except FileNotFoundError:
             return self.create_default_config()
-            
-            
+                
     def save_config(self, config):
         with open(self.config_file, 'w') as f:
             fcntl.flock(f, fcntl.LOCK_EX)  # Acquire an exclusive lock
