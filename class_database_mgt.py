@@ -240,25 +240,21 @@ class DatabaseManager:
         rows = self.retry_operation(self._execute_select, select_query, (sensor_type,), retries=5, base_sleep_interval=1, max_sleep_interval=1)
         return rows
 
-
-    def select_max_value_by_type_since(self, sensor_type, sensor, since):
-        """
-        Return MAX(value) for readings of `sensor_type` from `sensor` with
-        date >= `since`, or None if there are no matching rows. Used for
-        monotonically increasing accumulated values (e.g. rain_today).
-        """
+    def select_measurements_by_type_since(self, sensor_type, sensor, since):
+        """Return all rows of `sensor_type` from `sensor` with date >= `since`,
+        ordered oldest first. Used for re-deriving accumulated values (e.g.
+        rain_today from rain_rate) that must be reconstructed from raw data."""
         select_query = '''
-            SELECT MAX(value) AS peak
+            SELECT date, value
             FROM sensor_measurement
             WHERE type = ? AND sensor = ? AND date >= ?
+            ORDER BY date ASC
         '''
         rows = self.retry_operation(
             self._execute_select, select_query, (sensor_type, sensor, since),
             retries=5, base_sleep_interval=1, max_sleep_interval=1
         )
-        if not rows or rows[0].get('peak') is None:
-            return None
-        return float(rows[0]['peak'])
+        return rows
         
     def select_measurements_all(self) -> dict:
         """
