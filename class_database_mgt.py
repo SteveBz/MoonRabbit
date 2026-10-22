@@ -239,6 +239,26 @@ class DatabaseManager:
         '''
         rows = self.retry_operation(self._execute_select, select_query, (sensor_type,), retries=5, base_sleep_interval=1, max_sleep_interval=1)
         return rows
+
+
+    def select_max_value_by_type_since(self, sensor_type, sensor, since):
+        """
+        Return MAX(value) for readings of `sensor_type` from `sensor` with
+        date >= `since`, or None if there are no matching rows. Used for
+        monotonically increasing accumulated values (e.g. rain_today).
+        """
+        select_query = '''
+            SELECT MAX(value) AS peak
+            FROM sensor_measurement
+            WHERE type = ? AND sensor = ? AND date >= ?
+        '''
+        rows = self.retry_operation(
+            self._execute_select, select_query, (sensor_type, sensor, since),
+            retries=5, base_sleep_interval=1, max_sleep_interval=1
+        )
+        if not rows or rows[0].get('peak') is None:
+            return None
+        return float(rows[0]['peak'])
         
     def select_measurements_all(self) -> dict:
         """
