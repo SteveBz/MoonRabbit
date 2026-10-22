@@ -164,6 +164,8 @@ class SensorModule:
         
         if self.weather_source == 'vantage':
             self.ATTR_TO_READING['rain_mm'] = 'rain_mm'
+            self._restore_rain_today()          # ← new
+            
         #self.bus_address=config_manager.get_bus_address()
         try:
             self.bus_address = int(config_manager.get_bus_address(), 16)  # Convert hex string to int
@@ -533,7 +535,33 @@ class SensorModule:
             self.full_spectrum_val = self.tsl2591.full_spectrum
         except Exception as e:
             logger.error(f"TSL2591 read failed: {e}")
-            
+    
+    def _restore_rain_today(self):
+        """Load rain_today from the most recent vantage_pro measurement written today.
+        Returns silently if nothing is found, or on any DB error — starting from 0.0
+        is the correct behaviour in those cases."""
+        today_iso = datetime.now().date().isoformat()
+        try:
+            db = DatabaseManager('measurement.db')
+            row = db.conn.execute(
+                "SELECT value FROM measurement "
+                "WHERE sensor_type = 'vantage_pro' "
+                "  AND reading_type = 'rain_today' "
+                "  AND timestamp >= ? "
+                "ORDER BY timestamp DESC LIMIT 1",
+                (today_iso,)
+            ).fetchone()
+            db.conn.close()
+        except Exception as e:
+            logger.warning(f"rain_today restore failed: {e} — starting from 0")
+            return
+        if row is None:
+            return
+        self.rain_today = float(row[0])
+        self._rain_day = datetime.now().date()
+        logger.info(f"Restored rain_today = {self.rain_today:.2f} mm from DB")
+
+    
     def get_sensor_readings(self):
         print ("get_sensor_readings")
         # Re-read BME280 first – Vantage may not be available
