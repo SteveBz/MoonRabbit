@@ -206,19 +206,6 @@ class DatabaseManager:
                        strftime('%Y-%m-01 00:00:00', date),
                        AVG(value), MAX(max_value), MIN(min_value)
                 FROM sensor_measurement_days
-                WHERE type NOT IN ('rain_mm')
-                GROUP BY device_id, sensor, type, latitude, longitude,
-                         strftime('%Y-%m-01 00:00:00', date)
-            """)
-            cursor.execute("""
-                INSERT INTO sensor_measurement_months
-                    (device_id, sensor, type, latitude, longitude, transferred,
-                     date, value, max_value, min_value)
-                SELECT device_id, sensor, type, latitude, longitude, 0,
-                       strftime('%Y-%m-01 00:00:00', date),
-                       SUM(value), 0, 0
-                FROM sensor_measurement_days
-                WHERE type = 'rain_mm'
                 GROUP BY device_id, sensor, type, latitude, longitude,
                          strftime('%Y-%m-01 00:00:00', date)
             """)
