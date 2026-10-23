@@ -284,15 +284,23 @@ class SensorModule:
             self.ATTR_TO_READING['infrared_val']      = 'infrared'
             self.ATTR_TO_READING['full_spectrum_val'] = 'full_spectrum'
 
-        # MQTT client for receiving Vantage weather data from indi2mqtt
+        # MQTT client for receiving weather data from indi2mqtt / ecowitt2mqtt
         self.device_readings = {}
         self._mqtt_lock = threading.Lock()
         self._first_mqtt_message = threading.Event()
         self._stop_watchdog = threading.Event()
         self._last_vantage_update = 0.0
+
+        # Vantage only: the Pi initiates the serial/USB link to the console
+        # via the INDI driver. No equivalent for Ecowitt — the console pushes
+        # to us; there is nothing to connect to.
         if self.weather_source == 'vantage':
-            self._ensure_vantage_connected()          # one attempt at startup
-            threading.Thread(target=self._vantage_watchdog, daemon=True).start()
+            self._ensure_vantage_connected()
+
+        # Both sources publish via MQTT and need the same watch/recover logic.
+        if self.weather_source in ('vantage', 'ecowitt'):
+            threading.Thread(target=self._mqtt_watchdog, daemon=True).start()
+
         self._mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
         self._mqtt_client.on_connect = self._on_mqtt_connect
         self._mqtt_client.on_message = self._on_mqtt_message
@@ -444,10 +452,11 @@ class SensorModule:
         except Exception as e:
             logger.warning(f"Vantage CONNECT failed: {e}")
     
-    def _vantage_watchdog(self):
+    def _mqtt_watchdog(self):
         while not self._stop_watchdog.is_set():
-            self._ensure_vantage_connected()
-
+            if self.weather_source == 'vantage':
+                self._ensure_vantage_connected()
+            
             # MQTT staleness check
             if self._last_vantage_update > 0:
                 silence = time.time() - self._last_vantage_update
