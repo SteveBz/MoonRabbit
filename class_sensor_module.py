@@ -563,11 +563,9 @@ class SensorModule:
     def _restore_rain_today(self):
         """Rebuild today's rain_today by re-integrating rain_rate readings from the DB.
     
-        rain_rate is the source-of-truth rainfall reading; rain_today is only a
-        derived accumulator whose in-memory value is lost on every restart. The
-        DB holds every rain_rate sample, so re-integrating them at startup yields
-        the correct total for the day regardless of how many times the process
-        has restarted.
+        rain_rate is the raw rainfall reading from the sensor; rain_today is a
+        derived accumulator reset on every restart. This method re-integrates today's rainfall 
+        at startup to yields the correct total for the day.
     
         Uses the same rule as _on_mqtt_message: for each sample after the first,
         add rate × dt_h where dt_h is the gap since the previous sample, skipping
