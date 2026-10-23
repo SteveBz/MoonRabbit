@@ -63,8 +63,7 @@ class SensorModule:
     PORT = 1
     ADDRESS = 0x76
     ADDRESS2 = 0x77
-    CUMULATIVE_KEYS = {'rain_mm'}
-
+    CUMULATIVE_KEYS = set()
     
     # Per-source unit overrides. Keys not listed default to source_units.
     # The Davis Vantage Pro protocol encodes wind speed as mph natively,
@@ -93,7 +92,6 @@ class SensorModule:
             'wind_speed': 'vantage_pro',
             'wind_direction': 'vantage_pro',
             'rain_rate': 'vantage_pro',
-            'rain_mm':   'vantage_pro',
             'rain_today':'vantage_pro',
             'rain_hourly': 'ecowitt',
             'uv_index':'ecowitt',
@@ -129,7 +127,6 @@ class SensorModule:
         
         self._last_rain_time = None
         self.rain_today = 0.0        # mm since midnight
-        self.rain_mm    = 0.0        # mm since last poll (Vantage only)
         self._rain_day = None        # date of current total
         
         self.timer = 0
@@ -172,7 +169,6 @@ class SensorModule:
         self.source_units = config_manager.get_source_units()
         
         if self.weather_source == 'vantage':
-            self.ATTR_TO_READING['rain_mm'] = 'rain_mm'
             self._restore_rain_today()          # ← new
             
         #self.bus_address=config_manager.get_bus_address()
@@ -391,9 +387,6 @@ class SensorModule:
                         dt_h = (now - self._last_rain_time) / 3600.0
                         if dt_h < 0.1:
                             inc = value * dt_h
-                            self.device_readings["rain_mm"] = (
-                                self.device_readings.get("rain_mm", 0.0) + inc
-                            )
                             self.rain_today += inc
                     self._last_rain_time = now
                 self.device_readings["device_name"] = "vantage_pro"
@@ -656,16 +649,7 @@ class SensorModule:
                 self.wind_speed     = self.device_readings.get("wind_speed")
                 self.wind_direction = self.device_readings.get("wind_direction")
                 self.rain_rate      = self.device_readings.get("rain_rate")
-
-        # Atomically drain the Vantage rain_mm accumulator: snapshot into
-        # self.rain_mm and reset device_readings to 0 inside one lock, so no
-        # MQTT increment can land between the snapshot and the reset. Both the
-        # per-sample DB insert and the aggregation path read self.rain_mm.
-        if self.weather_source == 'vantage':
-            with self._mqtt_lock:
-                self.rain_mm = self.device_readings.get("rain_mm", 0.0)
-                self.device_readings["rain_mm"] = 0.0
-                
+               
         # Allow for zero value temp or hum in BME280
         if self.humidity_val==0 and self.hum != 0:
             self.humidity_val=self.hum
@@ -704,16 +688,11 @@ class SensorModule:
             logger.info(f"DEBUG: device_readings keys = {list(self.device_readings.keys())}")
             for key in ('temperature', 'humidity', 'pressure',
                         'wind_speed', 'wind_direction', 'rain_rate',
-                        'rain_mm', 'rain_today'):
-                if key == 'rain_mm' and self.weather_source != 'vantage':
-                    continue
+                        'rain_today'):
                 if key in self.device_readings:
                     if self.have_sht41 and key in ('temperature', 'humidity'):
                         continue
-                    if key == 'rain_mm':
-                        value = self.rain_mm
-                    else:
-                        value = self.device_readings[key]
+                    value = self.device_readings[key]
                     logger.info(f"DEBUG: inserting {key} = {value} (sensor={source_sensor})")
                     db_manager.insert_measurement(
                         self.device, source_sensor, self.lat, self.long,
