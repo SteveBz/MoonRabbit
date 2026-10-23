@@ -570,7 +570,10 @@ class SensorModule:
         Uses the same rule as _on_mqtt_message: for each sample after the first,
         add rate × dt_h where dt_h is the gap since the previous sample, skipping
         gaps >= 0.1 h (rain during extended process downtime cannot be recovered)."""
+        
         today_start = datetime.now().strftime('%Y-%m-%d 00:00:00')
+        self.rain_today = 0 
+        
         try:
             db = DatabaseManager('measurement.db')
             try:
