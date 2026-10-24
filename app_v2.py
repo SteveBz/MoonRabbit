@@ -27,12 +27,12 @@ HIDDEN_TYPES = set()
 # ==============================================================
 SENSOR_METADATA = {
     "temperature": {"unit": "°C", "min": -10, "max": 50, "reference": 23, "color": "#B22222"},
-    "humidity":    {"unit": "%",   "min": 20,   "max": 100, "reference": 50, "color": "#00008B"},
-    "pressure":    {"unit": "hPa", "min": 850, "max": 1100, "reference": 1000, "color": "#FF4500"},
-    "co2":         {"unit": "ppm", "min": 200, "max": 1000, "reference": 420, "color": "#383838"},
-    "voc":         {"unit": "idx", "min": 0,   "max": 500, "reference": 100, "color": "#228B22"},
-    "nox":         {"unit": "idx", "min": 0,   "max": 500, "reference": 1,   "color": "#8B0000"},
-    "sky_temperature": {"unit": "°C", "min": -30, "max": 50, "reference": 0, "color": "#8A2BE2"},
+    "humidity":    {"unit": "%",   "min": 30,   "max": 100, "reference": 60, "color": "#00008B"},
+    "pressure":    {"unit": "hPa", "min": 950, "max": 1050, "reference": 1000, "color": "#FF4500"},
+    "co2":         {"unit": "ppm", "min": 300, "max": 1000, "reference": 430, "color": "#383838"},
+    "voc":         {"unit": "idx", "min": 0,   "max": 200, "reference": 100, "color": "#228B22"},
+    "nox":         {"unit": "idx", "min": 0,   "max": 20, "reference": 1,   "color": "#8B0000"},
+    "sky_temperature": {"unit": "°C", "min": -30, "max": 30, "reference": 0, "color": "#8A2BE2"},
     "rain_rate":   {"unit": "mm/h", "min": 0, "max": 30, "reference": 0, "color": "#1E90FF"},
     "rain_mm":     {"unit": "mm",   "min": 0, "max": 10, "reference": 0, "color": "#1E90FF"},
     "rain_today":  {"unit": "mm",   "min": 0, "max": 50, "reference": 0, "color": "#1E90FF"},
