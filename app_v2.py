@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5000"}})
 # Sensor types that are stored and aggregated but not displayed on the dashboard
-HIDDEN_TYPES = set()
+HIDDEN_TYPES = {'rain_mm'}
 
 # ==============================================================
 # NEW: Sensor metadata configuration for the generic v2 API
@@ -38,7 +38,6 @@ SENSOR_METADATA = {
     "rain_today":  {"unit": "mm",   "min": 0, "max": 50, "reference": 0, "color": "#1E90FF"},
     "wind_speed":  {"unit": "m/s", "min": 0, "max": 30, "reference": 0, "color": "#32CD32"},
     "wind_direction": {"unit": "°", "min": 0, "max": 360, "reference": 0, "color": "#FFD700"},
-    "rain":        {"unit": "mm", "min": 0, "max": 500, "reference": 0, "color": "#00BFFF"},
     "lux":           {"unit": "lux",  "min": 0, "max": 100000, "reference": 0, "color": "#FFD700"}
 }
 
