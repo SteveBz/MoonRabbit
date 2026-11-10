@@ -1,0 +1,1 @@
+@reboot sleep 30 && /usr/bin/supervisorctl restart indi2mqtt
