@@ -28,3 +28,13 @@ mkdir -p build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 make
+
+
+# --- install root crontab entry (idempotent) ---
+CRON_LINE='@reboot sleep 30 && /usr/bin/supervisorctl restart indi2mqtt'
+if ! crontab -l 2>/dev/null | grep -qF "$CRON_LINE"; then
+    ( crontab -l 2>/dev/null; echo "$CRON_LINE" ) | crontab -
+    echo "Installed root crontab entry for indi2mqtt restart"
+else
+    echo "Root crontab entry already present, skipping"
+fi
