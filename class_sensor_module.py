@@ -97,8 +97,8 @@ class SensorModule:
             'uv_index':'ecowitt',
         }
 
-
         self.ECOWITT_MAP = {
+            # --- raw imperial (console's native format) ---
             'tempf':          'temperature',
             'tempc':          'temperature',
             'humidity':       'humidity',
@@ -114,7 +114,18 @@ class SensorModule:
             'dailyrainin':    'rain_today',
             'solarradiation': 'solar_radiation',
             'uv':             'uv_index',
+            # --- metric output (--output-unit-system=metric) ---
+            'temp':           'temperature',
+            'baromrel':       'pressure',
+            'baromabs':       'pressure',
+            'windspeed':      'wind_speed',
+            'rainrate':       'rain_rate',
+            'hourlyrain':     'rain_hourly',
+            'dailyrain':      'rain_today',
         }
+
+
+        
         self.ATTR_TO_READING = {
             'co2_val': 'co2',
             'humidity_val': 'humidity',
@@ -356,12 +367,45 @@ class SensorModule:
         if key == 'pressure':
             return value * 33.8639
         return value
-    
+
     def _on_mqtt_message(self, client, userdata, msg):
+        payload_str = msg.payload.decode(errors='replace')
+    
+        # --- ecowitt2mqtt --mqtt-topic=ecowitt publishes ONE JSON blob per push ---
+        if payload_str.lstrip().startswith('{'):
+            if self.weather_source != 'ecowitt':
+                return
+            try:
+                data = json.loads(payload_str)
+            except json.JSONDecodeError:
+                logger.warning(f"ecowitt: invalid JSON on topic {msg.topic}")
+                return
+            imperial_keys = {
+                'tempf', 'baromrelin', 'baromabsin', 'windspeedmph',
+                'rainratein', 'hourlyrainin', 'dailyrainin',
+            }
+            with self._mqtt_lock:
+                for raw_key, raw_val in data.items():
+                    canonical = self.ECOWITT_MAP.get(raw_key)
+                    if canonical is None:
+                        continue
+                    try:
+                        value = float(raw_val)
+                    except (ValueError, TypeError):
+                        continue
+                    if raw_key in imperial_keys:
+                        value = self._imperial_to_metric(canonical, value)
+                    self.device_readings[canonical] = value
+                self.device_readings["device_name"] = "ecowitt"
+            self._first_mqtt_message.set()
+            self._last_vantage_update = time.time()
+            return
+    
+        # --- Per-topic numeric payload (Vantage / indi2mqtt) ---
         tail = msg.topic.rsplit("/", 1)[-1].lower()
         try:
-            value = float(msg.payload.decode())
-        except (ValueError, UnicodeDecodeError):
+            value = float(payload_str)
+        except ValueError:
             return
         with self._mqtt_lock:
             if self.weather_source == 'ecowitt':
@@ -373,8 +417,7 @@ class SensorModule:
                 self.device_readings[key] = value
                 self.device_readings["device_name"] = "ecowitt"
             else:
-                # Vantage: match topic suffix to canonical key first, so we can
-                # consult _units_for(key) before storing.
+                # Vantage: unchanged, matches on topic suffix
                 if   "temperature"    in tail: key = "temperature"
                 elif "humidity"       in tail: key = "humidity"
                 elif "barometer"      in tail or "pressure" in tail: key = "pressure"
@@ -383,24 +426,19 @@ class SensorModule:
                 elif "rain_rate"      in tail: key = "rain_rate"
                 else:
                     return
-    
                 if self._units_for(key) == 'imperial':
                     value = self._imperial_to_metric(key, value)
-    
                 self.device_readings[key] = value
-    
                 if key == "rain_rate":
                     now = time.time()
                     if self._last_rain_time is not None:
                         dt_h = (now - self._last_rain_time) / 3600.0
                         if dt_h < 0.1:
-                            inc = value * dt_h
-                            self.rain_today += inc
+                            self.rain_today += value * dt_h
                     self._last_rain_time = now
                 self.device_readings["device_name"] = "vantage_pro"
         self._first_mqtt_message.set()
         self._last_vantage_update = time.time()
-       
 
     def _vantage_property_present(self):
         """True iff the Vantage driver is loaded and its CONNECTION property exists."""
