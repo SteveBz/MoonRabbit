@@ -202,7 +202,7 @@ function loadGlobalCO2() {
         // Special cases
         if (raw === 'co2') return 'CO\u2082';
         if (raw === 'rain_rate') return 'Rain Rate';
-        if (raw === 'voc') return 'VOC';
+        if (raw === 'voc') return 'VOCs';
         if (raw === 'nox') return 'NOx';
         let name = raw;
         // Remove 'weather_' prefix
