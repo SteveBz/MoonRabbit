@@ -172,6 +172,7 @@ class SensorModule:
         self.visible_val = None
         self.infrared_val = None
         self.full_spectrum_val = None
+      
         
         config_manager = ConfigManager("config.json")
         self.lat=config_manager.get_lat()
@@ -268,6 +269,14 @@ class SensorModule:
         
         logger.info(f"have_sht41={self.have_sht41}  have_sgp41={self.have_sgp41}")
 
+        # Aggregate the station's outdoor T/H alongside the indoor ones.
+        _SOURCE_LABEL = {'vantage': 'vantage_pro', 'ecowitt': 'ecowitt'}.get(self.weather_source)
+        if _SOURCE_LABEL:
+            self.SENSOR_SOURCE_MAP['temperature_ext'] = _SOURCE_LABEL
+            self.SENSOR_SOURCE_MAP['humidity_ext']    = _SOURCE_LABEL
+            self.ATTR_TO_READING['temperature_ext']   = 'temperature_ext'
+            self.ATTR_TO_READING['humidity_ext']      = 'humidity_ext'
+                    
         # Re-attribute T/H to SHT41 for aggregates if it's present
         if self.have_sht41:
             self.SENSOR_SOURCE_MAP['temperature'] = 'sht41'
@@ -711,6 +720,13 @@ class SensorModule:
                 self.rain_rate      = self.device_readings.get("rain_rate")
                 self.temperature_ext = self.device_readings.get("temperature_ext")
                 self.humidity_ext    = self.device_readings.get("humidity_ext")
+        else:
+            # Station stale or never seen — clear so last-known values do not
+            # feed the aggregate this cycle. `if val is not None` in the
+            # `values` loop then skips them, so the minute/hour/day mean is
+            # computed only over samples with a fresh outdoor reading.
+            self.temperature_ext = None
+            self.humidity_ext    = None
                
         # Allow for zero value temp or hum in BME280
         if self.humidity_val==0 and self.hum != 0:
