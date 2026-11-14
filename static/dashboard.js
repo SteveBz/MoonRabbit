@@ -73,7 +73,14 @@ function loadGlobalCO2() {
     let pollInterval = null;
     const sensors = {};
     window.sensors = sensors;    // debug hook
-
+    
+    // Overlay sensors: drawn as an extra trace on their host chart instead of
+    // getting their own box/gauge/chart. Left = overlay sensor name; right = host.
+    const OVERLAY_HOST = {
+        'temperature_ext': 'temperature',
+        'humidity_ext':    'humidity',   // enable when ready
+    };
+    
     // Global CO₂ history (shared as y2 trace on every other chart)
     let co2XArray = [];
     let co2YArray = [];
@@ -204,6 +211,8 @@ function loadGlobalCO2() {
         if (raw === 'rain_rate') return 'Rain Rate';
         if (raw === 'voc') return 'VOCs';
         if (raw === 'nox') return 'NOx';
+        if (raw === 'temperature_ext') return 'Temperature (ext)';
+        if (raw === 'humidity_ext')    return 'Humidity (ext)';
         let name = raw;
         // Remove 'weather_' prefix
         if (name.startsWith('weather_')) {
@@ -256,6 +265,7 @@ function loadGlobalCO2() {
 
     // ---- Build UI for a single sensor ----
     function createSensorElements(name, meta) {
+        if (name in OVERLAY_HOST) return;   // overlays live on their host chart
         const displayName = getDisplayName(name);
         const iconClass = getIconForSensor(name);
         // Wind speed and direction are combined into one box
@@ -347,6 +357,7 @@ function loadGlobalCO2() {
             // Box only — no gauge, no chart
             return;
         }
+        if (name in OVERLAY_HOST) return;   // overlays render on their host chart
         const sensor = sensors[name];
         const meta = sensor.meta;
         const displayName = getDisplayName(name);
@@ -462,11 +473,32 @@ function loadGlobalCO2() {
         sensor.layout = lineLayout;
 
         sensor.hasCo2Axis = (name !== 'co2');
+        const historyTraces = [];
         if (name === 'co2') {
-            Plotly.newPlot('history-' + name, [trace, preindustrialTrace], lineLayout);
+            historyTraces.push(trace, preindustrialTrace);
         } else {
-            Plotly.newPlot('history-' + name, [co2Trace, trace], lineLayout);
+            historyTraces.push(co2Trace, trace);
         }
+        // Any overlays that target this host chart
+        Object.entries(OVERLAY_HOST).forEach(([extName, hostName]) => {
+            if (hostName !== name) return;
+            const ext = sensors[extName];
+            if (!ext) return;
+            const extColor = (ext.meta && ext.meta.color) || '#FF8C00';
+            const extTrace = {
+                x: ext.xArray.slice(),
+                y: ext.yArray.slice(),
+                name: getDisplayName(extName),
+                mode: 'lines+markers',
+                type: 'scatter',
+                line:   { color: extColor, width: 2 },
+                marker: { color: extColor }
+            };
+            ext.hostId     = 'history-' + name;
+            ext.traceIndex = historyTraces.length;
+            historyTraces.push(extTrace);
+        });
+        Plotly.newPlot('history-' + name, historyTraces, lineLayout);
     }
 
     // ---- Initialisation ----
@@ -502,7 +534,8 @@ function loadGlobalCO2() {
                     sensors[name] = {
                         meta: meta,
                         xArray: [],
-                        yArray: []
+                        yArray: [],
+                        isOverlay: (name in OVERLAY_HOST)
                     };
                     createSensorElements(name, meta);
                 });
@@ -556,6 +589,15 @@ function loadGlobalCO2() {
                 startPolling();
             })
             .catch(err => console.error('Init error:', err));
+    }
+    // Push an overlay's current arrays onto its host chart's overlay trace
+    function updateOverlayTrace(extName) {
+        const ext = sensors[extName];
+        if (!ext || !ext.hostId || ext.traceIndex === undefined) return;
+        Plotly.update(ext.hostId,
+            { x: [ext.xArray.slice()], y: [ext.yArray.slice()] },
+            {},
+            [ext.traceIndex]);
     }
 
     // ---- Polling ----
@@ -633,6 +675,20 @@ function loadGlobalCO2() {
                     }
                     // rain_today has a box but no gauge or chart
                     if (name === 'rain_today') return;
+
+                    // Overlays have no gauge or standalone chart — route to host trace
+                    if (sensor.isOverlay) {
+                        if (pollingPaused) return;
+                        sensor.xArray.push(new Date());
+                        sensor.yArray.push(value);
+                        if (sensor.xArray.length > MAX_POINTS) {
+                            sensor.xArray.shift();
+                            sensor.yArray.shift();
+                        }
+                        updateOverlayTrace(name);
+                        return;
+                    }
+                    
                     // Update gauge
                     Plotly.update('gauge-' + name, { value: value });
 
@@ -652,14 +708,15 @@ function loadGlobalCO2() {
                         Plotly.update('history-co2',
                             { x: [co2XArray.slice(), co2XArray.slice()],
                               y: [co2YArray.slice(), y280] });
-                        // Update y2 overlay on every other chart
+                        // Update y2 overlay on every other chart (traces 0 and 1 only —
+                        // overlay traces at index 2+ are updated by their own loop)
                         Object.keys(sensors).forEach(otherName => {
                             const other = sensors[otherName];
                             if (other.hasCo2Axis) {
                                 Plotly.update('history-' + otherName, {
                                     x: [co2XArray.slice(), other.xArray.slice()],
                                     y: [co2YArray.slice(), other.yArray.slice()]
-                                });
+                                }, {}, [0, 1]);
                             }
                         });
                     } else {
@@ -673,7 +730,7 @@ function loadGlobalCO2() {
                             Plotly.update('history-' + name, {
                                 x: [co2XArray.slice(), sensor.xArray.slice()],
                                 y: [co2YArray.slice(), sensor.yArray.slice()]
-                            });
+                            }, {}, [0, 1]);
                         } else {
                             Plotly.update('history-' + name, {
                                 x: [sensor.xArray.slice()],
@@ -699,6 +756,7 @@ function loadGlobalCO2() {
                 const shapes = currentShapes(5 * 60 * 1000);
                 Object.keys(sensors).forEach(name => {
                     if (name === 'rain_today') return;
+                    if (sensors[name].isOverlay) return;
                     Plotly.relayout('history-' + name, { shapes: shapes });
                 });
             })
@@ -743,30 +801,45 @@ function loadGlobalCO2() {
                     shapes.push(...buildNightShapes(xMin, xMax, currentLat, currentLng));
                 }
     
-                // ---- 4. Update each chart's y1 (and y2 = CO₂) ----
+                // ---- 4. Populate each sensor's arrays from parsed history ----
                 Object.keys(data).forEach(name => {
-                    //if (name === 'co2') return;    // no standalone CO₂ chart
-                    if (name === 'rain_today') return;
                     const sensor = sensors[name];
                     if (!sensor) return;
                     const pairs = data[name] || [];
                     const sorted = pairs
                         .map(p => ({ x: new Date(p[0]), y: p[1] }))
                         .sort((a, b) => a.x - b.x);
-                    const xArr = sorted.map(p => p.x);
-                    const yArr = sorted.map(p => p.y);
-                    sensor.xArray = xArr;
-                    sensor.yArray = yArr;
-    
-                    // CO₂ chart gets an extra reference line at 280 ppm
+                    sensor.xArray = sorted.map(p => p.x);
+                    sensor.yArray = sorted.map(p => p.y);
+                });
+
+                // ---- 5. Render: hosts pull in their overlay traces ----
+                Object.keys(data).forEach(name => {
+                    if (name === 'rain_today') return;
+                    const sensor = sensors[name];
+                    if (!sensor) return;
+                    if (sensor.isOverlay) return;   // overlays render on host chart
+
+                    const xArr = sensor.xArray;
+                    const yArr = sensor.yArray;
+
                     if (name === 'co2') {
                         const y280 = new Array(xArr.length).fill(280);
                         Plotly.update('history-' + name,
                             { x: [xArr, xArr], y: [yArr, y280] },
                             { shapes: shapes });
                     } else if (sensor.hasCo2Axis) {
+                        const xs = [co2XArray, xArr];
+                        const ys = [co2YArray, yArr];
+                        Object.entries(OVERLAY_HOST).forEach(([extName, hostName]) => {
+                            if (hostName !== name) return;
+                            const ext = sensors[extName];
+                            if (!ext) return;
+                            xs.push(ext.xArray);
+                            ys.push(ext.yArray);
+                        });
                         Plotly.update('history-' + name,
-                            { x: [co2XArray, xArr], y: [co2YArray, yArr] },
+                            { x: xs, y: ys },
                             { shapes: shapes });
                     } else {
                         Plotly.update('history-' + name,
@@ -797,6 +870,7 @@ function loadGlobalCO2() {
         Object.keys(sensors).forEach(name => {
             //if (name === 'co2') return;    // no standalone CO₂ chart
             if (name === 'rain_today') return;
+            if (sensors[name].isOverlay) return;
             Plotly.relayout('history-' + name, { shapes: shapes });
         });
     }
@@ -858,6 +932,7 @@ function loadGlobalCO2() {
             const sizes = getSizes();
             Object.keys(sensors).forEach(name => {
                 if (name === 'rain_today') return;
+                if (sensors[name].isOverlay) return;
                 Plotly.relayout('history-' + name, {
                     width: sizes.chartWidth,
                     height: sizes.chartHeight
