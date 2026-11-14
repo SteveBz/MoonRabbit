@@ -124,8 +124,6 @@ class SensorModule:
             'dailyrain':      'rain_today',
         }
 
-
-        
         self.ATTR_TO_READING = {
             'co2_val': 'co2',
             'humidity_val': 'humidity',
@@ -147,6 +145,10 @@ class SensorModule:
         self.temperature_val = None
         self.humidity_val = None
         self.pressure_val = None
+        # External values if avaiable
+        self.temperature_ext = None
+        self.humidity_ext    = None
+        
         self.temp = None
         self.hum = None
         self.co2 = None
@@ -170,7 +172,7 @@ class SensorModule:
         self.visible_val = None
         self.infrared_val = None
         self.full_spectrum_val = None
-
+        
         config_manager = ConfigManager("config.json")
         self.lat=config_manager.get_lat()
         self.long=config_manager.get_long()
@@ -396,6 +398,11 @@ class SensorModule:
                     if raw_key in imperial_keys:
                         value = self._imperial_to_metric(canonical, value)
                     self.device_readings[canonical] = value
+
+                if "temperature" in self.device_readings:
+                    self.device_readings["temperature_ext"] = self.device_readings["temperature"]
+                if "humidity" in self.device_readings:
+                    self.device_readings["humidity_ext"]    = self.device_readings["humidity"]
                 self.device_readings["device_name"] = "ecowitt"
             self._first_mqtt_message.set()
             self._last_vantage_update = time.time()
@@ -429,6 +436,12 @@ class SensorModule:
                 if self._units_for(key) == 'imperial':
                     value = self._imperial_to_metric(key, value)
                 self.device_readings[key] = value
+
+                if key == "temperature":
+                    self.device_readings["temperature_ext"] = value
+                elif key == "humidity":
+                    self.device_readings["humidity_ext"]    = value
+                
                 if key == "rain_rate":
                     now = time.time()
                     if self._last_rain_time is not None:
@@ -696,6 +709,8 @@ class SensorModule:
                 self.wind_speed     = self.device_readings.get("wind_speed")
                 self.wind_direction = self.device_readings.get("wind_direction")
                 self.rain_rate      = self.device_readings.get("rain_rate")
+                self.temperature_ext = self.device_readings.get("temperature_ext")
+                self.humidity_ext    = self.device_readings.get("humidity_ext")
                
         # Allow for zero value temp or hum in BME280
         if self.humidity_val==0 and self.hum != 0:
@@ -752,6 +767,12 @@ class SensorModule:
                                               'temperature', self.temperature_val)
                 db_manager.insert_measurement(self.device, 'sht41', self.lat, self.long,
                                               'humidity',    self.humidity_val)
+                if self.temperature_ext is not None:
+                    db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long,
+                                                  'temperature_ext', self.temperature_ext)
+                if self.humidity_ext is not None:
+                    db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long,
+                                                  'humidity_ext', self.humidity_ext)
         else:
             # No Vantage: pressure is always BME280; temp/hum come from SHT41 if present
             th_sensor = 'sht41' if self.have_sht41 else 'bme280'
