@@ -27,6 +27,8 @@ HIDDEN_TYPES = {'rain_mm'}
 # ==============================================================
 SENSOR_METADATA = {
     "temperature": {"unit": "°C", "min": -10, "max": 50, "reference": 23, "color": "#B22222"},
+    "temperature_ext": {"unit": "°C", "min": -30, "max": 50, "reference": 15, "color": "#FF8C00"},
+    "humidity_ext":    {"unit": "%",  "min": 0,   "max": 100, "reference": 60, "color": "#FF8C00"},
     "humidity":    {"unit": "%",   "min": 30,   "max": 100, "reference": 60, "color": "#00008B"},
     "pressure":    {"unit": "hPa", "min": 950, "max": 1050, "reference": 1000, "color": "#FF4500"},
     "co2":         {"unit": "ppm", "min": 300, "max": 1000, "reference": 430, "color": "#383838"},
