@@ -783,11 +783,13 @@ class SensorModule:
                                               'temperature', self.temperature_val)
                 db_manager.insert_measurement(self.device, 'sht41', self.lat, self.long,
                                               'humidity',    self.humidity_val)
-                if self.temperature_ext is not None:
-                    db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long,
-                                                  'temperature_ext', self.temperature_ext)
-                if self.humidity_ext is not None:
-                    db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long,
+            if self.temperature_ext is not None:
+                logger.info(f"DEBUG: inserting temperature_ext = {self.temperature_ext} (sensor={source_sensor})")
+                db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long,
+                                                'temperature_ext', self.temperature_ext)
+            if self.humidity_ext is not None:
+                logger.info(f"DEBUG: inserting humidity_ext = {self.humidity_ext} (sensor={source_sensor})")
+                db_manager.insert_measurement(self.device, source_sensor, self.lat, self.long,
                                                   'humidity_ext', self.humidity_ext)
         else:
             # No Vantage: pressure is always BME280; temp/hum come from SHT41 if present
